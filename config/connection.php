@@ -1,0 +1,24 @@
+<?php
+$host = 'localhost';
+$db   = 'ta_portal';
+$user = 'root';
+$pass = '';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+];
+
+try {
+     $pdo = new PDO($dsn, $user, $pass, $options);
+} catch (\PDOException $e) {
+     die("Koneksi gagal: " . $e->getMessage());
+}
+
+// ========================
+// BASE URL untuk sidebar / link
+// ========================
+$BASE_URL = "http://coba.test"; // sesuaikan dengan virtual host kamu
