@@ -23,10 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user) {
-            // cek password plain text sementara (jika belum hash)
             if (password_verify($password, $user['password'])) {
                 $_SESSION['user'] = [
-                    'id' => $user['id'],  // sesuai kolom PK di tabel
+                    'id' => $user['id'],
                     'username' => $user['username'],
                     'role' => $table
                 ];
@@ -42,26 +41,159 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login Portal TA</title>
-<link rel="stylesheet" href="style.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#f2f2f2;
+}
+
+.container{
+    width:90%;
+    max-width:1100px;
+    margin:40px auto;
+    background:#fff;
+    border-radius:16px;
+    display:flex;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* LEFT */
+.left{
+    width:50%;
+    padding:50px;
+    background:linear-gradient(135deg,#ff6aa2,#ff9a3c);
+    color:#fff;
+}
+
+.left h2{
+    font-size:26px;
+    line-height:1.4;
+}
+
+.left img{
+    width:100%;
+    margin-top:30px;
+}
+
+/* RIGHT */
+.right{
+    width:50%;
+    padding:50px;
+}
+
+.right h2{
+    margin-bottom:25px;
+}
+
+form{
+    display:flex;
+    flex-direction:column;
+}
+
+input{
+    border:none;
+    border-bottom:1px solid #ccc;
+    padding:12px 5px;
+    margin-bottom:20px;
+    outline:none;
+    font-size:14px;
+}
+
+button{
+    background:linear-gradient(to right,#ff6aa2,#ff9a3c);
+    border:none;
+    padding:12px;
+    border-radius:25px;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.error{
+    color:red;
+    margin-bottom:15px;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:768px){
+
+.container{
+    flex-direction:column;
+}
+
+.left{
+    width:100%;
+    text-align:center;
+    padding:30px 20px;
+}
+
+.left h2{
+    font-size:20px;
+}
+
+.left img{
+    width:80%;
+}
+
+.right{
+    width:100%;
+    padding:30px 20px;
+}
+
+}
+</style>
+
 </head>
 <body>
-<main>
-    <h1>Login Portal TA</h1>
-    <?php if($error): ?>
-        <p style="color:red"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-    <form action="" method="POST">
-        <label>Username:</label>
-        <input type="text" name="username" required>
-        <label>Password:</label>
-        <input type="password" name="password" required>
-        <button type="submit">Login</button>
-    </form>
-</main>
+
+<div class="container">
+
+    <!-- LEFT -->
+    <div class="left">
+        <h2>
+            Selamat datang di Portal<br>
+            Pengumpulan Tugas Akhir<br>
+            Politeknik Nest
+        </h2>
+
+        <!-- GANTI dengan gambar kamu -->
+        <img src="assets/img/login.png">
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+        <h2>Log In</h2>
+
+        <?php if($error): ?>
+            <p class="error"><?= htmlspecialchars($error) ?></p>
+        <?php endif; ?>
+
+        <form action="" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+
+            <button type="submit">Log In</button>
+        </form>
+    </div>
+
+</div>
+
 </body>
 </html>
