@@ -49,7 +49,8 @@ $mahasiswa = $stmt->fetch(PDO::FETCH_ASSOC);
 <body>
 
 <div class="container">
-    <?php include "sidebar.php"; ?>
+    <?php include __DIR__ . "/sidebar.php"; ?>
+
 
     <div class="content">
         <h1>Dashboard Mahasiswa</h1>

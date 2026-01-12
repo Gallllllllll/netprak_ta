@@ -15,8 +15,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = password_hash(trim($_POST['password']), PASSWORD_DEFAULT);
 
     if($nama && $nip && $username && $_POST['password']) {
-        $stmt = $pdo->prepare("INSERT INTO dosen (nama,nip,username,password) VALUES (?,?,?,?)");
-        $stmt->execute([$nama,$nip,$username,$password]);
+        $stmt = $pdo->prepare("INSERT INTO dosen (nama,nip,email,username,password) VALUES (?,?,?,?,?)");
+        $stmt->execute([$nama, $nip, $_POST['email'], $username, $password]);
+
         header("Location: index.php");
         exit;
     } else {

@@ -2,7 +2,8 @@
 session_start();
 require "../../config/connection.php";
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role']!=='mahasiswa') {
+// cek role mahasiswa
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
     exit;
 }
@@ -29,12 +30,21 @@ $files = [
 if($_SERVER['REQUEST_METHOD']=='POST'){
     $updates = [];
     foreach($files as $input_name => $f){
-        // hanya update jika ada file diupload
         if(!empty($_FILES[$input_name]['name'])){
             $nama = time().'_'.basename($_FILES[$input_name]['name']);
             if(!is_dir($upload_dir)) mkdir($upload_dir,0777,true);
-            move_uploaded_file($_FILES[$input_name]['tmp_name'], $upload_dir.$nama);
-            $updates[] = $f['db']."='$nama'";
+
+            if(move_uploaded_file($_FILES[$input_name]['tmp_name'], $upload_dir.$nama)){
+                // update pengajuan_ta
+                $updates[] = $f['db']."='$nama'";
+
+                // insert ke revisi_ta
+                $stmt2 = $pdo->prepare("
+                    INSERT INTO revisi_ta (pengajuan_id, nama_file)
+                    VALUES (?, ?)
+                ");
+                $stmt2->execute([$id, $nama]);
+            }
         }
     }
 
@@ -77,7 +87,6 @@ button:hover { background:#138496; }
     <?php
     $has_revisi = false;
     foreach($files as $input_name => $f):
-        // tampilkan input file hanya jika status file = revisi
         if(($data[$f['status']] ?? '') === 'revisi'):
             $has_revisi = true;
     ?>
