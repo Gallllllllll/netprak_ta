@@ -13,6 +13,7 @@ $stmt = $pdo->query("
 
 $data = $stmt->fetchAll();
 ?>
+<?php require_once __DIR__ . '/../sidebar.php'; ?>
 
 <h3>Daftar Pengajuan TA</h3>
 <table border="1">
