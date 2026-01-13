@@ -18,10 +18,7 @@ $mahasiswa_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRUD Mahasiswa</title>
-<link rel="stylesheet" href="/coba/style.css">
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; }
-.content { padding: 20px; }
 h1 { margin-bottom: 20px; }
 table { width: 100%; border-collapse: collapse; background: #fff; }
 th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
@@ -37,7 +34,7 @@ a.btn.delete:hover { background: #b02a37; }
 
 <?php require_once __DIR__ . '/../sidebar.php'; ?>
 
-<div class="content">
+<div class="main-content">
     <h1>Daftar Mahasiswa</h1>
 
     <!-- Search Bar -->

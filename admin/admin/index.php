@@ -19,17 +19,8 @@ $admin_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRUD Admin</title>
 
-<link rel="stylesheet" href="/coba/style.css">
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    background: #f4f6f9;
-}
-.content {
-    padding: 20px;
-}
 h1 {
     margin-top: 0;
 }
@@ -72,7 +63,7 @@ a.btn:hover {
 
 <?php require_once __DIR__ . '/../sidebar.php'; ?>
 
-<div class="content">
+<div class="main-content">
     <h1>Daftar Admin</h1>
 
     <input type="text" id="search" placeholder="Cari admin (NIP / Nama / Username)...">

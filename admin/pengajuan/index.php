@@ -15,6 +15,7 @@ $data = $stmt->fetchAll();
 ?>
 <?php require_once __DIR__ . '/../sidebar.php'; ?>
 
+<div class="main-content">
 <h3>Daftar Pengajuan TA</h3>
 <table border="1">
 <tr>
@@ -34,3 +35,4 @@ $data = $stmt->fetchAll();
 </tr>
 <?php endforeach ?>
 </table>
+</div>

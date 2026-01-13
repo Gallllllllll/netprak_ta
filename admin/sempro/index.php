@@ -27,11 +27,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daftar Pengajuan Sempro</title>
-<link rel="stylesheet" href="../../style.css">
 <style>
-body { margin:0; font-family: Arial,sans-serif; background:#f4f6f8; }
-.container { display:flex; min-height:100vh; }
-.content { flex:1; padding:20px; }
 .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }
 table { width:100%; border-collapse:collapse; }
 th, td { padding:10px; border:1px solid #ccc; text-align:left; }
@@ -50,7 +46,7 @@ a.detail-link:hover { text-decoration:underline; }
 <div class="container">
     <?php include "../sidebar.php"; ?>
 
-    <div class="content">
+    <div class="main-content">
         <h1>Daftar Pengajuan Seminar Proposal</h1>
 
         <div class="card">

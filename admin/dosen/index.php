@@ -19,11 +19,8 @@ $dosen_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CRUD Dosen</title>
-<link rel="stylesheet" href="/coba/style.css">
 
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; }
-.content { padding: 20px; }
 h1 { margin-bottom: 15px; }
 
 table {
@@ -65,7 +62,7 @@ a.btn.delete:hover {
 
 <?php require_once __DIR__ . '/../sidebar.php'; ?>
 
-<div class="content">
+<div class="main-content">
     <h1>Daftar Dosen</h1>
 
     <!-- Search -->
