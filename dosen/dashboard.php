@@ -38,10 +38,6 @@ body {
     min-height: 100vh;
 }
 
-.content {
-    flex: 1;
-    padding: 30px;
-}
 
 /* HEADER */
 .header {
@@ -108,7 +104,7 @@ body {
     <?php include "sidebar.php"; ?>
 
     <!-- CONTENT -->
-    <div class="content">
+    <div class="main-content">
 
         <div class="header">
             <h2>Dashboard Dosen</h2>
