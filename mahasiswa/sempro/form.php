@@ -113,6 +113,7 @@ hr { margin:20px 0; }
     <?php include "../sidebar.php"; ?>
 
     <div class="container">
+        <div class="main-content">
         <div class="card">
             <h2>Pengajuan Seminar Proposal</h2>
 
@@ -152,8 +153,9 @@ hr { margin:20px 0; }
             <?php endif; ?>
 
         </div>
-    </div>
 
+    </div>
+            </div>
 </div>
 </body>
 </html>

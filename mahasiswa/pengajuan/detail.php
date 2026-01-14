@@ -110,7 +110,7 @@ ul.dosen {
 <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
 
 <!-- CONTENT -->
-<div class="content">
+<div class="main-content">
     <div class="card">
 
         <h1>Detail Pengajuan TA</h1>

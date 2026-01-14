@@ -115,7 +115,7 @@ ul.revisi li {
 
     <?php include "../sidebar.php"; ?>
 
-    <div class="content">
+    <div class="main-content">
         <h1>Riwayat Pengajuan TA</h1>
 
         <?php if ($pengajuan_list): ?>

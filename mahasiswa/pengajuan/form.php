@@ -60,7 +60,7 @@ form button:hover { background:#0056b3; }
 <div class="container">
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
 
-    <div class="content">
+    <div class="main-content">
         <?php if ($pesan_error): ?>
             <div class="card">
                 <h2>Pengajuan TA</h2>

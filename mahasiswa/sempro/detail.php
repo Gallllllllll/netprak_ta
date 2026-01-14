@@ -71,7 +71,7 @@ a.file-link:hover { text-decoration:underline; }
 <div class="container">
     <?php include "../sidebar.php"; ?>
 
-    <div class="content">
+    <div class="main-content">
         <h1>Detail Pengajuan Seminar Proposal</h1>
 
         <div class="card">

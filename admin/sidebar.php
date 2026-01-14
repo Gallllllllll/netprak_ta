@@ -38,7 +38,7 @@ function isAnyActive(array $paths)
 
 body {
     background-color: #FFF1E5;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif !important;
     margin: 0;
 }
 
