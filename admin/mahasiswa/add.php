@@ -46,7 +46,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tambah Mahasiswa</title>
-
 <style>
 /* FORM CARD */
 .form-card {
@@ -56,16 +55,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     max-width: 700px;
     border: 1px solid #f1dcdc;
 }
-
-.form-group {
-    margin-bottom: 14px;
-}
-
-label {
-    font-weight: 500;
-    font-size: 14px;
-}
-
+.form-group { margin-bottom: 14px; }
+label { font-weight: 500; font-size: 14px; }
 input, select {
     width: 100%;
     padding: 10px 12px;
@@ -73,12 +64,10 @@ input, select {
     border: 1px solid #ddd;
     font-size: 14px;
 }
-
 input:focus, select:focus {
     outline: none;
     border-color: #FF983D;
 }
-
 .btn {
     background: linear-gradient(135deg, #FF74C7, #FF983D);
     color: white;
@@ -88,11 +77,7 @@ input:focus, select:focus {
     font-weight: 600;
     cursor: pointer;
 }
-
-.btn:hover {
-    opacity: 0.9;
-}
-
+.btn:hover { opacity: 0.9; }
 .error {
     background: #ffe5e5;
     color: #c0392b;
@@ -108,7 +93,6 @@ input:focus, select:focus {
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
-
     <div class="dashboard-header">
         <h1>Tambah Mahasiswa</h1>
         <p>Form pendaftaran akun mahasiswa baru</p>
@@ -138,7 +122,7 @@ input:focus, select:focus {
 
             <div class="form-group">
                 <label>Program Studi</label>
-                <select name="prodi">
+                <select name="prodi" id="prodi">
                     <option value="">-- Pilih Prodi --</option>
                     <option value="Seni Kuliner">Seni Kuliner</option>
                     <option value="Teknologi Informasi">Teknologi Informasi</option>
@@ -148,7 +132,9 @@ input:focus, select:focus {
 
             <div class="form-group">
                 <label>Kelas</label>
-                <input type="text" name="kelas">
+                <select name="kelas" id="kelas">
+                    <option value="">-- Pilih Kelas --</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -168,9 +154,34 @@ input:focus, select:focus {
 
             <button type="submit" class="btn">Simpan</button>
         </form>
-
     </div>
 </div>
+
+<script>
+// mapping prodi ke kelas
+const kelasByProdi = {
+    "Teknologi Informasi": ["TI-1","TI-2","TI-3"],
+    "Perhotelan": ["PH-1","PH-2","PH-3"],
+    "Seni Kuliner": ["SK-1","SK-2","SK-3"]
+};
+
+const prodiSelect = document.getElementById('prodi');
+const kelasSelect = document.getElementById('kelas');
+
+function updateKelas() {
+    const prodi = prodiSelect.value;
+    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+    if(kelasByProdi[prodi]) {
+        kelasByProdi[prodi].forEach(kelas => {
+            kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
+        });
+    }
+}
+
+// jalankan saat load & saat prodi berubah
+updateKelas();
+prodiSelect.addEventListener('change', updateKelas);
+</script>
 
 </body>
 </html>
