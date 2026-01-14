@@ -79,7 +79,15 @@ a.detail-link:hover { text-decoration:underline; }
                         </td>
                         <td>
                             <a class="detail-link" href="detail.php?id=<?= $p['id'] ?>">Detail</a>
+
+                            <?php if (($p['status'] ?? '') === 'disetujui'): ?>
+                                <!-- Tombol penjadwalan hanya muncul jika status disetujui -->
+                                <a class="detail-link" href="jadwal.php?id=<?= $p['id'] ?>" style="margin-left:10px; color:#28a745;">
+                                    Penjadwalan
+                                </a>
+                            <?php endif; ?>
                         </td>
+
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>

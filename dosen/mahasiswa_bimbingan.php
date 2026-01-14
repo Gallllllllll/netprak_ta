@@ -12,7 +12,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dosen') {
 }
 
 // ===============================
-// AMBIL DATA MAHASISWA BIMBINGAN + TANGGAL SIDANG
+// AMBIL DATA MAHASISWA BIMBINGAN + TANGGAL SEMPRO
 // ===============================
 $stmt = $pdo->prepare("
     SELECT 
@@ -22,16 +22,19 @@ $stmt = $pdo->prepare("
         d.role,
         d.status_persetujuan,
         d.persetujuan_sempro,
-        s.tanggal_sidang
+        s.tanggal_sidang,
+        sempro.tanggal_sempro
     FROM dosbing_ta d
     JOIN pengajuan_ta p ON d.pengajuan_id = p.id
     JOIN mahasiswa m ON p.mahasiswa_id = m.id
     LEFT JOIN pengajuan_semhas s ON s.mahasiswa_id = m.id
+    LEFT JOIN pengajuan_sempro sempro ON sempro.mahasiswa_id = m.id
     WHERE d.dosen_id = ?
     ORDER BY m.nama ASC
 ");
 $stmt->execute([$_SESSION['user']['id']]);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -121,80 +124,89 @@ th {
         <?php if ($data): ?>
         <table>
             <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Nama Mahasiswa</th>
-                    <th>Judul TA</th>
-                    <th>Peran</th>
-                    <th>Status Sempro</th>
-                    <th>Tanggal Sidang</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php $no = 1; foreach ($data as $row): ?>
-                <tr>
-                    <td><?= $no++ ?></td>
+    <tr>
+        <th>No</th>
+        <th>Nama Mahasiswa</th>
+        <th>Judul TA</th>
+        <th>Peran</th>
+        <th>Status Sempro</th>
+        <th>Tanggal Sempro</th> <!-- baru -->
+        <th>Tanggal Sidang</th>
+        <th>Aksi</th>
+    </tr>
+        </thead>
+        <tbody>
+        <?php $no = 1; foreach ($data as $row): ?>
+        <tr>
+            <td><?= $no++ ?></td>
+            <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
+            <td><?= htmlspecialchars($row['judul_ta']) ?></td>
+            <td>
+                <?= $row['role'] === 'dosbing_1'
+                    ? '<span class="badge badge-1">Pembimbing 1</span>'
+                    : '<span class="badge badge-2">Pembimbing 2</span>' ?>
+            </td>
 
-                    <td><?= htmlspecialchars($row['nama_mahasiswa']) ?></td>
+            <td>
+                <?= $row['status_persetujuan'] === 'disetujui'
+                    ? '<span class="badge badge-ok">Disetujui</span>'
+                    : '<span class="badge badge-wait">Menunggu</span>' ?>
+            </td>
 
-                    <td><?= htmlspecialchars($row['judul_ta']) ?></td>
+            <!-- TANGGAL SEMPRO -->
+            <td>
+                <?php
+                if (!$row['tanggal_sempro']) {
+                    echo '<span class="badge badge-belum">Belum Dijadwalkan</span>';
+                } else {
+                    echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sempro'])) . '</span>';
+                }
+                ?>
+            </td>
 
-                    <td>
-                        <?= $row['role'] === 'dosbing_1'
-                            ? '<span class="badge badge-1">Pembimbing 1</span>'
-                            : '<span class="badge badge-2">Pembimbing 2</span>' ?>
-                    </td>
+            <!-- TANGGAL SIDANG -->
+            <td>
+                <?php
+                if (!$row['tanggal_sidang']) {
+                    echo '<span class="badge badge-belum">Belum Dijadwalkan</span>';
+                } else {
+                    $today  = new DateTime();
+                    $sidang = new DateTime($row['tanggal_sidang']);
+                    $selisih = $today->diff($sidang)->days;
+                    $isLewat = $sidang < $today;
 
-                    <!-- STATUS SEMPRO -->
-                    <td>
-                        <?= $row['status_persetujuan'] === 'disetujui'
-                            ? '<span class="badge badge-ok">Disetujui</span>'
-                            : '<span class="badge badge-wait">Menunggu</span>' ?>
-                    </td>
+                    if ($isLewat) {
+                        $badge = 'badge-merah';
+                        $label = 'Terlewat';
+                    } elseif ($selisih <= 3) {
+                        $badge = 'badge-merah';
+                        $label = 'H-' . $selisih;
+                    } elseif ($selisih <= 7) {
+                        $badge = 'badge-kuning';
+                        $label = 'H-' . $selisih;
+                    } else {
+                        $badge = 'badge-hijau';
+                        $label = date('d M Y', strtotime($row['tanggal_sidang']));
+                    }
 
-                    <!-- TANGGAL SIDANG -->
-                    <td>
-                        <?php
-                        if (!$row['tanggal_sidang']) {
-                            echo '<span class="badge badge-belum">Belum Dijadwalkan</span>';
-                        } else {
-                            $today  = new DateTime();
-                            $sidang = new DateTime($row['tanggal_sidang']);
-                            $selisih = $today->diff($sidang)->days;
-                            $isLewat = $sidang < $today;
+                    echo "<span class='badge $badge'>$label</span>";
+                }
+                ?>
+            </td>
 
-                            if ($isLewat) {
-                                $badge = 'badge-merah';
-                                $label = 'Terlewat';
-                            } elseif ($selisih <= 3) {
-                                $badge = 'badge-merah';
-                                $label = 'H-' . $selisih;
-                            } elseif ($selisih <= 7) {
-                                $badge = 'badge-kuning';
-                                $label = 'H-' . $selisih;
-                            } else {
-                                $badge = 'badge-hijau';
-                                $label = date('d M Y', strtotime($row['tanggal_sidang']));
-                            }
+            <td>
+                <?php if ($row['status_persetujuan'] !== 'disetujui'): ?>
+                    <a href="upload_persetujuan_sempro.php?id=<?= $row['dosbing_id'] ?>" class="btn-upload">
+                        Upload Persetujuan
+                    </a>
+                <?php else: ?>
+                    <small>✔ Sudah Upload</small>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
 
-                            echo "<span class='badge $badge'>$label</span>";
-                        }
-                        ?>
-                    </td>
-
-                    <td>
-                        <?php if ($row['status_persetujuan'] !== 'disetujui'): ?>
-                            <a href="upload_persetujuan_sempro.php?id=<?= $row['dosbing_id'] ?>" class="btn-upload">
-                                Upload Persetujuan
-                            </a>
-                        <?php else: ?>
-                            <small>✔ Sudah Upload</small>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-            </tbody>
         </table>
         <?php else: ?>
             <p>Belum ada mahasiswa bimbingan.</p>

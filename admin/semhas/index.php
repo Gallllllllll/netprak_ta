@@ -2,136 +2,107 @@
 session_start();
 require "../../config/connection.php";
 
+// ===============================
+// CEK ROLE ADMIN
+// ===============================
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
-/* ===============================
-   SIMPAN / UPDATE JADWAL
-================================ */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['jadwal_id'])) {
-    $stmt = $pdo->prepare("
-        UPDATE pengajuan_semhas
-        SET tanggal_sidang = ?, jam_sidang = ?, tempat_sidang = ?
-        WHERE id = ?
-    ");
-    $stmt->execute([
-        $_POST['tanggal_sidang'],
-        $_POST['jam_sidang'],
-        $_POST['tempat_sidang'],
-        $_POST['jadwal_id']
-    ]);
-
-    header("Location: index.php");
-    exit;
-}
-
-/* ===============================
-   AMBIL DATA SEMHAS
-================================ */
+// ===============================
+// AMBIL DATA SEMHAS
+// ===============================
 $stmt = $pdo->query("
-    SELECT s.*, 
-           m.nama, m.nim, 
-           p.judul_ta
+    SELECT s.id, m.nama, m.nim, s.status, p.judul_ta, s.tanggal_sidang
     FROM pengajuan_semhas s
     JOIN mahasiswa m ON s.mahasiswa_id = m.id
     JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
     ORDER BY s.created_at DESC
 ");
-$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Admin - Seminar Hasil</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Pengajuan Seminar Hasil</title>
 <style>
-.card{
-    background:#fff;
-    padding:18px;
-    border-radius:12px;
-    margin-bottom:14px;
-    box-shadow:0 2px 6px rgba(0,0,0,.08);
-}
-.status{font-weight:bold}
-.jadwal{
-    background:#f8f9fa;
-    padding:12px;
-    border-radius:8px;
-    margin-top:10px;
-}
-.jadwal label{
-    display:block;
-    font-size:13px;
-    margin-top:6px;
-}
-.jadwal input{
-    width:100%;
-    padding:6px;
-}
-button{
-    margin-top:8px;
-    padding:6px 14px;
-    border:none;
-    border-radius:6px;
-    background:#28a745;
-    color:#fff;
-    cursor:pointer;
-}
-button:hover{opacity:.9}
+.card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; }
+th, td { padding:10px; border:1px solid #ccc; text-align:left; }
+th { background:#eee; }
+a.detail-link { color:#007bff; text-decoration:none; padding:4px 8px; border-radius:4px; font-size:13px; display:inline-block; }
+a.detail-link:hover { text-decoration:underline; }
+a.penjadwalan { color:#28a745; margin-left:6px; border:1px solid #28a745; text-decoration:none; }
+a.penjadwalan:hover { background:#28a745; color:#fff; }
+.status-badge { padding:5px 10px; border-radius:4px; color:#fff; font-size:12px; display:inline-block; }
+.status-diajukan { background:#ffc107; }
+.status-revisi { background:#fd7e14; }
+.status-ditolak { background:#dc3545; }
+.status-disetujui { background:#28a745; }
 </style>
 </head>
-
 <body>
 
-<?php include "../sidebar.php"; ?>
+<div class="container">
+    <?php include "../sidebar.php"; ?>
 
-<div class="main-content">
-<h1>Pengajuan Seminar Hasil</h1>
+    <div class="main-content">
+        <h1>Daftar Pengajuan Seminar Hasil</h1>
 
-<?php foreach ($data as $d): ?>
-<div class="card">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Mahasiswa</th>
+                        <th>NIM</th>
+                        <th>Judul TA</th>
+                        <th>Status</th>
+                        <th>Tanggal Sidang</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(empty($pengajuan_list)): ?>
+                        <tr><td colspan="7">Belum ada pengajuan Semhas.</td></tr>
+                    <?php else: 
+                        $no = 1;
+                        foreach($pengajuan_list as $p):
+                            $status_class = 'status-' . ($p['status'] ?? 'diajukan');
+                            $tanggal_sidang = $p['tanggal_sidang'] ? date('d M Y', strtotime($p['tanggal_sidang'])) : '-';
+                    ?>
+                    <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= htmlspecialchars($p['nama']) ?></td>
+                        <td><?= htmlspecialchars($p['nim']) ?></td>
+                        <td><?= htmlspecialchars($p['judul_ta'] ?? '-') ?></td>
+                        <td>
+                            <span class="status-badge <?= $status_class ?>">
+                                <?= $p['status'] ?? 'diajukan' ?>
+                            </span>
+                        </td>
+                        <td><?= $tanggal_sidang ?></td>
+                        <td>
+                            <!-- Tombol Detail -->
+                            <a class="detail-link" href="detail.php?id=<?= $p['id'] ?>">Detail</a>
 
-    <b><?= htmlspecialchars($d['nama']) ?></b> (<?= $d['nim'] ?>)<br>
-    <b>Judul TA:</b> <?= htmlspecialchars($d['judul_ta']) ?><br>
-    <b>Status:</b>
-    <span class="status"><?= strtoupper($d['status']) ?></span><br>
-
-    <a href="detail.php?id=<?= $d['id'] ?>">Lihat Detail</a>
-
-    <?php if ($d['status'] === 'disetujui'): ?>
-        <div class="jadwal">
-            <b>Jadwal Sidang Seminar Hasil</b>
-
-            <form method="POST">
-                <input type="hidden" name="jadwal_id" value="<?= $d['id'] ?>">
-
-                <label>Tanggal</label>
-                <input type="date" name="tanggal_sidang"
-                       value="<?= $d['tanggal_sidang'] ?>">
-
-                <label>Jam</label>
-                <input type="time" name="jam_sidang"
-                       value="<?= $d['jam_sidang'] ?>">
-
-                <label>Tempat</label>
-                <input type="text" name="tempat_sidang"
-                       placeholder="Ruang / Online"
-                       value="<?= htmlspecialchars($d['tempat_sidang'] ?? '') ?>">
-
-                <button type="submit">
-                    <?= $d['tanggal_sidang'] ? 'Update Jadwal' : 'Simpan Jadwal' ?>
-                </button>
-            </form>
+                            <!-- Tombol Penjadwalan hanya muncul jika status disetujui -->
+                            <?php if (($p['status'] ?? '') === 'disetujui'): ?>
+                                <a class="detail-link penjadwalan" href="jadwal.php?id=<?= $p['id'] ?>">Penjadwalan</a>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
         </div>
-    <?php endif; ?>
 
-</div>
-<?php endforeach; ?>
-
+    </div>
 </div>
 
 </body>

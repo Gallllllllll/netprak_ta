@@ -2,11 +2,24 @@
 session_start();
 require "../../config/connection.php";
 
+// ===============================
+// CEK ROLE ADMIN
+// ===============================
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    die("Unauthorized");
+}
+
 $id = $_GET['id'] ?? 0;
+if (!$id) die("ID tidak valid");
 
-// ambil daftar dosen
-$dosen = $pdo->query("SELECT * FROM dosen")->fetchAll(PDO::FETCH_ASSOC);
+// ===============================
+// AMBIL DOSEN
+// ===============================
+$dosen = $pdo->query("SELECT * FROM dosen ORDER BY nama")->fetchAll(PDO::FETCH_ASSOC);
 
+// ===============================
+// SIMPAN PLOT DOSEN
+// ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dosen1 = $_POST['dosen1'];
     $dosen2 = $_POST['dosen2'];
@@ -15,8 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Dosen 1 dan Dosen 2 tidak boleh sama!");
     }
 
-    // insert ke dosbing_ta, satu per baris
-    $stmt = $pdo->prepare("INSERT INTO dosbing_ta (pengajuan_id, dosen_id, role) VALUES (?, ?, ?)");
+    // hapus jika sudah pernah diplot
+    $pdo->prepare("DELETE FROM dosbing_ta WHERE pengajuan_id=?")
+        ->execute([$id]);
+
+    $stmt = $pdo->prepare("
+        INSERT INTO dosbing_ta (pengajuan_id, dosen_id, role)
+        VALUES (?, ?, ?)
+    ");
 
     $stmt->execute([$id, $dosen1, 'dosbing_1']);
     $stmt->execute([$id, $dosen2, 'dosbing_2']);
@@ -33,45 +52,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plot Dosen Pembimbing</title>
 <link rel="stylesheet" href="../../style.css">
+
 <style>
-body { font-family:Arial,sans-serif; background:#f4f6f8; margin:0; }
-.container { display:flex; min-height:100vh; }
-.content { flex:1; padding:20px; }
-.card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); max-width:500px; margin:auto; }
-select { width:100%; padding:10px; margin-top:10px; border:1px solid #ccc; border-radius:4px; }
-button { margin-top:15px; padding:10px 20px; background:#007bff; color:#fff; border:none; border-radius:6px; cursor:pointer; }
-button:hover { background:#0056b3; }
+.card {
+    background:#fff;
+    padding:24px;
+    border-radius:16px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    max-width:500px;
+}
+
+label {
+    font-weight:600;
+    display:block;
+    margin-top:14px;
+}
+
+select {
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border-radius:8px;
+    border:1px solid #d1d5db;
+}
+
+button {
+    margin-top:20px;
+    padding:10px 18px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(135deg,#10b981,#059669);
+    color:#fff;
+    font-weight:600;
+    cursor:pointer;
+}
+button:hover { opacity:.9; }
 </style>
 </head>
+
 <body>
 
-<div class="container">
-    <?php include "../sidebar.php"; ?>
+<!-- SIDEBAR -->
+<?php include "../sidebar.php"; ?>
 
-    <div class="content">
-        <div class="card">
-            <h2>Plot Dosen Pembimbing</h2>
-            <form method="POST">
-                <label>Dosen 1</label>
-                <select name="dosen1" required>
-                    <option value="">-- Pilih Dosen 1 --</option>
-                    <?php foreach($dosen as $d): ?>
-                        <option value="<?= $d['id'] ?>"><?= htmlspecialchars($d['nama']) ?></option>
-                    <?php endforeach; ?>
-                </select>
+<!-- MAIN CONTENT -->
+<div class="main-content">
 
-                <label>Dosen 2</label>
-                <select name="dosen2" required>
-                    <option value="">-- Pilih Dosen 2 --</option>
-                    <?php foreach($dosen as $d): ?>
-                        <option value="<?= htmlspecialchars($d['id']) ?>"><?= htmlspecialchars($d['nama']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-
-                <button type="submit">Simpan</button>
-            </form>
-        </div>
+    <div class="dashboard-header">
+        <h1>Plot Dosen Pembimbing</h1>
+        <p>Tentukan dosen pembimbing 1 dan 2</p>
     </div>
+
+    <div class="card">
+        <form method="POST">
+
+            <label>Dosen Pembimbing 1</label>
+            <select name="dosen1" required>
+                <option value="">-- Pilih Dosen --</option>
+                <?php foreach($dosen as $d): ?>
+                    <option value="<?= $d['id'] ?>">
+                        <?= htmlspecialchars($d['nama']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <label>Dosen Pembimbing 2</label>
+            <select name="dosen2" required>
+                <option value="">-- Pilih Dosen --</option>
+                <?php foreach($dosen as $d): ?>
+                    <option value="<?= $d['id'] ?>">
+                        <?= htmlspecialchars($d['nama']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <button type="submit">Simpan Plot Dosen</button>
+        </form>
+    </div>
+
 </div>
 
 </body>

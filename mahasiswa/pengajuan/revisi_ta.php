@@ -18,27 +18,58 @@ $data = $stmt->fetch();
 
 if (!$data) die("Pengajuan tidak ditemukan.");
 
-// mapping input name => kolom DB
+// mapping input => kolom db
 $files = [
-    'bukti_pembayaran' => ['db' => 'bukti_pembayaran', 'status' => 'status_bukti_pembayaran', 'label'=>'Bukti Pembayaran'],
-    'formulir' => ['db' => 'formulir_pendaftaran', 'status' => 'status_formulir_pendaftaran', 'label'=>'Formulir Pendaftaran'],
-    'transkrip' => ['db' => 'transkrip_nilai', 'status' => 'status_transkrip_nilai', 'label'=>'Transkrip Nilai'],
-    'magang' => ['db' => 'bukti_magang', 'status' => 'status_bukti_magang', 'label'=>'Bukti Kelulusan Magang'],
+    'bukti_pembayaran' => [
+        'db' => 'bukti_pembayaran',
+        'status' => 'status_bukti_pembayaran',
+        'catatan' => 'catatan_bukti_pembayaran',
+        'label' => 'Bukti Pembayaran'
+    ],
+    'formulir' => [
+        'db' => 'formulir_pendaftaran',
+        'status' => 'status_formulir_pendaftaran',
+        'catatan' => 'catatan_formulir_pendaftaran',
+        'label' => 'Formulir Pendaftaran'
+    ],
+    'transkrip' => [
+        'db' => 'transkrip_nilai',
+        'status' => 'status_transkrip_nilai',
+        'catatan' => 'catatan_transkrip_nilai',
+        'label' => 'Transkrip Nilai'
+    ],
+    'magang' => [
+        'db' => 'bukti_magang',
+        'status' => 'status_bukti_magang',
+        'catatan' => 'catatan_bukti_magang',
+        'label' => 'Bukti Kelulusan Magang'
+    ],
 ];
 
-// proses form
-if($_SERVER['REQUEST_METHOD']=='POST'){
+// proses upload revisi
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $updates = [];
-    foreach($files as $input_name => $f){
-        if(!empty($_FILES[$input_name]['name'])){
-            $nama = time().'_'.basename($_FILES[$input_name]['name']);
-            if(!is_dir($upload_dir)) mkdir($upload_dir,0777,true);
+    $adaUpload = false;
 
-            if(move_uploaded_file($_FILES[$input_name]['tmp_name'], $upload_dir.$nama)){
-                // update pengajuan_ta
-                $updates[] = $f['db']."='$nama'";
+    foreach ($files as $input_name => $f) {
+        if (!empty($_FILES[$input_name]['name'])) {
 
-                // insert ke revisi_ta
+            $adaUpload = true;
+            $nama = time() . '_' . basename($_FILES[$input_name]['name']);
+
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, true);
+            }
+
+            if (move_uploaded_file($_FILES[$input_name]['tmp_name'], $upload_dir . $nama)) {
+
+                // update file + reset status per file
+                $updates[] = "{$f['db']} = '$nama'";
+                $updates[] = "{$f['status']} = 'proses'";
+                $updates[] = "{$f['catatan']} = NULL";
+
+                // simpan histori revisi (opsional)
                 $stmt2 = $pdo->prepare("
                     INSERT INTO revisi_ta (pengajuan_id, nama_file)
                     VALUES (?, ?)
@@ -48,9 +79,14 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         }
     }
 
-    if($updates){
-        // setelah upload revisi, status global kembali ke 'proses'
-        $sql = "UPDATE pengajuan_ta SET ".implode(", ", $updates).", status='proses' WHERE id=?";
+    if ($adaUpload && $updates) {
+        // reset status global
+        $sql = "
+            UPDATE pengajuan_ta SET
+                " . implode(", ", $updates) . ",
+                status = 'proses'
+            WHERE id = ?
+        ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id]);
     }
@@ -59,6 +95,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
