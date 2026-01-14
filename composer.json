@@ -1,0 +1,10 @@
+{
+    "name": "acer/coba",
+    "description": "Project sistem mahasiswa",
+    "autoload": {
+        "psr-4": {
+            "Acer\\Coba\\": "src/"
+        }
+    },
+    "require": {}
+}
