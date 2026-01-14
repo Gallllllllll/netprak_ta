@@ -22,7 +22,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
     foreach($files as $key){
         $status_field = "status_file_{$key}";
         $catatan_field = "catatan_file_{$key}";
-        $status = $status_all[$key] ?? 'proses';
+        $status = $status_all[$key] ?? 'pending';
         $catatan = $catatan_all[$key] ?? '';
 
         $stmt = $pdo->prepare("UPDATE pengajuan_sempro SET $status_field=?, $catatan_field=? WHERE id=?");

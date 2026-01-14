@@ -33,7 +33,7 @@ $ta = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$ta) {
     $pesan_error = "Anda belum mengajukan Tugas Akhir.\nSilakan ajukan Tugas Akhir terlebih dahulu.";
 } elseif ($ta['status'] !== 'disetujui') {
-    $pesan_error = "Pengajuan Tugas Akhir belum selesai.\nStatus saat ini:{$ta['status']}Silakan selesaikan proses pengajuan TA terlebih dahulu.";
+    $pesan_error = "Pengajuan Tugas Akhir belum selesai.\nStatus saat ini: {$ta['status']}\nSilakan selesaikan proses pengajuan TA terlebih dahulu.";
 } else {
     /* ===============================
        CEK PERSETUJUAN DOSBING
@@ -45,6 +45,7 @@ if (!$ta) {
         AND status_persetujuan = 'disetujui'
     ");
     $stmt->execute([$ta['id']]);
+
     if ($stmt->fetchColumn() < 2) {
         $pesan_error = "Pengajuan Seminar Proposal belum dapat dilakukan.\nMenunggu persetujuan dari Dosen Pembimbing 1 dan 2.";
     } else {
@@ -58,6 +59,7 @@ if (!$ta) {
             LIMIT 1
         ");
         $cek->execute([$_SESSION['user']['id']]);
+
         if ($cek->rowCount() > 0) {
             $pesan_error = "Anda sudah pernah mengajukan Seminar Proposal.";
         } else {
@@ -70,92 +72,114 @@ if (!$ta) {
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pengajuan Seminar Proposal</title>
-<link rel="stylesheet" href="<?= base_url('style.css') ?>">
+
 <style>
-body { margin:0; font-family: Arial, sans-serif; }
-.wrapper { display:flex; min-height:100vh; }
-
-.sidebar {
-    width:220px;
-    background:#2c3e50;
-    color:#fff;
-    padding:20px;
-}
-.sidebar a { color:#fff; text-decoration:none; display:block; margin-bottom:10px; }
-.sidebar a:hover { text-decoration:underline; }
-
-.container {
-    flex:1;
-    padding:30px;
-    background:#f4f4f4;
-}
 .card {
-    background:#fff;
-    padding:25px;
-    max-width:650px;
-    border-radius:8px;
-    box-shadow:0 2px 6px rgba(0,0,0,.1);
+    background: #ffffff;
+    padding: 26px;
+    max-width: 720px;
+    border-radius: 16px;
+    box-shadow: 0 6px 14px rgba(0,0,0,.08);
 }
-.alert { background:#fff3cd; color:#856404; padding:15px; border-radius:6px; margin-bottom:15px; }
-input, button { width:100%; padding:10px; margin-top:8px; }
-button { background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer; }
-button:hover { background:#0056b3; }
-label { margin-top:12px; display:block; font-weight:bold; }
-hr { margin:20px 0; }
+
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 22px;
+    color: #1f2937;
+}
+
+.alert {
+    background: #fff7ed;
+    color: #9a3412;
+    padding: 14px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+label {
+    display: block;
+    margin-top: 14px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input[type="file"] {
+    width: 100%;
+    margin-top: 6px;
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg,#FF74C7,#FF983D);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+hr {
+    margin: 22px 0;
+    border: none;
+    border-top: 1px solid #e5e7eb;
+}
 </style>
 </head>
+
 <body>
 
-<div class="wrapper">
+<?php include "../sidebar.php"; ?>
 
-    <!-- INCLUDE SIDEBAR -->
-    <?php include "../sidebar.php"; ?>
+<div class="main-content">
 
-    <div class="container">
-        <div class="main-content">
-        <div class="card">
-            <h2>Pengajuan Seminar Proposal</h2>
+    <div class="dashboard-header">
+        <h1>Pengajuan Seminar Proposal</h1>
+        <p>Unggah dokumen Seminar Proposal sesuai ketentuan</p>
+    </div>
 
-            <?php
-            if ($pesan_error) {
-                echo '<div class="alert">'.nl2br(htmlspecialchars($pesan_error)).'</div>';
-            } elseif ($boleh_upload) {
-            ?>
-                <form action="simpan.php" method="POST" enctype="multipart/form-data">
+    <div class="card">
 
-                    <label>Form Pendaftaran Seminar Proposal (PDF)</label>
-                    <input type="file" name="file_pendaftaran" accept="application/pdf" required>
+        <?php if ($pesan_error): ?>
+            <div class="alert"><?= nl2br(htmlspecialchars($pesan_error)) ?></div>
 
-                    <label>Lembar Persetujuan Proposal TA (PDF)</label>
-                    <input type="file" name="file_persetujuan" accept="application/pdf" required>
+        <?php elseif ($boleh_upload): ?>
+            <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
-                    <label>Buku Konsultasi Tugas Akhir (PDF)</label>
-                    <input type="file" name="file_konsultasi" accept="application/pdf" required>
+                <label>Form Pendaftaran Seminar Proposal (PDF)</label>
+                <input type="file" name="file_pendaftaran" accept="application/pdf" required>
 
-                    <button type="submit">Ajukan Seminar Proposal</button>
+                <label>Lembar Persetujuan Proposal TA (PDF)</label>
+                <input type="file" name="file_persetujuan" accept="application/pdf" required>
 
-                </form>
-            <?php
-            } else {
-                if (!$pesan_error) {
-                    $pesan_error = "Pengajuan Seminar Proposal belum bisa dilakukan saat ini.";
-                }
-                echo '<div class="alert">'.nl2br(htmlspecialchars($pesan_error)).'</div>';
-            }
+                <label>Buku Konsultasi Tugas Akhir (PDF)</label>
+                <input type="file" name="file_konsultasi" accept="application/pdf" required>
 
-            ?>
+                <button type="submit">Ajukan Seminar Proposal</button>
 
-            <?php if ($ta): ?>
-                <hr>
-                <p><b>Judul Tugas Akhir:</b><br><?= htmlspecialchars($ta['judul_ta']) ?></p>
-                <p><b>Status TA:</b> <?= htmlspecialchars($ta['status']) ?></p>
-            <?php endif; ?>
+            </form>
+        <?php endif; ?>
 
-        </div>
+        <?php if ($ta): ?>
+            <hr>
+            <p><b>Judul Tugas Akhir:</b><br><?= htmlspecialchars($ta['judul_ta']) ?></p>
+            <p><b>Status TA:</b> <?= htmlspecialchars($ta['status']) ?></p>
+        <?php endif; ?>
 
     </div>
-            </div>
+
 </div>
+
 </body>
 </html>
