@@ -41,7 +41,6 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
 <meta charset="UTF-8">
 <title>Mahasiswa Bimbingan</title>
-<link rel="stylesheet" href="<?= base_url('style.css') ?>">
 
 <style>
 .card {

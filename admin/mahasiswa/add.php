@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
 if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
@@ -45,18 +46,35 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/img/Logo.webp')?>">
 <title>Tambah Mahasiswa</title>
+
 <style>
-/* FORM CARD */
+/* CARD */
 .form-card {
     background: #fff;
     padding: 24px;
     border-radius: 16px;
-    max-width: 700px;
+    max-width: auto;
     border: 1px solid #f1dcdc;
 }
-.form-group { margin-bottom: 14px; }
-label { font-weight: 500; font-size: 14px; }
+
+/* FORM ROW (HORIZONTAL) */
+.form-group {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-right: 30px;
+}
+
+label {
+    font-weight: 700;
+    font-size: 14px;
+    color: #000000;
+}
+
 input, select {
     width: 100%;
     padding: 10px 12px;
@@ -64,20 +82,41 @@ input, select {
     border: 1px solid #ddd;
     font-size: 14px;
 }
+
 input:focus, select:focus {
     outline: none;
     border-color: #FF983D;
 }
+
+/* BUTTON */
 .btn {
     background: linear-gradient(135deg, #FF74C7, #FF983D);
-    color: white;
+    color: #fff;
     border: none;
-    padding: 10px 18px;
+    padding: 12px 22px;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
 }
-.btn:hover { opacity: 0.9; }
+
+.btn.secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: 176px;
+}
+
+/* ERROR */
 .error {
     background: #ffe5e5;
     color: #c0392b;
@@ -86,13 +125,27 @@ input:focus, select:focus {
     margin-bottom: 14px;
     font-size: 14px;
 }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    .form-group {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        margin-left: 0;
+        flex-direction: column;
+    }
+}
 </style>
 </head>
+
 <body>
 
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
+
     <div class="dashboard-header">
         <h1>Tambah Mahasiswa</h1>
         <p>Form pendaftaran akun mahasiswa baru</p>
@@ -105,6 +158,7 @@ input:focus, select:focus {
         <?php endif; ?>
 
         <form method="POST">
+
             <div class="form-group">
                 <label>Nama</label>
                 <input type="text" name="nama" required>
@@ -122,7 +176,7 @@ input:focus, select:focus {
 
             <div class="form-group">
                 <label>Program Studi</label>
-                <select name="prodi" id="prodi">
+                <select name="prodi">
                     <option value="">-- Pilih Prodi --</option>
                     <option value="Seni Kuliner">Seni Kuliner</option>
                     <option value="Teknologi Informasi">Teknologi Informasi</option>
@@ -132,9 +186,7 @@ input:focus, select:focus {
 
             <div class="form-group">
                 <label>Kelas</label>
-                <select name="kelas" id="kelas">
-                    <option value="">-- Pilih Kelas --</option>
-                </select>
+                <input type="text" name="kelas">
             </div>
 
             <div class="form-group">
@@ -152,36 +204,15 @@ input:focus, select:focus {
                 <input type="password" name="password" required>
             </div>
 
-            <button type="submit" class="btn">Simpan</button>
+            <div class="form-actions">
+                <a href="index.php" class="btn secondary">Kembali</a>
+                <button type="submit" class="btn">Update</button>
+            </div>
+
         </form>
+
     </div>
 </div>
-
-<script>
-// mapping prodi ke kelas
-const kelasByProdi = {
-    "Teknologi Informasi": ["TI-1","TI-2","TI-3"],
-    "Perhotelan": ["PH-1","PH-2","PH-3"],
-    "Seni Kuliner": ["SK-1","SK-2","SK-3"]
-};
-
-const prodiSelect = document.getElementById('prodi');
-const kelasSelect = document.getElementById('kelas');
-
-function updateKelas() {
-    const prodi = prodiSelect.value;
-    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-    if(kelasByProdi[prodi]) {
-        kelasByProdi[prodi].forEach(kelas => {
-            kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
-        });
-    }
-}
-
-// jalankan saat load & saat prodi berubah
-updateKelas();
-prodiSelect.addEventListener('change', updateKelas);
-</script>
 
 </body>
 </html>

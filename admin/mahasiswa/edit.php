@@ -1,8 +1,9 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
-// cek login admin
+/* CEK LOGIN */
 if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
@@ -17,42 +18,61 @@ $id = $_GET['id'];
 $stmt = $pdo->prepare("SELECT * FROM mahasiswa WHERE id = ?");
 $stmt->execute([$id]);
 $mahasiswa = $stmt->fetch();
+
 if(!$mahasiswa) {
     header("Location: index.php");
     exit;
 }
 
 $error = '';
+
+/* ======================
+   HANDLE UPDATE
+   ====================== */
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $nim = trim($_POST['nim'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $prodi = trim($_POST['prodi'] ?? '');
     $kelas = trim($_POST['kelas'] ?? '');
     $nomor_telepon = trim($_POST['nomor_telepon'] ?? '');
-    $email = trim($_POST['email'] ?? '');
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
     if($nama && $nim && $username) {
-        // cek NIM unik
-        $cek_nim = $pdo->prepare("SELECT id FROM mahasiswa WHERE nim = ? AND id <> ?");
-        $cek_nim->execute([$nim, $id]);
-        if($cek_nim->rowCount() > 0){
-            $error = "NIM '$nim' sudah dipakai mahasiswa lain!";
+
+        $cek = $pdo->prepare("SELECT id FROM mahasiswa WHERE nim = ? AND id <> ?");
+        $cek->execute([$nim, $id]);
+
+        if($cek->rowCount() > 0) {
+            $error = "NIM sudah digunakan mahasiswa lain!";
         } else {
             if($password) {
-                $password_hashed = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE mahasiswa SET nama=?, nim=?, prodi=?, kelas=?, nomor_telepon=?, email=?, username=?, password=? WHERE id=?");
-                $stmt->execute([$nama,$nim,$prodi,$kelas,$nomor_telepon,$email,$username,$password_hashed,$id]);
+                $hashed = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("
+                    UPDATE mahasiswa SET 
+                    nama=?, nim=?, email=?, prodi=?, kelas=?, nomor_telepon=?, username=?, password=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $nama,$nim,$email,$prodi,$kelas,$nomor_telepon,$username,$hashed,$id
+                ]);
             } else {
-                $stmt = $pdo->prepare("UPDATE mahasiswa SET nama=?, nim=?, prodi=?, kelas=?, nomor_telepon=?, email=?, username=? WHERE id=?");
-                $stmt->execute([$nama,$nim,$prodi,$kelas,$nomor_telepon,$email,$username,$id]);
+                $stmt = $pdo->prepare("
+                    UPDATE mahasiswa SET 
+                    nama=?, nim=?, email=?, prodi=?, kelas=?, nomor_telepon=?, username=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $nama,$nim,$email,$prodi,$kelas,$nomor_telepon,$username,$id
+                ]);
             }
+
             header("Location: index.php");
             exit;
         }
     } else {
-        $error = "Nama, NIM, dan username wajib diisi!";
+        $error = "Nama, NIM, dan Username wajib diisi!";
     }
 }
 ?>
@@ -61,95 +81,168 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Edit Mahasiswa</title>
-<link rel="stylesheet" href="../../style.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+
 <style>
-body { margin:0; font-family:'Inter', sans-serif; background:#f4f6f8; }
-.container { display:flex; min-height:100vh; }
-.main-content { margin-left:270px; padding:30px; flex:1; background:#f4f6f8; }
-form label { display:block; margin-bottom:5px; font-weight:bold; margin-top:10px; }
-form input[type="text"], form input[type="email"], form input[type="password"], form select { width:100%; padding:8px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
-form button { background:#3498db; color:#fff; border:none; padding:10px 18px; border-radius:5px; cursor:pointer; margin-top:10px; }
-form button:hover { background:#2980b9; }
-.error-message { color:red; margin-bottom:15px; padding:10px; border-radius:5px; background:#fdd; }
-@media (max-width:768px){ .container { flex-direction:column; } .main-content { margin-left:0; } }
+/* CARD */
+.form-card {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #f1dcdc;
+}
+
+/* FORM ROW */
+.form-group {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-right: 30px;
+}
+
+label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #FF983D;
+}
+
+/* BUTTON */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: 176px;
+}
+
+.btn {
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn.secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* ERROR */
+.error {
+    background: #ffe5e5;
+    color: #c0392b;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width:600px){
+    .form-group {
+        grid-template-columns: 1fr;
+    }
+    .form-actions {
+        margin-left: 0;
+        flex-direction: column;
+    }
+}
 </style>
 </head>
-<body>
-<div class="container">
-    <?php include __DIR__ . '/../sidebar.php'; ?>
 
-    <div class="main-content">
+<body>
+
+<?php include "../sidebar.php"; ?>
+
+<div class="main-content">
+
+    <div class="dashboard-header">
         <h1>Edit Mahasiswa</h1>
+        <p>Perbarui data mahasiswa</p>
+    </div>
+
+    <div class="form-card">
 
         <?php if($error): ?>
-            <div class="error-message"><?= htmlspecialchars($error); ?></div>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form action="" method="POST">
-            <label>Nama:</label>
-            <input type="text" name="nama" value="<?= htmlspecialchars($mahasiswa['nama'] ?? ''); ?>" required>
+        <form method="POST">
 
-            <label>NIM:</label>
-            <input type="text" name="nim" value="<?= htmlspecialchars($mahasiswa['nim'] ?? ''); ?>" required>
+            <div class="form-group">
+                <label>Nama</label>
+                <input type="text" name="nama" value="<?= htmlspecialchars($mahasiswa['nama']) ?>" required>
+            </div>
 
-            <label>Prodi:</label>
-            <select name="prodi" id="prodi" required>
-                <option value="">-- Pilih Prodi --</option>
-                <option value="Seni Kuliner" <?= ($mahasiswa['prodi'] ?? '') === 'Seni Kuliner' ? 'selected' : ''; ?>>Seni Kuliner</option>
-                <option value="Teknologi Informasi" <?= ($mahasiswa['prodi'] ?? '') === 'Teknologi Informasi' ? 'selected' : ''; ?>>Teknologi Informasi</option>
-                <option value="Perhotelan" <?= ($mahasiswa['prodi'] ?? '') === 'Perhotelan' ? 'selected' : ''; ?>>Perhotelan</option>
-            </select>
+            <div class="form-group">
+                <label>NIM</label>
+                <input type="text" name="nim" value="<?= htmlspecialchars($mahasiswa['nim']) ?>" required>
+            </div>
 
-            <label>Kelas:</label>
-            <select name="kelas" id="kelas">
-                <option value="">-- Pilih Kelas --</option>
-            </select>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="<?= htmlspecialchars($mahasiswa['email']) ?>">
+            </div>
 
-            <label>Nomor Telepon:</label>
-            <input type="text" name="nomor_telepon" value="<?= htmlspecialchars($mahasiswa['nomor_telepon'] ?? ''); ?>">
+            <div class="form-group">
+                <label>Program Studi</label>
+                <select name="prodi">
+                    <option value="">-- Pilih Prodi --</option>
+                    <option value="Seni Kuliner" <?= $mahasiswa['prodi']=='Seni Kuliner'?'selected':'' ?>>Seni Kuliner</option>
+                    <option value="Teknologi Informasi" <?= $mahasiswa['prodi']=='Teknologi Informasi'?'selected':'' ?>>Teknologi Informasi</option>
+                    <option value="Perhotelan" <?= $mahasiswa['prodi']=='Perhotelan'?'selected':'' ?>>Perhotelan</option>
+                </select>
+            </div>
 
-            <label>Email:</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($mahasiswa['email'] ?? ''); ?>">
+            <div class="form-group">
+                <label>Kelas</label>
+                <input type="text" name="kelas" value="<?= htmlspecialchars($mahasiswa['kelas']) ?>">
+            </div>
 
-            <label>Username:</label>
-            <input type="text" name="username" value="<?= htmlspecialchars($mahasiswa['username'] ?? ''); ?>" required>
+            <div class="form-group">
+                <label>Nomor Telepon</label>
+                <input type="text" name="nomor_telepon" value="<?= htmlspecialchars($mahasiswa['nomor_telepon']) ?>">
+            </div>
 
-            <label>Password (kosongkan kalau tidak diubah):</label>
-            <input type="password" name="password">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="<?= htmlspecialchars($mahasiswa['username']) ?>" required>
+            </div>
 
-            <button type="submit" class="btn">Update</button>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah">
+            </div>
+
+            <div class="form-actions">
+                <a href="index.php" class="btn secondary">Batal</a>
+                <button type="submit" class="btn">Update</button>
+            </div>
+
         </form>
     </div>
 </div>
 
-<script>
-// mapping prodi ke kelas
-const kelasByProdi = {
-    "Teknologi Informasi": ["TI-1","TI-2","TI-3"],
-    "Perhotelan": ["PH-1","PH-2","PH-3"],
-    "Seni Kuliner": ["SK-1","SK-2","SK-3"]
-};
-
-const prodiSelect = document.getElementById('prodi');
-const kelasSelect = document.getElementById('kelas');
-
-function updateKelas() {
-    const prodi = prodiSelect.value;
-    kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
-    if(kelasByProdi[prodi]) {
-        kelasByProdi[prodi].forEach(kelas => {
-            const selected = "<?= $mahasiswa['kelas'] ?? '' ?>" === kelas ? "selected" : "";
-            kelasSelect.innerHTML += `<option value="${kelas}" ${selected}>${kelas}</option>`;
-        });
-    }
-}
-
-// jalankan saat load & saat prodi berubah
-updateKelas();
-prodiSelect.addEventListener('change', updateKelas);
-</script>
 </body>
 </html>

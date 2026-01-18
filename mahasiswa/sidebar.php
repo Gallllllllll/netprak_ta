@@ -348,6 +348,15 @@ body {
             </ul>
         </li>
 
+        <!-- CEK NILAI -->
+        <li>
+            <a href="<?= base_url('mahasiswa/cek_nilai.php') ?>"
+               class="<?= isActive('/mahasiswa/cek_nilai.php') ? 'active' : '' ?>">
+                <span class="material-symbols-rounded">fact_check</span>
+                <span>Cek Nilai</span>
+            </a>
+        </li>
+
         <!-- TEMPLATE DOKUMEN -->
         <li>
             <a href="<?= base_url('mahasiswa/template.php') ?>"
@@ -365,6 +374,10 @@ body {
             </a>
         </li>
     </ul>
+</div>
+
+<div>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/footer.php'; ?>
 </div>
 
 <script>

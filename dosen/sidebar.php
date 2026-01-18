@@ -273,4 +273,7 @@ body {
     </ul>
 </div>
 
-<link rel="stylesheet" href="<?= base_url('style.css') ?>">
+<div>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/dosen/footer.php'; ?>
+</div>
+

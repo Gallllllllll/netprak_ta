@@ -1,118 +1,227 @@
 <?php
 session_start();
-require_once "../../config/connection.php";
+require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
-// cek login admin
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+/* CEK LOGIN */
+if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
-// cek parameter id
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+/* CEK PARAMETER */
+if(!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: index.php");
     exit;
 }
 
 $id = $_GET['id'];
 
-// ambil data dosen
+/* AMBIL DATA DOSEN */
 $stmt = $pdo->prepare("SELECT * FROM dosen WHERE id = ?");
 $stmt->execute([$id]);
 $dosen = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$dosen) {
+if(!$dosen) {
     header("Location: index.php");
     exit;
 }
 
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nama     = trim($_POST['nama']);
-    $nip      = trim($_POST['nip']);
-    $email    = trim($_POST['email']);
-    $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
+/* HANDLE UPDATE */
+if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nama     = trim($_POST['nama'] ?? '');
+    $nip      = trim($_POST['nip'] ?? '');
+    $email    = trim($_POST['email'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-    if ($nama && $nip && $email && $username) {
+    if($nama && $nip && $username) {
 
-        // update dengan / tanpa password
-        if ($password !== '') {
-            $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare(
-                "UPDATE dosen 
-                 SET nama = ?, nip = ?, email = ?, username = ?, password = ?
-                 WHERE id = ?"
-            );
-            $stmt->execute([$nama, $nip, $email, $username, $passwordHash, $id]);
+        // cek nip unik (optional tapi rapi)
+        $cek = $pdo->prepare("SELECT id FROM dosen WHERE nip = ? AND id <> ?");
+        $cek->execute([$nip, $id]);
+
+        if($cek->rowCount() > 0) {
+            $error = "NIP sudah digunakan dosen lain!";
         } else {
-            $stmt = $pdo->prepare(
-                "UPDATE dosen 
-                 SET nama = ?, nip = ?, email = ?, username = ?
-                 WHERE id = ?"
-            );
-            $stmt->execute([$nama, $nip, $email, $username, $id]);
+            if($password) {
+                $hashed = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("
+                    UPDATE dosen SET
+                    nama=?, nip=?, email=?, username=?, password=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $nama,$nip,$email,$username,$hashed,$id
+                ]);
+            } else {
+                $stmt = $pdo->prepare("
+                    UPDATE dosen SET
+                    nama=?, nip=?, email=?, username=?
+                    WHERE id=?
+                ");
+                $stmt->execute([
+                    $nama,$nip,$email,$username,$id
+                ]);
+            }
+
+            header("Location: index.php");
+            exit;
         }
-
-        header("Location: index.php");
-        exit;
-
     } else {
-        $error = "Semua field wajib diisi kecuali password!";
+        $error = "Nama, NIP, dan Username wajib diisi!";
     }
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Edit Dosen</title>
-<link rel="stylesheet" href="/coba/style.css">
+
 <style>
-.content { padding: 20px; }
-input { width: 300px; padding: 6px; margin-bottom: 10px; }
-button.btn {
-    padding: 8px 15px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 4px;
+/* CARD */
+.form-card {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #f1dcdc;
 }
-button.btn:hover { background: #0056b3; }
+
+/* FORM ROW */
+.form-group {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-right: 30px;
+}
+
+label {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #FF983D;
+}
+
+/* BUTTON */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: 176px;
+}
+
+.btn {
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn.secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+/* ERROR */
+.error {
+    background: #ffe5e5;
+    color: #c0392b;
+    padding: 10px 14px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width:600px){
+    .form-group {
+        grid-template-columns: 1fr;
+    }
+    .form-actions {
+        margin-left: 0;
+        flex-direction: column;
+    }
+}
 </style>
 </head>
+
 <body>
 
-<?php require_once __DIR__ . '/../sidebar.php'; ?>
+<?php include "../sidebar.php"; ?>
 
-<div class="content">
-    <h1>Edit Dosen</h1>
+<div class="main-content">
 
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error); ?></p>
-    <?php endif; ?>
+    <div class="dashboard-header">
+        <h1>Edit Dosen</h1>
+        <p>Perbarui data dosen</p>
+    </div>
 
-    <form method="POST">
-        <label>Nama</label><br>
-        <input type="text" name="nama" value="<?= htmlspecialchars($dosen['nama']); ?>" required><br>
+    <div class="form-card">
 
-        <label>NIP</label><br>
-        <input type="text" name="nip" value="<?= htmlspecialchars($dosen['nip']); ?>" required><br>
+        <?php if($error): ?>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
 
-        <label>Email</label><br>
-        <input type="email" name="email" value="<?= htmlspecialchars($dosen['email'] ?? ''); ?>" required><br>
+        <form method="POST">
 
+            <div class="form-group">
+                <label>Nama</label>
+                <input type="text" name="nama" value="<?= htmlspecialchars($dosen['nama']) ?>" required>
+            </div>
 
-        <label>Username</label><br>
-        <input type="text" name="username" value="<?= htmlspecialchars($dosen['username']); ?>" required><br>
+            <div class="form-group">
+                <label>NIP</label>
+                <input type="text" name="nip" value="<?= htmlspecialchars($dosen['nip']) ?>" required>
+            </div>
 
-        <label>Password <small>(kosongkan jika tidak diubah)</small></label><br>
-        <input type="password" name="password"><br><br>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value="<?= htmlspecialchars($dosen['email']) ?>">
+            </div>
 
-        <button type="submit" class="btn">Update</button>
-    </form>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" value="<?= htmlspecialchars($dosen['username']) ?>" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Kosongkan jika tidak diubah">
+            </div>
+
+            <div class="form-actions">
+                <a href="index.php" class="btn secondary">Batal</a>
+                <button type="submit" class="btn">Update</button>
+            </div>
+
+        </form>
+
+    </div>
 </div>
 
 </body>
