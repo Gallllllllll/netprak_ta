@@ -111,7 +111,9 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     font-size:20px;
     line-height:1;
 }
-.btn.delete{background:#ff4d4d}
+
+.btn.delete{background:#ff4d4d;padding: 5px 15px !important;}
+.btn.edit{background:#ff8c42;padding: 5px 15px !important;}
 
 /* CARD */
 .card{
@@ -147,7 +149,8 @@ td{
 /* ACTION BTN */
 .action-btn{
     display:flex;
-    gap:6px
+    gap:6px;
+    justify-content:center;
 }
 
 /* DATATABLES CUSTOM */
@@ -169,6 +172,55 @@ td{
     background:#ff8c42 !important;
     color:#fff !important;
 }
+
+/* GARIS ANTAR KOLOM */
+table.dataTable th,
+table.dataTable td {
+    border-right: 1px solid #e5e7eb; /* abu soft */
+}
+
+/* HILANGKAN GARIS KOLOM TERAKHIR */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    border-right: none;
+}
+
+table.dataTable tbody tr td {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* No */
+table.dataTable th:nth-child(1),
+table.dataTable td:nth-child(1) {
+    width: 10px;
+    text-align: center;
+}
+
+/* Nama */
+table.dataTable th:nth-child(2),
+table.dataTable td:nth-child(2) {
+    width: 250px;
+}
+
+/* NIP */
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+    width: 150px;
+}
+
+/* Username */
+table.dataTable th:nth-child(4),
+table.dataTable td:nth-child(4) {
+    width: 225px;
+}
+
+/* Aksi */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    width: 50px;
+    text-align: center;
+}
+
 </style>
 </head>
 
@@ -209,8 +261,8 @@ td{
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>NIP</th>
                     <th>Nama</th>
+                    <th>NIP</th>
                     <th>Username</th>
                     <th>Aksi</th>
                 </tr>
@@ -219,14 +271,14 @@ td{
             <?php foreach($data as $a): ?>
                 <tr>
                     <td><?= $no++ ?></td>
-                    <td><?= htmlspecialchars($a['nip']) ?></td>
                     <td><?= htmlspecialchars($a['nama']) ?></td>
+                    <td><?= htmlspecialchars($a['nip']) ?></td>
                     <td><?= htmlspecialchars($a['username']) ?></td>
                     <td>
                         <div class="action-btn">
-                            <a href="edit.php?id=<?= $a['id'] ?>" class="btn">Edit</a>
+                            <a href="edit.php?id=<?= $a['id'] ?>" class="btn edit">Edit</a>
                             <a href="delete.php?id=<?= $a['id'] ?>"
-                               onclick="return confirm('Yakin ingin hapus admin ini?')"
+                               onclick="return confirm('Yakin ingin menghapus data admin ini?')"
                                class="btn delete">Hapus</a>
                         </div>
                     </td>

@@ -9,8 +9,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-$adminName = $_SESSION['user']['nama'] ?? 'Admin';
-
 /* LOAD DATA */
 $username = $_SESSION['user']['username'];
 $no=1;
@@ -80,7 +78,8 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     vertical-align: middle;
 }
 
-.btn.delete{background:#ff4d4d}
+.btn.delete{background:#ff4d4d;padding: 5px 15px !important;}
+.btn.edit{background:#ff8c42;padding: 5px 15px !important;}
 .btn.blue{background:#4f7cff}
 
 /* CARD */
@@ -106,7 +105,7 @@ td{
 }
 
 /* ACTION BTN */
-.action-btn{display:flex;gap:6px}
+.action-btn{display:flex;gap:6px;justify-content:center;}
 
 /* DATATABLES CUSTOM */
 .dataTables_filter{display:none}
@@ -120,12 +119,67 @@ td{
 .dataTables_paginate .paginate_button{
     padding:6px 12px;margin:20px 2px;
     border-radius:10px;
-    font-size: 14px !important
+    font-size: 14px !important;
 }
 .dataTables_paginate .paginate_button.current{
     background:#ff8c42 !important;
     color:#fff !important;
 }
+
+/* GARIS ANTAR KOLOM */
+table.dataTable th,
+table.dataTable td {
+    border-right: 1px solid #e5e7eb; /* abu soft */
+}
+
+/* HILANGKAN GARIS KOLOM TERAKHIR */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    border-right: none;
+}
+
+table.dataTable tbody tr td {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* No */
+table.dataTable th:nth-child(1),
+table.dataTable td:nth-child(1) {
+    width: 20px;
+    text-align: center;
+}
+
+/* Nama */
+table.dataTable th:nth-child(2),
+table.dataTable td:nth-child(2) {
+    width: 250px;
+}
+
+/* NIM */
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+    width: 100px;
+}
+
+/* Prodi */
+table.dataTable th:nth-child(4),
+table.dataTable td:nth-child(4) {
+    width: 100px;
+}
+
+/* NIM */
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+    width: 100px;
+}
+
+/* Aksi */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    width: 100px;
+    text-align: center;
+}
+
 </style>
 </head>
 
@@ -158,7 +212,7 @@ td{
         <a href="add.php" class="btn">
             <span class="material-symbols-rounded">add</span> Add Data
         </a>
-        <a href="batch.php" class="btn blue">
+        <a href="mahasiswa_import.php" class="btn blue">
             <span class="material-symbols-rounded">add</span> Add Batch
         </a>
     </div>
@@ -192,9 +246,9 @@ td{
     <td><?= $m['username'] ?></td>
     <td>
         <div class="action-btn">
-            <a href="edit.php?id=<?= $m['id'] ?>" class="btn">Edit</a>
+            <a href="edit.php?id=<?= $m['id'] ?>" class="btn edit">Edit</a>
             <a href="delete.php?id=<?= $m['id'] ?>"
-               onclick="return confirm('Yakin?')"
+               onclick="return confirm('Yakin ingin menghapus data mahasiswa ini?')"
                class="btn delete">Hapus</a>
         </div>
     </td>

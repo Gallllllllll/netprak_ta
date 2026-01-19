@@ -215,6 +215,7 @@ body {
 .main-content {
     margin-left: 270px;
     padding: 28px 32px;
+    margin-bottom: 60px;
 }
 
 /* HEADER DASHBOARD */

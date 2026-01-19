@@ -8,6 +8,8 @@ if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
+$username = $_SESSION['user']['username'];
+
 $error = '';
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -50,6 +52,21 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Tambah Mahasiswa</title>
 
 <style>
+/* TOP */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.topbar h1{color:#ff8c42;font-size:28px}
+
+/* PROFILE */
+.admin-info{display:flex;align-items:left;gap:20px}
+.admin-text span{font-size:13px;color:#555}
+.admin-text b{color:#ff8c42;font-size:14px}
+
+.avatar{
+    width:42px;height:42px;
+    background:#ff8c42;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+}
+
 /* CARD */
 .form-card {
     background: #fff;
@@ -146,9 +163,18 @@ input:focus, select:focus {
 
 <div class="main-content">
 
-    <div class="dashboard-header">
-        <h1>Tambah Mahasiswa</h1>
-        <p>Form pendaftaran akun mahasiswa baru</p>
+    <div class="topbar">
+        <h1>Tambah Data Mahasiswa</h1>
+
+        <div class="admin-info">
+            <div class="admin-text">
+                <span>Selamat Datang,</span><br>
+                <b><?php echo htmlspecialchars($username); ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
     </div>
 
     <div class="form-card">

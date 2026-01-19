@@ -115,7 +115,8 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     line-height:1;
 }
 
-.btn.delete{background:#ff4d4d}
+.btn.delete{background:#ff4d4d;padding: 5px 15px !important;}
+.btn.edit{background:#ff8c42;padding: 5px 15px !important;}
 .btn.blue{background:#4f7cff}
 
 /* CARD */
@@ -153,6 +154,7 @@ td{
 .action-btn{
     display:flex;
     gap:6px;
+    justify-content:center;
 }
 
 /* DATATABLES CUSTOM */
@@ -173,6 +175,61 @@ td{
     background:#ff8c42 !important;
     color:#fff !important;
 }
+
+/* GARIS ANTAR KOLOM */
+table.dataTable th,
+table.dataTable td {
+    border-right: 1px solid #e5e7eb; /* abu soft */
+}
+
+/* HILANGKAN GARIS KOLOM TERAKHIR */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    border-right: none;
+}
+
+table.dataTable tbody tr td {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* No */
+table.dataTable th:nth-child(1),
+table.dataTable td:nth-child(1) {
+    width: 20px;
+    text-align: center;
+}
+
+/* Nama */
+table.dataTable th:nth-child(2),
+table.dataTable td:nth-child(2) {
+    width: 250px;
+}
+
+/* NIP */
+table.dataTable th:nth-child(3),
+table.dataTable td:nth-child(3) {
+    width: 150px;
+}
+
+/* Email */
+table.dataTable th:nth-child(4),
+table.dataTable td:nth-child(4) {
+    width: 225px;
+}
+
+/* Username */
+table.dataTable th:nth-child(5),
+table.dataTable td:nth-child(5) {
+    width: 100px;
+}
+
+/* Aksi */
+table.dataTable th:last-child,
+table.dataTable td:last-child {
+    width: 50px;
+    text-align: center;
+}
+
 </style>
 </head>
 
@@ -236,9 +293,9 @@ td{
     <td><?= htmlspecialchars($d['username']) ?></td>
     <td>
         <div class="action-btn">
-            <a href="edit.php?id=<?= $d['id'] ?>" class="btn">Edit</a>
+            <a href="edit.php?id=<?= $d['id'] ?>" class="btn edit">Edit</a>
             <a href="delete.php?id=<?= $d['id'] ?>"
-               onclick="return confirm('Yakin ingin menghapus dosen ini?')"
+               onclick="return confirm('Yakin ingin menghapus data dosen ini?')"
                class="btn delete">Hapus</a>
         </div>
     </td>
