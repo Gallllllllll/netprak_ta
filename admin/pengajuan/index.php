@@ -44,6 +44,7 @@ body{
     background:#ff8c42;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
 }
+
 /* CARD */
 .main-content{
     background:#fff3e6;
@@ -118,6 +119,7 @@ table td:nth-child(5){
     width: 180px;
     text-align: center;
 }
+
 /* HEADER */
 thead tr{
     background:linear-gradient(90deg,#ff9a4d,#ff5fcf);
@@ -147,7 +149,6 @@ td{
     font-size:14px;
     background:white;
 }
-
 
 /* STATUS */
 .status-btn{
@@ -207,6 +208,14 @@ td{
     border-radius:12px;
     font-size:14px;
     text-decoration:none;
+}
+
+/* DISABLED BUTTON */
+.btn-plot.disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.6;
 }
 
 /* PAGINATION (dummy) */
@@ -287,6 +296,8 @@ $classStatus = "";
 if($status=="disetujui") $classStatus="status-disetujui";
 elseif($status=="revisi") $classStatus="status-revisi";
 elseif($status=="ditolak") $classStatus="status-ditolak";
+
+$isApproved = ($status == "disetujui"); // Hanya disetujui yang bisa klik
 ?>
 
 <tr>
@@ -303,15 +314,15 @@ elseif($status=="ditolak") $classStatus="status-ditolak";
 
     <!-- AKSI -->
     <td class="actions">
-        <a class="btn-detail" 
-           href="detail.php?id=<?= $row['id'] ?>">
-           Detail
-        </a>
+        <a class="btn-detail" href="detail.php?id=<?= $row['id'] ?>">Detail</a>
 
-        <a class="btn-plot" 
-           href="plot_dosbing.php?id=<?= $row['id'] ?>">
-           Plot Dosen
-        </a>
+        <?php if ($isApproved): ?>
+            <a class="btn-plot" href="plot_dosbing.php?id=<?= $row['id'] ?>">Plot Dosen</a>
+        <?php else: ?>
+            <a class="btn-plot disabled" href="javascript:void(0)" title="Belum disetujui">
+                Plot Dosen
+            </a>
+        <?php endif; ?>
     </td>
 </tr>
 <?php endforeach; ?>

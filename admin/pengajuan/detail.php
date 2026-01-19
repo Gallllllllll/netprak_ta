@@ -166,7 +166,7 @@ button {
                     <td>
                         <b><?= $label ?></b>
                         <select name="status[<?= $field ?>]">
-                            <?php foreach(['proses','revisi','ditolak','disetujui'] as $s): ?>
+                            <?php foreach(['diajukan','revisi','ditolak','disetujui'] as $s): ?>
                                 <option value="<?= $s ?>" <?= ($data[$sf]??'')==$s?'selected':'' ?>>
                                     <?= ucfirst($s) ?>
                                 </option>

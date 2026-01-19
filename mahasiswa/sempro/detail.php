@@ -111,6 +111,11 @@ a.file-link:hover { text-decoration:underline; }
             <p><b>Nama Mahasiswa:</b> <?= htmlspecialchars($data['mahasiswa_nama'] ?? '-') ?></p>
             <p><b>Tanggal Pengajuan:</b> <?= htmlspecialchars($data['created_at'] ?? '-') ?></p>
 
+            <!-- TAMBAHKAN TANGGAL, RUANGAN, JAM SEMPRO -->
+            <p><b>Tanggal Seminar Proposal:</b> <?= htmlspecialchars($data['tanggal_sempro'] ?? '-') ?></p>
+            <p><b>Jam Seminar Proposal:</b> <?= htmlspecialchars($data['jam_sempro'] ?? '-') ?></p>
+            <p><b>Ruangan Seminar Proposal:</b> <?= htmlspecialchars($data['ruangan_sempro'] ?? '-') ?></p>
+
             <p>
                 <b>Status:</b>
                 <span class="status <?= $status_class_map[strtolower($data['status'] ?? 'proses')] ?>">
