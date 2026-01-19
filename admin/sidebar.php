@@ -3,6 +3,7 @@ $currentUri = $_SERVER['REQUEST_URI'];
 $currentPage = basename($_SERVER['PHP_SELF']);
 require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
 
+
 // Fungsi menu aktif
 function isActive($path)
 {
@@ -356,6 +357,10 @@ body {
 
     </ul>
 
+</div>
+
+<div>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/admin/footer.php'; ?>
 </div>
 
 <script>

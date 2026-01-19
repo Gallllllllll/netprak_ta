@@ -1,83 +1,214 @@
 <?php
 session_start();
 require_once "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
-// cek login admin
+/* CEK LOGIN */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
-// ambil semua data admin
+$username = $_SESSION['user']['username'] ?? 'Admin';
+$no = 1;
+
+/* LOAD DATA ADMIN */
 $stmt = $pdo->query("SELECT id, nip, nama, username FROM admin ORDER BY id ASC");
-$admin_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUD Admin</title>
+<link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/img/Logo.webp') ?>">
+<title>Daftar Admin</title>
 
+<!-- MATERIAL ICON -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+
+<!-- DATATABLES CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
 
 <style>
-h1 {
-    margin-top: 0;
+
+/* TOP */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
 }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
 }
-th, td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
+
+/* PROFILE */
+.admin-info{
+    display:flex;
+    align-items:left;
+    gap:20px
 }
-th {
-    background: #f1f1f1;
+.admin-text span{
+    font-size:13px;
+    color:#555
 }
-a.btn {
-    padding: 6px 10px;
-    background: #007bff;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
+.admin-text b{
+    color:#ff8c42;
+    font-size:14px
 }
-a.btn.delete {
-    background: #dc3545;
+
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
-a.btn:hover {
-    opacity: 0.85;
+
+/* ACTION */
+.action-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+    flex-wrap:wrap;
+    gap:10px
 }
-#search {
-    padding: 8px;
-    width: 300px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+
+.search-box{
+    background:#fff;
+    padding:10px 15px;
+    border-radius:25px;
+    width:300px;
+    display:flex;
+    box-shadow:0 3px 10px rgba(0,0,0,.15)
+}
+.search-box input{
+    border:none;
+    outline:none;
+    width:100%
+}
+
+/* BUTTON */
+.btn{
+    padding:10px 18px;
+    border-radius:20px;
+    background:#ff8c42;
+    color:#fff;
+    text-decoration:none;
+    border:none;
+    font-size:14px;
+    gap:6px;
+    margin-left:6px;
+    display:inline-flex;
+    align-items:center;
+}
+.btn .material-symbols-rounded{
+    font-size:20px;
+    line-height:1;
+}
+.btn.delete{background:#ff4d4d}
+
+/* CARD */
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+    overflow-x:auto;
+}
+
+/* TABLE */
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px
+}
+thead tr{
+    background:linear-gradient(to right,#ff8c42,#ff6aa2);
+}
+th{
+    padding:12px;
+    color:#fff;
+    font-size:14px;
+    text-align:center
+}
+td{
+    padding:10px;
+    border-bottom:1px solid #eee;
+    font-size:14px;
+    text-align:left
+}
+
+/* ACTION BTN */
+.action-btn{
+    display:flex;
+    gap:6px
+}
+
+/* DATATABLES CUSTOM */
+.dataTables_filter{display:none}
+
+.dataTables_info{
+    font-size:14px;
+    margin:20px 2px;
+    color:#555
+}
+
+.dataTables_paginate .paginate_button{
+    padding:6px 12px;
+    margin:20px 2px;
+    border-radius:10px;
+    font-size:14px !important
+}
+.dataTables_paginate .paginate_button.current{
+    background:#ff8c42 !important;
+    color:#fff !important;
 }
 </style>
 </head>
+
 <body>
 
-<?php require_once __DIR__ . '/../sidebar.php'; ?>
+<?php require_once __DIR__.'/../sidebar.php'; ?>
 
 <div class="main-content">
-    <h1>Daftar Admin</h1>
 
-    <input type="text" id="search" placeholder="Cari admin (NIP / Nama / Username)...">
+    <div class="topbar">
+        <h1>Daftar Admin</h1>
 
-    <br><br>
-    <a href="add.php" class="btn">Tambah Admin</a>
+        <div class="admin-info">
+            <div class="admin-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
+    </div>
 
-    <br><br>
+    <div class="action-row">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search...">
+        </div>
 
-    <div id="table-container">
-        <table>
+        <div>
+            <a href="add.php" class="btn">
+                <span class="material-symbols-rounded">add</span> Add Admin
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <table id="datatable">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>No</th>
                     <th>NIP</th>
                     <th>Nama</th>
                     <th>Username</th>
@@ -85,43 +216,50 @@ a.btn:hover {
                 </tr>
             </thead>
             <tbody>
-                <?php if (count($admin_list) > 0): ?>
-                    <?php foreach ($admin_list as $a): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($a['id']); ?></td>
-                        <td><?= htmlspecialchars($a['nip']); ?></td>
-                        <td><?= htmlspecialchars($a['nama']); ?></td>
-                        <td><?= htmlspecialchars($a['username']); ?></td>
-                        <td>
-                            <a href="edit.php?id=<?= $a['id']; ?>" class="btn">Edit</a>
-                            <a href="delete.php?id=<?= $a['id']; ?>" class="btn delete"
-                               onclick="return confirm('Yakin ingin hapus admin ini?')">
-                               Hapus
-                            </a>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5" style="text-align:center;">Data admin kosong</td>
-                    </tr>
-                <?php endif; ?>
+            <?php foreach($data as $a): ?>
+                <tr>
+                    <td><?= $no++ ?></td>
+                    <td><?= htmlspecialchars($a['nip']) ?></td>
+                    <td><?= htmlspecialchars($a['nama']) ?></td>
+                    <td><?= htmlspecialchars($a['username']) ?></td>
+                    <td>
+                        <div class="action-btn">
+                            <a href="edit.php?id=<?= $a['id'] ?>" class="btn">Edit</a>
+                            <a href="delete.php?id=<?= $a['id'] ?>"
+                               onclick="return confirm('Yakin ingin hapus admin ini?')"
+                               class="btn delete">Hapus</a>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+
 </div>
 
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- DATATABLES -->
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
 <script>
-document.getElementById('search').addEventListener('keyup', function () {
-    const keyword = this.value;
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'search.php?keyword=' + encodeURIComponent(keyword), true);
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            document.getElementById('table-container').innerHTML = xhr.responseText;
+$(document).ready(function () {
+    const table = $('#datatable').DataTable({
+        pageLength:50,
+        lengthChange:false,
+        ordering:true,
+        info:true,
+        language:{
+            emptyTable:"Data tidak ditemukan",
+            zeroRecords:"Data tidak ditemukan"
         }
-    };
-    xhr.send();
+    });
+
+    $('#search').on('keyup', function () {
+        table.search(this.value).draw();
+    });
 });
 </script>
 

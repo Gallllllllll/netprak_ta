@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../config/connection.php";
-require_once '../config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
 // cek login admin
 if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
@@ -17,6 +17,8 @@ $total_pengajuan = $pdo->query("SELECT COUNT(*) FROM pengajuan_ta")->fetchColumn
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="assets\img\Logo.webp">
     
 <title>Dashboard Admin</title>
 
