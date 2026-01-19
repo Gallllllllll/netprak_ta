@@ -207,7 +207,7 @@ td{
         <a href="add.php" class="btn">
             <span class="material-symbols-rounded">add</span> Add Data
         </a>
-        <a href="batch.php" class="btn blue">
+        <a href="import_dosen.php" class="btn blue">
             <span class="material-symbols-rounded">add</span> Add Batch
         </a>
     </div>
