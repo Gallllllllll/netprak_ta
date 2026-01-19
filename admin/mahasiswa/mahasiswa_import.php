@@ -185,6 +185,49 @@ input[type="file"] {
 
 .btn:hover { opacity: .9; }
 
+/* DOWNLOAD TEMPLATE */
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100%;
+    background: #FF983D;
+}
+
+.template-download {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.template-download p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    background: #32cd3226;
+    color: #32CD32;
+    border: 1px solid #43ff43;
+}
+
+.btn-download:hover {
+    background: #32CD32;
+    color: #ffffff;
+}
+
 /* ERROR */
 .error {
     background: #ffe5e5;
@@ -196,7 +239,7 @@ input[type="file"] {
 
 /* INFO / WARNING BOX */
 .info-box {
-    background: rgba(255, 152, 61, 0.15);
+    background: #FFDFE0;
     color: #FF983D;
     border: 1px solid rgba(255, 152, 61, 0.35);
     border-radius: 14px;
@@ -291,6 +334,21 @@ input[type="file"] {
             <li>No Telepon (default: 0000000000)</li>
             <li>Password (default: 123456)</li>
         </ul>
+
+        <div class="template-download">
+            <hr class="divider">
+            <p>
+                Gunakan template agar proses impor tidak gagal.
+            </p>
+            <a 
+                href="<?= base_url('assets/template/Template Impor Data Batch Mahasiswa.xlsx') ?>"
+                class="btn-download"
+                download
+            >
+                <span class="material-symbols-rounded">download</span>
+                Download Template Excel
+            </a>
+        </div>
     </div>
 
 

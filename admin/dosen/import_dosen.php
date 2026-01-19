@@ -1,81 +1,79 @@
 <?php
 session_start();
-require "../../config/connection.php"; 
+require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 require __DIR__ . '/../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+/* CEK LOGIN */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
+$username = $_SESSION['user']['username'];
 $error = '';
+$success = 0;
 
+/* HANDLE IMPORT */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
+
     $file = $_FILES['excel'];
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $error = "Terjadi kesalahan saat upload file.";
     } else {
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, ['xls','xlsx'])) {
-            $error = "Format file harus XLS atau XLSX";
+
+        if (!in_array($ext, ['xls', 'xlsx'])) {
+            $error = "Format file harus XLS atau XLSX.";
         } else {
             try {
                 $spreadsheet = IOFactory::load($file['tmp_name']);
-                $sheet = $spreadsheet->getActiveSheet();
-                $rows = $sheet->toArray();
+                $rows = $spreadsheet->getActiveSheet()->toArray();
 
+                $pdo->beginTransaction();
                 $count = 0;
 
                 for ($i = 1; $i < count($rows); $i++) {
-                    $nip       = trim($rows[$i][0]);
-                    $username  = trim($rows[$i][1]);
-                    $password  = trim($rows[$i][2]);
-                    $nama      = trim($rows[$i][3]);
-                    $email     = trim($rows[$i][4] ?? '') ?: null;
-                    $created   = trim($rows[$i][5] ?? '') ?: null;
 
-                    // validasi wajib
-                    if (!$nip || !$username || !$nama) {
-                        continue; // skip baris yang tidak lengkap
+                    $nip      = trim($rows[$i][0] ?? '');
+                    $nama     = trim($rows[$i][1] ?? '');
+                    $username = trim($rows[$i][2] ?? '');
+                    $email    = trim($rows[$i][3] ?? '') ?: null;
+                    $rawPass  = trim($rows[$i][4] ?? '') ?: '123456';
+                    $password = password_hash($rawPass, PASSWORD_DEFAULT);
+
+                    if (!$nip || !$nama || !$username) {
+                        continue;
                     }
 
-                    if (!$password) $password = '123456';
-                    $password = password_hash($password, PASSWORD_DEFAULT);
-
-                    // cek duplicate nip / username
-                    $cek = $pdo->prepare("SELECT id FROM dosen WHERE nip=? OR username=?");
+                    /* CEK DUPLIKAT */
+                    $cek = $pdo->prepare("SELECT id FROM dosen WHERE nip = ? OR username = ?");
                     $cek->execute([$nip, $username]);
 
-                    if ($cek->rowCount() == 0) {
-
-                        if ($created) {
-                            $stmt = $pdo->prepare("
-                                INSERT INTO dosen
-                                (nip, username, password, nama, email, created_at)
-                                VALUES (?, ?, ?, ?, ?, ?)
-                            ");
-                            $stmt->execute([$nip, $username, $password, $nama, $email, $created]);
-                        } else {
-                            $stmt = $pdo->prepare("
-                                INSERT INTO dosen
-                                (nip, username, password, nama, email)
-                                VALUES (?, ?, ?, ?, ?)
-                            ");
-                            $stmt->execute([$nip, $username, $password, $nama, $email]);
-                        }
-
+                    if ($cek->rowCount() === 0) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO dosen
+                            (nip, username, password, nama, email)
+                            VALUES (?, ?, ?, ?, ?)
+                        ");
+                        $stmt->execute([
+                            $nip, $username, $password,
+                            $nama, $email
+                        ]);
                         $count++;
                     }
                 }
 
-                header("Location: index.php?success=$count");
+                $pdo->commit();
+                header("Location: index.php?imported=$count");
                 exit;
 
-            } catch (\PhpOffice\PhpSpreadsheet\Reader\Exception $e) {
-                $error = "Gagal membaca file Excel: " . $e->getMessage();
+            } catch (Throwable $e) {
+                $pdo->rollBack();
+                $error = "Gagal membaca file Excel.";
             }
         }
     }
@@ -86,59 +84,245 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Import Data Dosen</title>
-<link rel="stylesheet" href="../../style.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
+<title>Import Dosen</title>
+
 <style>
-body { margin:0; font-family:'Inter', sans-serif; background:#f4f6f8; }
-.container { display:flex; min-height:100vh; }
+/* TOP */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
+}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
+}
 
-.sidebar { width: 250px; background:#fff; position:fixed; top:0; left:0; bottom:0; padding:20px; overflow-y:auto; z-index:1000; }
-.main-content { margin-left:270px; padding:30px; flex:1; }
+/* PROFILE */
+.admin-info{
+    display:flex;
+    gap:20px
+}
+.admin-text span{
+    font-size:13px;
+    color:#555
+}
+.admin-text b{
+    color:#ff8c42;
+    font-size:14px
+}
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 
-form label { display:block; margin-bottom:5px; font-weight:bold; }
-form input[type="file"] { display:block; margin-bottom:15px; }
-form button { background:#3498db; color:#fff; border:none; padding:10px 18px; border-radius:5px; cursor:pointer; }
-form button:hover { background:#2980b9; }
+/* CARD */
+.form-card {
+    background: #fff;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #f1dcdc;
+}
 
-.error-message { color:red; margin-bottom:15px; padding:10px; border-radius:5px; background:#fdd; }
+/* FORM */
+.form-group {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+label {
+    font-weight: 700;
+    font-size: 14px;
+}
+input[type="file"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+}
 
-ul { margin-top:10px; list-style:disc; padding-left:20px; }
+/* BUTTON */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-left: 196px;
+}
+.btn {
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+.btn.secondary {
+    background: #e5e7eb;
+    color: #374151;
+}
+.btn:hover { opacity: .9; }
 
-@media (max-width:768px){
-    .container { flex-direction:column; }
-    .sidebar { width:100%; position:relative; }
-    .main-content { margin-left:0; }
+/* DOWNLOAD TEMPLATE */
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100%;
+    background: #FF983D;
+}
+
+.template-download {
+    display:flex;
+    flex-direction: column;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+.template-download p {
+    margin:0;
+    font-size:13px;
+    color:#555;
+}
+.btn-download {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    background:#32cd3226;
+    color:#32CD32;
+    border:1px solid #43ff43;
+}
+.btn-download:hover {
+    background:#32CD32;
+    color:#fff;
+}
+
+/* ERROR */
+.error {
+    background:#ffe5e5;
+    color:#c0392b;
+    padding:10px 14px;
+    border-radius:10px;
+    margin-bottom:16px;
+}
+
+/* INFO BOX */
+.info-box {
+    background: #FFDFE0;
+    color: #FF983D;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.info-box strong {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+}
+.info-box ul {
+    margin:0;
+    padding-left:20px;
+}
+.info-box li {
+    margin-bottom:4px;
+    color:#555;
+}
+
+/* RESPONSIVE */
+@media (max-width:600px){
+    .form-group { grid-template-columns:1fr; }
+    .form-actions { margin-left:0; flex-direction:column; }
 }
 </style>
 </head>
-<body>
-<div class="container">
-    <?php include '../sidebar.php'; ?>
 
-    <div class="main-content">
-        <h1>Import Data Dosen dari Excel</h1>
+<body>
+
+<?php include '../sidebar.php'; ?>
+
+<div class="main-content">
+
+    <div class="topbar">
+        <h1>Import Data Dosen</h1>
+
+        <div class="admin-info">
+            <div class="admin-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card">
 
         <?php if ($error): ?>
-            <div class="error-message"><?= htmlspecialchars($error) ?></div>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
-            <label>Pilih file Excel</label>
-            <input type="file" name="excel" accept=".xls,.xlsx" required>
-            <button type="submit">Import</button>
+            <div class="form-group">
+                <label>File Excel</label>
+                <input type="file" name="excel" accept=".xls,.xlsx" required>
+            </div>
+
+            <div class="form-actions">
+                <a href="index.php" class="btn secondary">Kembali</a>
+                <button type="submit" class="btn">Import</button>
+            </div>
         </form>
 
-        <p>Contoh format Excel:</p>
-        <ul>
-            <li>nip (wajib)</li>
-            <li>username (wajib)</li>
-            <li>password (wajib, default 123456 jika kosong)</li>
-            <li>nama (wajib)</li>
-            <li>email (opsional)</li>
-        </ul>
+        <div class="info-box">
+            <strong>
+                <span class="material-symbols-rounded">info</span>
+                Format File Excel
+            </strong>
+            <ul>
+                <li>NIP (wajib)</li>
+                <li>Nama (wajib)</li>
+                <li>Username (wajib)</li>
+                <li>Email (opsional)</li>
+                <li>Password (default: 123456)</li>
+            </ul>
+
+        <div class="template-download">
+            <hr class="divider">
+            <p>Gunakan template agar proses impor tidak gagal.</p>
+                <a
+                    href="<?= base_url('assets/template/Template Impor Data Batch Dosen.xlsx') ?>"
+                    class="btn-download"
+                    download
+                >
+                    <span class="material-symbols-rounded">download</span>
+                    Download Template Excel
+                </a>
+            </div>
+        </div>
+
     </div>
 </div>
+
 </body>
 </html>

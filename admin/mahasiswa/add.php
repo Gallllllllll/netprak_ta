@@ -232,7 +232,7 @@ input:focus, select:focus {
 
             <div class="form-actions">
                 <a href="index.php" class="btn secondary">Kembali</a>
-                <button type="submit" class="btn">Update</button>
+                <button type="submit" class="btn">Simpan</button>
             </div>
 
         </form>

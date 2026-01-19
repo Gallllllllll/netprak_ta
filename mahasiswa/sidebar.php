@@ -259,6 +259,15 @@ body {
             </a>
         </li>
 
+        <!-- ALUR PANDUAN -->
+        <li>
+            <a href="<?= base_url('mahasiswa/alurpanduan.php') ?>"
+               class="<?= isActive('/mahasiswa/alurpanduan.php') ? 'active' : '' ?>">
+                <span class="material-symbols-rounded">book_5</span>
+                <span>Alur & Panduan</span>
+            </a>
+        </li>
+
         <!-- TUGAS AKHIR -->
         <li class="has-submenu <?= isAnyActive([
             '/mahasiswa/pengajuan/'
