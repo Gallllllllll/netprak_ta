@@ -18,7 +18,7 @@ if (!$id) die("ID tidak valid");
 $dosen = $pdo->query("SELECT * FROM dosen ORDER BY nama")->fetchAll(PDO::FETCH_ASSOC);
 
 // ===============================
-// SIMPAN PLOT DOSEN (BACKEND VALIDATION)
+// SIMPAN PLOT DOSEN
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dosen1 = $_POST['dosen1'];
@@ -54,48 +54,88 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="stylesheet" href="../../style.css">
 
 <style>
-.card {
-    background:#fff;
-    padding:24px;
-    border-radius:16px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-    max-width:500px;
+body{
+    background:#f3a4a4;
+    font-family:Arial, sans-serif;
 }
 
-label {
+.main-content{
+    padding:40px;
+}
+
+/* card utama */
+.card{
+    background:#fff3e8;
+    padding:28px;
+    border-radius:18px;
+    max-width:650px;
+    margin:auto;
+}
+
+/* header */
+.dashboard-header{
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    padding:18px 22px;
+    border-radius:14px;
+    margin-bottom:22px;
+}
+
+
+.dashboard-header h1{
+    font-size:18px;
+    margin:0;
+}
+
+.dashboard-header p{
+    font-size:13px;
+    margin:4px 0 0;
+    opacity:.9;
+}
+
+/* form */
+form{
+    background:#fff;
+    padding:22px;
+    border-radius:14px;
+}
+
+/* label */
+label{
+    font-size:14px;
     font-weight:600;
     display:block;
-    margin-top:14px;
+    margin-top:16px;
 }
 
-select {
+/* select */
+select{
     width:100%;
-    padding:10px;
+    padding:12px 14px;
     margin-top:6px;
-    border-radius:8px;
-    border:1px solid #d1d5db;
+    border-radius:10px;
+    border:2px solid #ff8a8a;
+    outline:none;
+    font-size:14px;
+    background:#fff;
 }
 
-.error {
-    margin-top:10px;
-    color:#dc2626;
-    font-weight:600;
-    display:none;
-}
-
-button {
-    margin-top:20px;
-    padding:10px 18px;
+/* tombol */
+button{
+    margin-top:22px;
+    padding:10px 22px;
     border:none;
-    border-radius:12px;
-    background:linear-gradient(135deg,#10b981,#059669);
+    border-radius:999px;
+    /* background:#E78F00; */
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    
     color:#fff;
     font-weight:600;
     cursor:pointer;
+    font-size:13px;
 }
-button:disabled {
-    background:#9ca3af;
-    cursor:not-allowed;
+
+button:hover{
+    opacity:.9;
 }
 </style>
 </head>
@@ -108,16 +148,17 @@ button:disabled {
 <!-- MAIN CONTENT -->
 <div class="main-content">
 
-    <div class="dashboard-header">
-        <h1>Plot Dosen Pembimbing</h1>
-        <p>Tentukan dosen pembimbing 1 dan 2</p>
-    </div>
-
     <div class="card">
-        <form method="POST" id="formPlot">
+
+        <div class="dashboard-header">
+            <h1>Plot Dosen Pembimbing</h1>
+            <p>Tentukan dosen pembimbing 1 dan 2</p>
+        </div>
+
+        <form method="POST">
 
             <label>Dosen Pembimbing 1</label>
-            <select name="dosen1" id="dosen1" required>
+            <select name="dosen1" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
                     <option value="<?= $d['id'] ?>">
@@ -127,7 +168,7 @@ button:disabled {
             </select>
 
             <label>Dosen Pembimbing 2</label>
-            <select name="dosen2" id="dosen2" required>
+            <select name="dosen2" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
                     <option value="<?= $d['id'] ?>">
@@ -136,35 +177,13 @@ button:disabled {
                 <?php endforeach; ?>
             </select>
 
-            <div class="error" id="errorMsg">
-                ❌ Dosen Pembimbing 1 dan 2 tidak boleh sama
-            </div>
+            <button type="submit">Simpan Plot Dosen</button>
 
-            <button type="submit" id="btnSubmit">Simpan Plot Dosen</button>
         </form>
+
     </div>
 
 </div>
-
-<script>
-const dosen1 = document.getElementById('dosen1');
-const dosen2 = document.getElementById('dosen2');
-const errorMsg = document.getElementById('errorMsg');
-const btnSubmit = document.getElementById('btnSubmit');
-
-function validateDosen() {
-    if (dosen1.value && dosen1.value === dosen2.value) {
-        errorMsg.style.display = 'block';
-        btnSubmit.disabled = true;
-    } else {
-        errorMsg.style.display = 'none';
-        btnSubmit.disabled = false;
-    }
-}
-
-dosen1.addEventListener('change', validateDosen);
-dosen2.addEventListener('change', validateDosen);
-</script>
 
 </body>
 </html>

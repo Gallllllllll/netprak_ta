@@ -201,7 +201,7 @@ td{
 }
 
 .btn-plot{
-    background:grey;
+    background:#FFAE00;
     color:white;
     padding:5px 10px;
     border-radius:12px;
