@@ -18,7 +18,7 @@ if (!$id) die("ID tidak valid");
 $dosen = $pdo->query("SELECT * FROM dosen ORDER BY nama")->fetchAll(PDO::FETCH_ASSOC);
 
 // ===============================
-// SIMPAN PLOT DOSEN
+// SIMPAN PLOT DOSEN (BACKEND VALIDATION)
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dosen1 = $_POST['dosen1'];
@@ -76,6 +76,13 @@ select {
     border:1px solid #d1d5db;
 }
 
+.error {
+    margin-top:10px;
+    color:#dc2626;
+    font-weight:600;
+    display:none;
+}
+
 button {
     margin-top:20px;
     padding:10px 18px;
@@ -86,7 +93,10 @@ button {
     font-weight:600;
     cursor:pointer;
 }
-button:hover { opacity:.9; }
+button:disabled {
+    background:#9ca3af;
+    cursor:not-allowed;
+}
 </style>
 </head>
 
@@ -104,10 +114,10 @@ button:hover { opacity:.9; }
     </div>
 
     <div class="card">
-        <form method="POST">
+        <form method="POST" id="formPlot">
 
             <label>Dosen Pembimbing 1</label>
-            <select name="dosen1" required>
+            <select name="dosen1" id="dosen1" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
                     <option value="<?= $d['id'] ?>">
@@ -117,7 +127,7 @@ button:hover { opacity:.9; }
             </select>
 
             <label>Dosen Pembimbing 2</label>
-            <select name="dosen2" required>
+            <select name="dosen2" id="dosen2" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
                     <option value="<?= $d['id'] ?>">
@@ -126,11 +136,35 @@ button:hover { opacity:.9; }
                 <?php endforeach; ?>
             </select>
 
-            <button type="submit">Simpan Plot Dosen</button>
+            <div class="error" id="errorMsg">
+                ❌ Dosen Pembimbing 1 dan 2 tidak boleh sama
+            </div>
+
+            <button type="submit" id="btnSubmit">Simpan Plot Dosen</button>
         </form>
     </div>
 
 </div>
+
+<script>
+const dosen1 = document.getElementById('dosen1');
+const dosen2 = document.getElementById('dosen2');
+const errorMsg = document.getElementById('errorMsg');
+const btnSubmit = document.getElementById('btnSubmit');
+
+function validateDosen() {
+    if (dosen1.value && dosen1.value === dosen2.value) {
+        errorMsg.style.display = 'block';
+        btnSubmit.disabled = true;
+    } else {
+        errorMsg.style.display = 'none';
+        btnSubmit.disabled = false;
+    }
+}
+
+dosen1.addEventListener('change', validateDosen);
+dosen2.addEventListener('change', validateDosen);
+</script>
 
 </body>
 </html>

@@ -123,7 +123,7 @@ button {
 <!-- SIDEBAR -->
 <?php include "../sidebar.php"; ?>
 
-<!-- MAIN CONTENT (WAJIB) -->
+<!-- MAIN CONTENT -->
 <div class="main-content">
 
     <div class="dashboard-header">
@@ -131,11 +131,20 @@ button {
         <p>Verifikasi dokumen dan plot dosen pembimbing</p>
     </div>
 
+    <!-- INFO MAHASISWA -->
     <div class="card">
+        <p>
+            <b>ID Pengajuan</b><br>
+            <span style="background:#f3f4f6;padding:6px 12px;border-radius:8px;font-weight:bold;">
+                <?= htmlspecialchars($data['id_pengajuan']) ?>
+            </span>
+        </p>
+
         <p><b>Nama Mahasiswa</b><br><?= htmlspecialchars($data['nama']) ?></p>
         <p><b>Judul TA</b><br><?= htmlspecialchars($data['judul_ta']) ?></p>
     </div>
 
+    <!-- VERIFIKASI -->
     <div class="card">
         <h3>Verifikasi Dokumen</h3>
 
@@ -179,6 +188,7 @@ button {
         </form>
     </div>
 
+    <!-- PLOT DOSEN -->
     <div class="card">
         <h3>Plot Dosen Pembimbing</h3>
         <?php if($all_approved): ?>

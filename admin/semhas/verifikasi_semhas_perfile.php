@@ -38,8 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $status_field  = "status_file_$key";
         $catatan_field = "catatan_file_$key";
 
-        $status  = $status_all[$key] ?? 'proses';
+        $status  = $status_all[$key] ?? 'diajukan';
         $catatan = $catatan_all[$key] ?? '';
+
+        // VALIDASI ENUM
+        if (!in_array($status, ['diajukan','revisi','disetujui','ditolak'])) {
+            die("Status tidak valid.");
+        }
 
         $stmt = $pdo->prepare("
             UPDATE pengajuan_semhas 
@@ -59,19 +64,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ===============================
     // HITUNG STATUS KESELURUHAN
     // ===============================
-    $all_valid = (
-        $data['status_file_berita_acara'] === 'valid' &&
-        $data['status_file_persetujuan_laporan'] === 'valid' &&
-        $data['status_file_pendaftaran_ujian'] === 'valid' &&
-        $data['status_file_buku_konsultasi'] === 'valid'
-    );
+    $statuses = [
+        $data['status_file_berita_acara'],
+        $data['status_file_persetujuan_laporan'],
+        $data['status_file_pendaftaran_ujian'],
+        $data['status_file_buku_konsultasi']
+    ];
 
-    $overall_status = $all_valid ? 'disetujui' : 'revisi';
+    // kalau ada 1 yang ditolak -> status keseluruhan ditolak
+    if (in_array('ditolak', $statuses)) {
+        $overall_status = 'ditolak';
+    }
+    // kalau semua disetujui -> status keseluruhan disetujui
+    elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'disetujui') {
+        $overall_status = 'disetujui';
+    }
+    // kalau ada yang revisi -> status keseluruhan revisi
+    elseif (in_array('revisi', $statuses)) {
+        $overall_status = 'revisi';
+    }
+    // selain itu -> tetap diajukan
+    else {
+        $overall_status = 'diajukan';
+    }
 
-    $pdo->prepare(
-        "UPDATE pengajuan_semhas SET status=? WHERE id=?"
-    )->execute([$overall_status, $id]);
-
+    // ===============================
+    // UPDATE STATUS KESELURUHAN
+    // ===============================
+    $stmt = $pdo->prepare("UPDATE pengajuan_semhas SET status = ? WHERE id = ?");
+    $stmt->execute([$overall_status, $id]);
 
     // ===============================
     // REDIRECT
@@ -79,3 +100,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: index.php?id=$id");
     exit;
 }
+?>

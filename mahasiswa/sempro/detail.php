@@ -3,19 +3,27 @@ session_start();
 require "../../config/connection.php";
 require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
-// cek login
+// ===============================
+// CEK LOGIN
+// ===============================
 if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role'], ['admin','mahasiswa'])) {
     header("Location: ".base_url('login.php'));
     exit;
 }
 
-// ambil id pengajuan
+// ===============================
+// AMBIL ID PENGAJUAN
+// ===============================
 $id = $_GET['id'] ?? null;
 if (!$id) die("ID pengajuan tidak diberikan.");
 
-// ambil data pengajuan sempro
+// ===============================
+// AMBIL DATA PENGAJUAN SEMPRO
+// ===============================
 $stmt = $pdo->prepare("
-    SELECT s.*, m.nama AS mahasiswa_nama
+    SELECT 
+        s.*,
+        m.nama AS mahasiswa_nama
     FROM pengajuan_sempro s
     JOIN mahasiswa m ON s.mahasiswa_id = m.id
     WHERE s.id = ?
@@ -25,20 +33,24 @@ $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$data) die("Data pengajuan tidak ditemukan.");
 
-// array dokumen
+// ===============================
+// DAFTAR DOKUMEN
+// ===============================
 $files = [
-    'file_pendaftaran' => 'Form Pendaftaran',
-    'file_persetujuan'  => 'Persetujuan Proposal',
+    'file_pendaftaran'     => 'Form Pendaftaran',
+    'file_persetujuan'     => 'Persetujuan Proposal',
     'file_buku_konsultasi' => 'Buku Konsultasi'
 ];
 
-// array status
+// ===============================
+// STATUS CLASS
+// ===============================
 $status_class_map = [
-    'proses' => 'status-proses',
-    'diajukan' => 'status-proses',
+    'proses'    => 'status-proses',
+    'diajukan'  => 'status-proses',
     'disetujui' => 'status-disetujui',
-    'ditolak' => 'status-ditolak',
-    'revisi' => 'status-revisi'
+    'ditolak'   => 'status-ditolak',
+    'revisi'    => 'status-revisi'
 ];
 ?>
 <!DOCTYPE html>
@@ -64,6 +76,15 @@ th { background:#eee; text-align:left; width:200px; }
 .status-revisi { background:#17a2b8; }
 a.file-link { color:#007bff; text-decoration:none; }
 a.file-link:hover { text-decoration:underline; }
+.id-badge {
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:20px;
+    background:#1f2937;
+    color:#fff;
+    font-weight:bold;
+    font-size:13px;
+}
 </style>
 </head>
 <body>
@@ -74,21 +95,39 @@ a.file-link:hover { text-decoration:underline; }
     <div class="main-content">
         <h1>Detail Pengajuan Seminar Proposal</h1>
 
+        <!-- =============================== -->
+        <!-- INFORMASI MAHASISWA -->
+        <!-- =============================== -->
         <div class="card">
-            <h3>Informasi Mahasiswa</h3>
-            <p><b>Nama:</b> <?= htmlspecialchars($data['mahasiswa_nama'] ?? '-') ?></p>
-            <p><b>Tanggal Pengajuan:</b> <?= htmlspecialchars($data['created_at'] ?? '-') ?></p>
+            <h3>Informasi Pengajuan</h3>
+
             <p>
-                <b>Status:</b> 
+                <b>ID Seminar Proposal:</b><br>
+                <span class="id-badge">
+                    <?= htmlspecialchars($data['id_sempro'] ?? '-') ?>
+                </span>
+            </p>
+
+            <p><b>Nama Mahasiswa:</b> <?= htmlspecialchars($data['mahasiswa_nama'] ?? '-') ?></p>
+            <p><b>Tanggal Pengajuan:</b> <?= htmlspecialchars($data['created_at'] ?? '-') ?></p>
+
+            <p>
+                <b>Status:</b>
                 <span class="status <?= $status_class_map[strtolower($data['status'] ?? 'proses')] ?>">
                     <?= strtoupper($data['status'] ?? 'DIAJUKAN') ?>
                 </span>
             </p>
-            <p><b>Catatan Admin / Dosen:</b> <?= htmlspecialchars($data['catatan_admin'] ?? '-') ?></p>
+
+            <p><b>Catatan Admin / Dosen:</b><br>
+                <?= htmlspecialchars($data['catatan_admin'] ?? '-') ?>
+            </p>
         </div>
 
+        <!-- =============================== -->
+        <!-- DOKUMEN -->
+        <!-- =============================== -->
         <div class="card">
-            <h3>Dokumen</h3>
+            <h3>Dokumen Persyaratan</h3>
             <table>
                 <tr>
                     <th>Nama Dokumen</th>
@@ -96,12 +135,15 @@ a.file-link:hover { text-decoration:underline; }
                     <th>Status</th>
                     <th>Catatan</th>
                 </tr>
-                <?php foreach($files as $field=>$label): ?>
+
+                <?php foreach($files as $field => $label): ?>
                 <tr>
                     <td><?= $label ?></td>
                     <td>
                         <?php if (!empty($data[$field])): ?>
-                            <a href="../../uploads/sempro/<?= htmlspecialchars($data[$field]) ?>" target="_blank" class="file-link">Lihat File</a>
+                            <a href="../../uploads/sempro/<?= htmlspecialchars($data[$field]) ?>" target="_blank" class="file-link">
+                                Lihat File
+                            </a>
                         <?php else: ?>
                             -
                         <?php endif; ?>

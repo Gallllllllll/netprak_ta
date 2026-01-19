@@ -76,16 +76,16 @@ form button:hover { background:#0056b3; }
                 <input type="text" id="judul" name="judul" required>
 
                 <label for="bukti_pembayaran">Bukti Pembayaran:</label>
-                <input type="file" id="bukti_pembayaran" name="bukti_pembayaran" required>
+                <input type="file" name="bukti_pembayaran" required accept=".pdf,.doc,.docx">
 
                 <label for="formulir">Formulir Pendaftaran:</label>
-                <input type="file" id="formulir" name="formulir" required>
+                <input type="file" id="formulir" name="formulir" required accept=".pdf,.doc,.docx">
 
                 <label for="transkrip">Transkrip Nilai:</label>
-                <input type="file" id="transkrip" name="transkrip" required>
+                <input type="file" id="transkrip" name="transkrip" required accept=".pdf,.doc,.docx">
 
                 <label for="magang">Bukti Kelulusan Magang:</label>
-                <input type="file" id="magang" name="magang" required>
+                <input type="file" id="magang" name="magang" required accept=".pdf,.doc,.docx">
 
                 <button type="submit">Ajukan TA</button>
             </form>

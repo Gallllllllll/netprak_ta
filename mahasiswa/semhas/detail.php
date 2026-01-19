@@ -43,6 +43,7 @@ if (!$data) {
     border-radius:12px;
     box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
+
 .file-list li {
     margin-bottom:8px;
 }
@@ -53,6 +54,7 @@ if (!$data) {
 .file-list a:hover {
     text-decoration:underline;
 }
+
 .badge {
     padding:5px 12px;
     border-radius:20px;
@@ -105,8 +107,24 @@ if (!$data) {
 
 <div class="card">
 
+    <!-- ===============================
+         ID SEMINAR HASIL
+    =============================== -->
+    <p>
+        <b>ID Seminar Hasil:</b><br>
+        <span style="font-size:16px;font-weight:600;">
+            <?= htmlspecialchars($data['id_semhas']) ?>
+        </span>
+    </p>
+
+    <hr>
+
+    <!-- ===============================
+         DOKUMEN
+    =============================== -->
     <h3>Dokumen</h3>
     <ul class="file-list">
+
         <?php if(!empty($data['file_berita_acara'])): ?>
             <li>
                 <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_berita_acara']) ?>" target="_blank">
@@ -138,8 +156,12 @@ if (!$data) {
                 </a>
             </li>
         <?php endif; ?>
+
     </ul>
 
+    <!-- ===============================
+         STATUS
+    =============================== -->
     <p>
         <b>Status:</b>
         <span class="badge badge-<?= $data['status'] ?>">
@@ -147,6 +169,9 @@ if (!$data) {
         </span>
     </p>
 
+    <!-- ===============================
+         CATATAN ADMIN
+    =============================== -->
     <p>
         <b>Catatan Admin:</b><br>
         <?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?>
@@ -164,6 +189,9 @@ if (!$data) {
         </div>
     <?php endif; ?>
 
+    <!-- ===============================
+         ACTION BUTTON
+    =============================== -->
     <div class="actions">
         <a class="btn-back" href="status.php">Kembali</a>
 

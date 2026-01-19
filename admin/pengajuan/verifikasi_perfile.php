@@ -2,84 +2,84 @@
 session_start();
 require "../../config/connection.php";
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role']!=='admin'){
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
-if($_SERVER['REQUEST_METHOD']==='POST'){
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $id = $_POST['id'] ?? null;
     $status_all = $_POST['status'] ?? [];
     $catatan_all = $_POST['catatan'] ?? [];
 
-    if(!$id || empty($status_all)){
+    if (!$id || empty($status_all)) {
         die("Data tidak lengkap.");
     }
 
-    // mapping input name => kolom DB
+    // mapping input => kolom status di DB
     $files = [
-        'bukti_pembayaran'=>'status_bukti_pembayaran',
-        'formulir_pendaftaran'=>'status_formulir_pendaftaran',
-        'transkrip_nilai'=>'status_transkrip_nilai',
-        'bukti_magang'=>'status_bukti_magang'
+        'bukti_pembayaran'      => 'status_bukti_pembayaran',
+        'formulir_pendaftaran'  => 'status_formulir_pendaftaran',
+        'transkrip_nilai'       => 'status_transkrip_nilai',
+        'bukti_magang'          => 'status_bukti_magang'
     ];
 
-    foreach($status_all as $file=>$status){
-        $status_field = $files[$file] ?? null;
-        $catatan_field = "catatan_$file";
-        $catatan = $catatan_all[$file] ?? '';
+    foreach ($status_all as $file => $status) {
 
-        if(!$status_field) continue;
+        if (!isset($files[$file])) continue;
+
+        $status_field  = $files[$file];
+        $catatan_field = "catatan_$file";
+        $catatan       = $catatan_all[$file] ?? '';
+
+        // VALIDASI ENUM
+        if (!in_array($status, ['proses','revisi','disetujui','ditolak'])) {
+            die("Status tidak valid.");
+        }
 
         // update status & catatan
-        $stmt = $pdo->prepare("UPDATE pengajuan_ta SET $status_field=?, $catatan_field=? WHERE id=?");
+        $stmt = $pdo->prepare("
+            UPDATE pengajuan_ta 
+            SET $status_field = ?, $catatan_field = ?
+            WHERE id = ?
+        ");
         $stmt->execute([$status, $catatan, $id]);
+    }
 
-        // jika status revisi, insert ke revisi_ta
-        if($status === 'revisi'){
-            $jenis_file_map = [
-                'bukti_pembayaran'=>'Bukti Pembayaran',
-                'formulir_pendaftaran'=>'Formulir Pendaftaran',
-                'transkrip_nilai'=>'Transkrip Nilai',
-                'bukti_magang'=>'Bukti Kelulusan Magang'
-            ];
-            $jenis_file = $jenis_file_map[$file] ?? $file;
+    /* ========================
+       HITUNG STATUS GLOBAL
+    ======================== */
+    $stmt = $pdo->prepare("
+        SELECT 
+            status_bukti_pembayaran,
+            status_formulir_pendaftaran,
+            status_transkrip_nilai,
+            status_bukti_magang
+        FROM pengajuan_ta
+        WHERE id = ?
+    ");
+    $stmt->execute([$id]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // cek dulu, kalau sudah ada revisi sama, jangan insert lagi
-            $stmt_check = $pdo->prepare("SELECT id FROM revisi_ta WHERE pengajuan_id=? AND nama_file=?");
-            $stmt_check->execute([$id, $jenis_file]);
-            if(!$stmt_check->fetch()){
-                $stmt2 = $pdo->prepare("INSERT INTO revisi_ta (pengajuan_id, nama_file) VALUES (?, ?)");
-                $stmt2->execute([$id, $jenis_file]);
-            }
-        } else {
-            // jika sebelumnya ada revisi tapi sekarang disetujui, hapus dari revisi_ta
-            $jenis_file_map = [
-                'bukti_pembayaran'=>'Bukti Pembayaran',
-                'formulir_pendaftaran'=>'Formulir Pendaftaran',
-                'transkrip_nilai'=>'Transkrip Nilai',
-                'bukti_magang'=>'Bukti Kelulusan Magang'
-            ];
-            $jenis_file = $jenis_file_map[$file] ?? $file;
-            $stmt_del = $pdo->prepare("DELETE FROM revisi_ta WHERE pengajuan_id=? AND nama_file=?");
-            $stmt_del->execute([$id, $jenis_file]);
-        }
+    $statuses = array_values($data);
+
+    if (in_array('ditolak', $statuses)) {
+        $overall_status = 'ditolak';
+    } elseif (in_array('revisi', $statuses)) {
+        $overall_status = 'revisi';
+    } elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'disetujui') {
+        $overall_status = 'disetujui';
+    } else {
+        $overall_status = 'proses';
     }
 
     // update status global
-    $stmt = $pdo->prepare("SELECT * FROM pengajuan_ta WHERE id=?");
-    $stmt->execute([$id]);
-    $data = $stmt->fetch();
-
-    $all_approved = (
-        ($data['status_bukti_pembayaran']??'')==='disetujui' &&
-        ($data['status_formulir_pendaftaran']??'')==='disetujui' &&
-        ($data['status_transkrip_nilai']??'')==='disetujui' &&
-        ($data['status_bukti_magang']??'')==='disetujui'
-    );
-
-    $overall_status = $all_approved ? 'disetujui' : 'revisi';
-    $stmt = $pdo->prepare("UPDATE pengajuan_ta SET status=? WHERE id=?");
+    $stmt = $pdo->prepare("
+        UPDATE pengajuan_ta 
+        SET status = ?
+        WHERE id = ?
+    ");
     $stmt->execute([$overall_status, $id]);
 
     header("Location: index.php?id=$id");

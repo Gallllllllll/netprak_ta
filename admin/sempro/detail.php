@@ -71,7 +71,7 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
 .btn-save { background: linear-gradient(135deg, #FF74C7, #FF983D); color: #fff; }
 
 .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; margin-left: 6px; }
-.badge-proses { background: #e5e7eb; color: #374151; }
+.badge-diajukan { background: #e5e7eb; color: #374151; }
 .badge-revisi { background: #fde68a; color: #92400e; }
 .badge-ditolak { background: #fecaca; color: #991b1b; }
 .badge-disetujui { background: #bbf7d0; color: #166534; }
@@ -93,6 +93,7 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
     </div>
 
     <div class="card">
+        <p><b>ID Seminar Proposal:</b> <?= htmlspecialchars($data['id_sempro'] ?? '-') ?></p>
         <p><b>Nama Mahasiswa:</b> <?= htmlspecialchars($data['nama']) ?></p>
         <p><b>Judul TA:</b> <?= htmlspecialchars($data['judul_ta']) ?></p>
         <p>
@@ -122,7 +123,7 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
                     $file_field     = "file_$key";
                     $status_field   = "status_file_$key";
                     $catatan_field  = "catatan_file_$key";
-                    $st = $data[$status_field] ?? 'proses';
+                    $st = $data[$status_field] ?? 'diajukan';
                 ?>
                 <tr>
                     <td>
@@ -130,7 +131,7 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
                         <span class="badge badge-<?= $st ?>"><?= $st ?></span>
 
                         <select name="status[<?= $key ?>]">
-                            <option value="proses" <?= $st=='proses'?'selected':'' ?>>Proses</option>
+                            <option value="diajukan" <?= $st=='diajukan'?'selected':'' ?>>Diajukan</option>
                             <option value="revisi" <?= $st=='revisi'?'selected':'' ?>>Revisi</option>
                             <option value="ditolak" <?= $st=='ditolak'?'selected':'' ?>>Ditolak</option>
                             <option value="disetujui" <?= $st=='disetujui'?'selected':'' ?>>Disetujui</option>

@@ -7,7 +7,7 @@ require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
    CEK LOGIN MAHASISWA
 ================================ */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
-    header("Location: ".base_url('login.php'));
+    header("Location: " . base_url('login.php'));
     exit;
 }
 
@@ -18,7 +18,7 @@ $boleh_upload = false;
    CEK PENGAJUAN TA TERAKHIR
 ================================ */
 $stmt = $pdo->prepare("
-    SELECT id, judul_ta, status
+    SELECT id, id_pengajuan, judul_ta, status
     FROM pengajuan_ta
     WHERE mahasiswa_id = ?
     ORDER BY created_at DESC
@@ -31,12 +31,17 @@ $ta = $stmt->fetch(PDO::FETCH_ASSOC);
    VALIDASI ALUR TA
 ================================ */
 if (!$ta) {
+
     $pesan_error = "Anda belum mengajukan Tugas Akhir.\nSilakan ajukan Tugas Akhir terlebih dahulu.";
+
 } elseif ($ta['status'] !== 'disetujui') {
-    $pesan_error = "Pengajuan Tugas Akhir belum selesai.\nStatus saat ini: {$ta['status']}\nSilakan selesaikan proses pengajuan TA terlebih dahulu.";
+
+    $pesan_error = "Pengajuan Tugas Akhir belum selesai.\nStatus saat ini: {$ta['status']}";
+
 } else {
+
     /* ===============================
-       CEK PERSETUJUAN DOSBING
+       CEK PERSETUJUAN DOSEN PEMBIMBING
     ================================ */
     $stmt = $pdo->prepare("
         SELECT COUNT(*) 
@@ -47,22 +52,29 @@ if (!$ta) {
     $stmt->execute([$ta['id']]);
 
     if ($stmt->fetchColumn() < 2) {
+
         $pesan_error = "Pengajuan Seminar Proposal belum dapat dilakukan.\nMenunggu persetujuan dari Dosen Pembimbing 1 dan 2.";
+
     } else {
+
         /* ===============================
            CEK SUDAH AJUKAN SEMPRO
         ================================ */
         $cek = $pdo->prepare("
             SELECT id 
             FROM pengajuan_sempro 
-            WHERE mahasiswa_id = ?
+            WHERE pengajuan_ta_id = ?
             LIMIT 1
         ");
-        $cek->execute([$_SESSION['user']['id']]);
+        $cek->execute([$ta['id']]);
 
         if ($cek->rowCount() > 0) {
+
             $pesan_error = "Anda sudah pernah mengajukan Seminar Proposal.";
+
         } else {
+
+            // ⬅️ TIDAK ADA PEMBUATAN ID APA PUN DI SINI
             $boleh_upload = true;
         }
     }
@@ -77,63 +89,35 @@ if (!$ta) {
 
 <style>
 .card {
-    background: #ffffff;
-    padding: 26px;
-    max-width: 720px;
-    border-radius: 16px;
-    box-shadow: 0 6px 14px rgba(0,0,0,.08);
+    background:#fff;
+    padding:26px;
+    max-width:720px;
+    border-radius:16px;
+    box-shadow:0 6px 14px rgba(0,0,0,.08);
 }
-
-.card h2 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    font-size: 22px;
-    color: #1f2937;
-}
-
 .alert {
-    background: #fff7ed;
-    color: #9a3412;
-    padding: 14px 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    line-height: 1.5;
+    background:#fff7ed;
+    color:#9a3412;
+    padding:14px;
+    border-radius:12px;
+    margin-bottom:16px;
+    white-space:pre-line;
 }
-
 label {
-    display: block;
-    margin-top: 14px;
-    font-weight: 600;
-    font-size: 14px;
+    display:block;
+    margin-top:14px;
+    font-weight:600;
 }
-
-input[type="file"] {
-    width: 100%;
-    margin-top: 6px;
-}
-
 button {
-    margin-top: 20px;
-    width: 100%;
-    padding: 12px;
-    background: linear-gradient(135deg,#FF74C7,#FF983D);
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-button:hover {
-    opacity: .9;
-}
-
-hr {
-    margin: 22px 0;
-    border: none;
-    border-top: 1px solid #e5e7eb;
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    background:linear-gradient(135deg,#FF74C7,#FF983D);
+    color:#fff;
+    border:none;
+    border-radius:14px;
+    font-weight:600;
+    cursor:pointer;
 }
 </style>
 </head>
@@ -144,18 +128,19 @@ hr {
 
 <div class="main-content">
 
-    <div class="dashboard-header">
-        <h1>Pengajuan Seminar Proposal</h1>
-        <p>Unggah dokumen Seminar Proposal sesuai ketentuan</p>
-    </div>
+    <h1>Pengajuan Seminar Proposal</h1>
 
     <div class="card">
 
         <?php if ($pesan_error): ?>
-            <div class="alert"><?= nl2br(htmlspecialchars($pesan_error)) ?></div>
+            <div class="alert"><?= htmlspecialchars($pesan_error) ?></div>
 
         <?php elseif ($boleh_upload): ?>
+
             <form action="simpan.php" method="POST" enctype="multipart/form-data">
+
+                <!-- HANYA KIRIM ID TA -->
+                <input type="hidden" name="pengajuan_ta_id" value="<?= $ta['id'] ?>">
 
                 <label>Form Pendaftaran Seminar Proposal (PDF)</label>
                 <input type="file" name="file_pendaftaran" accept="application/pdf" required>
@@ -167,18 +152,17 @@ hr {
                 <input type="file" name="file_konsultasi" accept="application/pdf" required>
 
                 <button type="submit">Ajukan Seminar Proposal</button>
-
             </form>
+
         <?php endif; ?>
 
         <?php if ($ta): ?>
             <hr>
-            <p><b>Judul Tugas Akhir:</b><br><?= htmlspecialchars($ta['judul_ta']) ?></p>
+            <p><b>Judul TA:</b><br><?= htmlspecialchars($ta['judul_ta']) ?></p>
             <p><b>Status TA:</b> <?= htmlspecialchars($ta['status']) ?></p>
         <?php endif; ?>
 
     </div>
-
 </div>
 
 </body>

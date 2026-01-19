@@ -12,6 +12,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $stmt = $pdo->prepare("
     SELECT 
         p.id,
+        p.id_pengajuan,
         p.judul_ta,
         p.status,
         p.catatan_admin,
@@ -65,10 +66,6 @@ body {
     display:flex;
     min-height:100vh;
 }
-.content {
-    flex:1;
-    padding:20px;
-}
 .card {
     background:#fff;
     padding:20px;
@@ -88,6 +85,16 @@ body {
 .status-ditolak { background:#dc3545; }
 .status-revisi { background:#17a2b8; }
 
+.badge-id {
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:6px;
+    background:#eef2ff;
+    color:#3730a3;
+    font-weight:700;
+    margin-bottom:6px;
+}
+
 a.button {
     display:inline-block;
     padding:8px 12px;
@@ -103,11 +110,7 @@ a.button:hover {
 ul.dosen, ul.revisi {
     margin:8px 0 0 20px;
 }
-ul.revisi li {
-    margin-bottom:4px;
-}
 </style>
-
 </head>
 <body>
 
@@ -122,22 +125,26 @@ ul.revisi li {
             <?php foreach($pengajuan_list as $data): ?>
 
                 <div class="card">
+
+                    <!-- ID PENGAJUAN -->
+                    <div class="badge-id">
+                        ID Pengajuan: <?= htmlspecialchars($data['id_pengajuan'] ?? '-') ?>
+                    </div>
+
                     <h3><?= htmlspecialchars($data['judul_ta']) ?></h3>
 
                     <?php
-                    $status_class = '';
                     switch (strtolower($data['status'])) {
-                        case 'proses': $status_class = 'status-proses'; break;
-                        case 'disetujui': $status_class = 'status-disetujui'; break;
-                        case 'ditolak': $status_class = 'status-ditolak'; break;
-                        case 'revisi': $status_class = 'status-revisi'; break;
-                        default: $status_class = 'status-proses';
+                        case 'disetujui': $cls = 'status-disetujui'; break;
+                        case 'ditolak': $cls = 'status-ditolak'; break;
+                        case 'revisi': $cls = 'status-revisi'; break;
+                        default: $cls = 'status-proses';
                     }
                     ?>
 
                     <p>
                         Status:
-                        <span class="status <?= $status_class ?>">
+                        <span class="status <?= $cls ?>">
                             <?= strtoupper($data['status'] ?? 'PROSES') ?>
                         </span>
                     </p>
@@ -152,8 +159,8 @@ ul.revisi li {
                     <?php if (strtolower($data['status']) === 'disetujui'): ?>
                         <p><b>Dosen Pembimbing:</b></p>
                         <ul class="dosen">
-                            <li>Pembimbing 1: <?= $data['dosen1_nama'] ?? '-' ?></li>
-                            <li>Pembimbing 2: <?= $data['dosen2_nama'] ?? '-' ?></li>
+                            <li>Pembimbing 1: <?= htmlspecialchars($data['dosen1_nama'] ?? '-') ?></li>
+                            <li>Pembimbing 2: <?= htmlspecialchars($data['dosen2_nama'] ?? '-') ?></li>
                         </ul>
                     <?php endif; ?>
 
@@ -173,14 +180,20 @@ ul.revisi li {
                                 }
                             }
                             if(!$has_revisi){
-                                echo "<li>- Tidak ada file spesifik, silakan cek catatan admin.</li>";
+                                echo "<li>- Tidak ada file spesifik</li>";
                             }
                             ?>
                         </ul>
-                        <a href="revisi_ta.php?id=<?= $data['id'] ?>" class="button">Upload Revisi</a>
+                        <a href="revisi_ta.php?id=<?= $data['id'] ?>" class="button">
+                            Upload Revisi
+                        </a>
                     <?php endif; ?>
 
-                    <p><a href="detail.php?id=<?= $data['id'] ?>" class="button">Lihat Detail</a></p>
+                    <p>
+                        <a href="detail.php?id=<?= $data['id'] ?>" class="button">
+                            Lihat Detail
+                        </a>
+                    </p>
                 </div>
 
             <?php endforeach; ?>

@@ -2,7 +2,9 @@
 session_start();
 require "../../config/connection.php";
 
-// cek role mahasiswa
+// ===============================
+// CEK ROLE MAHASISWA
+// ===============================
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
     exit;
@@ -11,14 +13,24 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $id = $_GET['id'] ?? 0;
 $upload_dir = "../../uploads/ta/";
 
-// ambil data pengajuan
-$stmt = $pdo->prepare("SELECT * FROM pengajuan_ta WHERE id=? AND mahasiswa_id=?");
+// ===============================
+// AMBIL DATA PENGAJUAN TA
+// ===============================
+$stmt = $pdo->prepare("
+    SELECT * 
+    FROM pengajuan_ta 
+    WHERE id = ? AND mahasiswa_id = ?
+");
 $stmt->execute([$id, $_SESSION['user']['id']]);
-$data = $stmt->fetch();
+$data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$data) die("Pengajuan tidak ditemukan.");
+if (!$data) {
+    die("Pengajuan tidak ditemukan.");
+}
 
-// mapping input => kolom db
+// ===============================
+// MAPPING FILE
+// ===============================
 $files = [
     'bukti_pembayaran' => [
         'db' => 'bukti_pembayaran',
@@ -46,49 +58,54 @@ $files = [
     ],
 ];
 
-// proses upload revisi
+// ===============================
+// PROSES UPLOAD REVISI
+// ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $updates = [];
     $adaUpload = false;
 
-    foreach ($files as $input_name => $f) {
-        if (!empty($_FILES[$input_name]['name'])) {
+    foreach ($files as $input => $f) {
+
+        // hanya boleh upload kalau status = revisi
+        if (
+            ($data[$f['status']] ?? '') === 'revisi' &&
+            !empty($_FILES[$input]['name'])
+        ) {
 
             $adaUpload = true;
-            $nama = time() . '_' . basename($_FILES[$input_name]['name']);
 
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
 
-            if (move_uploaded_file($_FILES[$input_name]['tmp_name'], $upload_dir . $nama)) {
+            $nama = time() . '_' . preg_replace("/[^a-zA-Z0-9._-]/", "_", $_FILES[$input]['name']);
+            $target = $upload_dir . $nama;
 
-                // update file + reset status per file
-                $updates[] = "{$f['db']} = '$nama'";
-                $updates[] = "{$f['status']} = 'proses'";
+            if (move_uploaded_file($_FILES[$input]['tmp_name'], $target)) {
+
+                $updates[] = "{$f['db']} = " . $pdo->quote($nama);
+                $updates[] = "{$f['status']} = 'diajukan'";
                 $updates[] = "{$f['catatan']} = NULL";
 
-                // simpan histori revisi (opsional)
-                $stmt2 = $pdo->prepare("
+                // histori revisi (opsional)
+                $pdo->prepare("
                     INSERT INTO revisi_ta (pengajuan_id, nama_file)
                     VALUES (?, ?)
-                ");
-                $stmt2->execute([$id, $nama]);
+                ")->execute([$id, $nama]);
             }
         }
     }
 
     if ($adaUpload && $updates) {
-        // reset status global
         $sql = "
             UPDATE pengajuan_ta SET
                 " . implode(", ", $updates) . ",
-                status = 'proses'
+                status = 'diajukan'
             WHERE id = ?
         ";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$id]);
+        $pdo->prepare($sql)->execute([$id]);
     }
 
     header("Location: status.php");
@@ -96,49 +113,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Revisi Pengajuan TA</title>
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../../style.css">
 <style>
 body { font-family:Arial,sans-serif; background:#f4f6f8; padding:20px; }
 form { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); max-width:600px; margin:auto; }
 label { display:block; margin-top:15px; font-weight:bold; }
 input[type=file], input[type=text] { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
-button { margin-top:15px; padding:10px 20px; background:#17a2b8; color:#fff; border:none; border-radius:6px; cursor:pointer; }
-button:hover { background:#138496; }
+button { margin-top:15px; padding:10px 20px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+button:hover { background:#1d4ed8; }
+.alert { background:#fff3cd; padding:12px; border-radius:6px; margin-bottom:15px; }
 </style>
 </head>
 <body>
 
-<h1>Revisi Pengajuan TA</h1>
+<h1>Revisi Pengajuan Tugas Akhir</h1>
 
 <form method="POST" enctype="multipart/form-data">
-    <label>Judul TA (tidak bisa diubah)</label>
-    <input type="text" name="judul" value="<?= htmlspecialchars($data['judul_ta']) ?>" readonly>
+
+    <label>Judul TA</label>
+    <input type="text" value="<?= htmlspecialchars($data['judul_ta']) ?>" readonly>
 
     <?php
     $has_revisi = false;
-    foreach($files as $input_name => $f):
-        if(($data[$f['status']] ?? '') === 'revisi'):
+    foreach ($files as $input => $f):
+        if (($data[$f['status']] ?? '') === 'revisi'):
             $has_revisi = true;
     ?>
-        <label><?= $f['label'] ?></label>
-        <input type="file" name="<?= $input_name ?>">
+        <label><?= htmlspecialchars($f['label']) ?></label>
+        <input type="file" id="<?= $input ?>" name="<?= $input ?>" required accept=".pdf,.doc,.docx">
     <?php
         endif;
     endforeach;
 
-    if(!$has_revisi):
-        echo "<p>Semua file sudah disetujui. Tidak ada file yang perlu direvisi.</p>";
+    if (!$has_revisi):
+        echo "<div class='alert'>Tidak ada file yang perlu direvisi.</div>";
     else:
     ?>
         <button type="submit">Upload Revisi</button>
     <?php endif; ?>
+
 </form>
 
 </body>

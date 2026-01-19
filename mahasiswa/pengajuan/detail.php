@@ -15,20 +15,16 @@ $id = $_GET['id'] ?? 0;
 $stmt = $pdo->prepare("
     SELECT 
         p.*,
-
         MAX(CASE WHEN db.role = 'dosbing_1' THEN d.nama END) AS dosen1_nama,
         MAX(CASE WHEN db.role = 'dosbing_2' THEN d.nama END) AS dosen2_nama
-
     FROM pengajuan_ta p
     LEFT JOIN dosbing_ta db ON p.id = db.pengajuan_id
     LEFT JOIN dosen d ON db.dosen_id = d.id
-
     WHERE p.id = ? AND p.mahasiswa_id = ?
     GROUP BY p.id
 ");
 $stmt->execute([$id, $_SESSION['user']['id']]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
-
 
 if (!$data) {
     die("Pengajuan tidak ditemukan.");
@@ -114,6 +110,16 @@ ul.dosen {
     <div class="card">
 
         <h1>Detail Pengajuan TA</h1>
+
+        <!-- ✅ ID PENGAJUAN -->
+        <p>
+            <b>ID Pengajuan:</b><br>
+            <span style="background:#f1f1f1;padding:4px 10px;border-radius:5px;font-weight:bold;">
+                <?= $data['id_pengajuan']
+                    ? htmlspecialchars($data['id_pengajuan'])
+                    : '-' ?>
+            </span>
+        </p>
 
         <p><b>Judul TA:</b><br>
             <?= htmlspecialchars($data['judul_ta']) ?>

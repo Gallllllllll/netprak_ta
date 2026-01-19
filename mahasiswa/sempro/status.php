@@ -63,6 +63,17 @@ $file_map = [
     color:#1f2937;
 }
 
+.id-sempro {
+    background:#eef2ff;
+    color:#3730a3;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    display:inline-block;
+    margin-bottom:8px;
+}
+
 .status {
     display:inline-block;
     padding:6px 14px;
@@ -129,6 +140,12 @@ ul.files li {
             <?php $status_class = 'status-' . strtolower($data['status']); ?>
 
             <div class="card">
+
+                <!-- ID SEMPRO -->
+                <div class="id-sempro">
+                    ID SEMPRO: <?= htmlspecialchars($data['id_sempro'] ?? '-') ?>
+                </div>
+
                 <h3><?= htmlspecialchars($data['judul_ta']) ?></h3>
 
                 <p>
@@ -140,7 +157,7 @@ ul.files li {
 
                 <p>
                     <b>Catatan Admin / Dosen:</b><br>
-                    <?= htmlspecialchars($data['catatan_admin'] ?? '-') ?>
+                    <?= htmlspecialchars($data['catatan'] ?? '-') ?>
                 </p>
 
                 <p><b>Dokumen:</b></p>
@@ -154,7 +171,7 @@ ul.files li {
 
                                 <?php if (($data[$info['status']] ?? '') === 'revisi'): ?>
                                     <span class="badge-revisi">
-                                        Revisi (<?= htmlspecialchars($data[$field]) ?>)
+                                        Revisi
                                     </span>
                                 <?php endif; ?>
                             </li>

@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (move_uploaded_file($_FILES[$input]['tmp_name'], $target)) {
                 $updates[] = "{$f['db']} = " . $pdo->quote($filename);
-                $updates[] = "{$f['status']} = 'pending'";
+                $updates[] = "{$f['status']} = 'diajukan'";
             }
         }
     }
@@ -163,7 +163,8 @@ button:hover {
             $ada_revisi = true;
     ?>
         <label><?= htmlspecialchars($f['label']) ?></label>
-        <input type="file" name="<?= $input ?>" required>
+        <input type="file" name="<?= $input ?>"
+           accept=".pdf,.doc,.docx" required> 
     <?php
         endif;
     endforeach;

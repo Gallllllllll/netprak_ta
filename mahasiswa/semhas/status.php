@@ -61,7 +61,6 @@ $fileMap = [
     margin-bottom:15px;
     box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
-
 .badge {
     display:inline-block;
     padding:4px 10px;
@@ -123,7 +122,7 @@ $fileMap = [
 
 <?php
     // ===============================
-    // FILE YANG REVISI
+    // FILE YANG PERLU REVISI
     // ===============================
     $revisiFiles = [];
     foreach ($fileMap as $f) {
@@ -134,6 +133,9 @@ $fileMap = [
 ?>
 
 <div class="card">
+
+    <!-- ID SEMHAS -->
+    <p><b>ID Seminar Hasil:</b> <?= htmlspecialchars($d['id_semhas']) ?></p>
 
     <p>
         <b>Status:</b>
@@ -147,15 +149,12 @@ $fileMap = [
         <?= date('d M Y', strtotime($d['created_at'])) ?>
     </p>
 
-    <!-- ===============================
-         JADWAL SIDANG (JIKA ADA)
-    =============================== -->
     <?php if (!empty($d['tanggal_sidang'])): ?>
         <div class="jadwal">
             <b>📅 Jadwal Sidang Seminar Hasil</b><br>
             Tanggal : <?= date('d M Y', strtotime($d['tanggal_sidang'])) ?><br>
             Jam     : <?= substr($d['jam_sidang'], 0, 5) ?> WIB<br>
-            Tempat : <?= htmlspecialchars($d['tempat_sidang']) ?>
+            Tempat  : <?= htmlspecialchars($d['tempat_sidang']) ?>
         </div>
     <?php endif; ?>
 

@@ -11,7 +11,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $pesan_error = '';
 $boleh_upload = false;
 
-/* CEK TA */
+/* ===============================
+   CEK TA
+================================ */
 $stmt = $pdo->prepare("
     SELECT id, judul_ta, status 
     FROM pengajuan_ta 
@@ -24,7 +26,9 @@ $ta = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$ta || $ta['status'] !== 'disetujui') {
     $pesan_error = "Tugas Akhir belum disetujui.";
 } else {
-    /* CEK SEMPRO */
+    /* ===============================
+       CEK SEMPRO
+    ================================ */
     $cek = $pdo->prepare("
         SELECT status 
         FROM pengajuan_sempro 
@@ -37,7 +41,9 @@ if (!$ta || $ta['status'] !== 'disetujui') {
     if (!$sempro || $sempro['status'] !== 'disetujui') {
         $pesan_error = "Seminar Proposal belum disetujui.";
     } else {
-        /* CEK SUDAH SEMHAS */
+        /* ===============================
+           CEK SUDAH SEMHAS
+        ================================ */
         $cek = $pdo->prepare("
             SELECT id FROM pengajuan_semhas 
             WHERE mahasiswa_id = ? LIMIT 1
@@ -61,8 +67,13 @@ if (!$ta || $ta['status'] !== 'disetujui') {
 .card{background:#fff;padding:26px;max-width:720px;border-radius:16px}
 .alert{background:#fff7ed;color:#9a3412;padding:14px;border-radius:12px}
 label{margin-top:14px;display:block;font-weight:600}
-button{margin-top:20px;width:100%;padding:12px;border:none;border-radius:14px;
-background:linear-gradient(135deg,#FF74C7,#FF983D);color:#fff;font-weight:600}
+input[type=file]{margin-top:6px}
+button{
+    margin-top:20px;width:100%;padding:12px;border:none;border-radius:14px;
+    background:linear-gradient(135deg,#FF74C7,#FF983D);
+    color:#fff;font-weight:600
+}
+small{color:#6b7280}
 </style>
 </head>
 <body>
@@ -78,22 +89,30 @@ background:linear-gradient(135deg,#FF74C7,#FF983D);color:#fff;font-weight:600}
 <div class="card">
 
 <?php if ($pesan_error): ?>
-    <div class="alert"><?= nl2br(htmlspecialchars($pesan_error)) ?></div>
+    <div class="alert"><?= htmlspecialchars($pesan_error) ?></div>
 
 <?php elseif ($boleh_upload): ?>
 <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
-    <label>Lembar Berita Acara (PDF/JPG)</label>
-    <input type="file" name="file_berita_acara" required>
+    <label>Lembar Berita Acara</label>
+    <input type="file" name="file_berita_acara"
+           accept=".pdf,.doc,.docx" required>
+    <small>Format: PDF / Word</small>
 
     <label>Persetujuan Laporan TA (Form 5)</label>
-    <input type="file" name="file_persetujuan_laporan" accept="application/pdf" required>
+    <input type="file" name="file_persetujuan_laporan"
+           accept=".pdf,.doc,.docx" required>
+    <small>Format: PDF / Word</small>
 
     <label>Form Pendaftaran Ujian TA (Form 7)</label>
-    <input type="file" name="file_pendaftaran_ujian" accept="application/pdf" required>
+    <input type="file" name="file_pendaftaran_ujian"
+           accept=".pdf,.doc,.docx" required>
+    <small>Format: PDF / Word</small>
 
     <label>Buku Konsultasi TA (Form 4)</label>
-    <input type="file" name="file_buku_konsultasi" accept="application/pdf" required>
+    <input type="file" name="file_buku_konsultasi"
+           accept=".pdf,.doc,.docx" required>
+    <small>Format: PDF / Word</small>
 
     <button type="submit">Ajukan Seminar Hasil</button>
 </form>

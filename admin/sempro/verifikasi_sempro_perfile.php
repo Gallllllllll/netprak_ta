@@ -3,45 +3,82 @@ session_start();
 require "../../config/connection.php";
 
 // cek role admin
-if(!isset($_SESSION['user']) || $_SESSION['user']['role']!=='admin'){
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
 
-if($_SERVER['REQUEST_METHOD']==='POST'){
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $id = $_POST['id'] ?? null;
     $status_all = $_POST['status'] ?? [];
     $catatan_all = $_POST['catatan'] ?? [];
 
-    if(!$id || empty($status_all)){
+    if (!$id || empty($status_all)) {
         die("Data tidak lengkap.");
     }
 
-    $files = ['pendaftaran','persetujuan','buku_konsultasi'];
+    // daftar file sempro
+    $files = ['pendaftaran', 'persetujuan', 'buku_konsultasi'];
 
-    foreach($files as $key){
-        $status_field = "status_file_{$key}";
-        $catatan_field = "catatan_file_{$key}";
-        $status = $status_all[$key] ?? 'pending';
+    /* ========================
+       UPDATE STATUS PER FILE
+    ======================== */
+    foreach ($files as $key) {
+
+        $status_field  = "status_file_$key";
+        $catatan_field = "catatan_file_$key";
+
+        // DEFAULT STATUS = diajukan (AMAN ENUM)
+        $status  = $status_all[$key] ?? 'diajukan';
         $catatan = $catatan_all[$key] ?? '';
 
-        $stmt = $pdo->prepare("UPDATE pengajuan_sempro SET $status_field=?, $catatan_field=? WHERE id=?");
+        // validasi enum biar aman
+        $allowed_status = ['diajukan','revisi','disetujui','ditolak'];
+        if (!in_array($status, $allowed_status)) {
+            $status = 'diajukan';
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE pengajuan_sempro 
+            SET $status_field = ?, $catatan_field = ? 
+            WHERE id = ?
+        ");
         $stmt->execute([$status, $catatan, $id]);
     }
 
-    // update status keseluruhan pengajuan
-    $stmt = $pdo->prepare("SELECT * FROM pengajuan_sempro WHERE id=?");
+    /* ========================
+       HITUNG STATUS KESELURUHAN
+    ======================== */
+    $stmt = $pdo->prepare("SELECT * FROM pengajuan_sempro WHERE id = ?");
     $stmt->execute([$id]);
-    $data = $stmt->fetch();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $all_approved = (
-        ($data['status_file_pendaftaran']??'')==='disetujui' &&
-        ($data['status_file_persetujuan']??'')==='disetujui' &&
-        ($data['status_file_buku_konsultasi']??'')==='disetujui'
-    );
+    $statuses = [
+        $data['status_file_pendaftaran'],
+        $data['status_file_persetujuan'],
+        $data['status_file_buku_konsultasi']
+    ];
 
-    $overall_status = $all_approved ? 'disetujui' : 'revisi';
-    $pdo->prepare("UPDATE pengajuan_sempro SET status=? WHERE id=?")->execute([$overall_status, $id]);
+    if (in_array('ditolak', $statuses)) {
+        $overall_status = 'ditolak';
+    } elseif (in_array('revisi', $statuses)) {
+        $overall_status = 'revisi';
+    } elseif (
+        $statuses[0] === 'disetujui' &&
+        $statuses[1] === 'disetujui' &&
+        $statuses[2] === 'disetujui'
+    ) {
+        $overall_status = 'disetujui';
+    } else {
+        $overall_status = 'diajukan';
+    }
+
+    $pdo->prepare("
+        UPDATE pengajuan_sempro 
+        SET status = ? 
+        WHERE id = ?
+    ")->execute([$overall_status, $id]);
 
     header("Location: index.php?id=$id");
     exit;

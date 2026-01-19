@@ -2,9 +2,7 @@
 session_start();
 require "../../config/connection.php";
 
-// ===============================
-// CEK ROLE MAHASISWA
-// ===============================
+// cek role mahasiswa
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
     exit;
@@ -13,24 +11,14 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $id = $_GET['id'] ?? 0;
 $upload_dir = "../../uploads/sempro/";
 
-// ===============================
-// AMBIL DATA PENGAJUAN SEMPRO
-// ===============================
-$stmt = $pdo->prepare("
-    SELECT *
-    FROM pengajuan_sempro
-    WHERE id=? AND mahasiswa_id=?
-");
+// ambil data pengajuan
+$stmt = $pdo->prepare("SELECT * FROM pengajuan_sempro WHERE id=? AND mahasiswa_id=?");
 $stmt->execute([$id, $_SESSION['user']['id']]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$data) {
-    die("Pengajuan Seminar Proposal tidak ditemukan.");
-}
+if (!$data) die("Pengajuan Seminar Proposal tidak ditemukan.");
 
-// ===============================
-// MAPPING FILE SEMPRO
-// ===============================
+// mapping file
 $files = [
     'file_pendaftaran' => [
         'db' => 'file_pendaftaran',
@@ -38,20 +26,18 @@ $files = [
         'label' => 'File Pendaftaran'
     ],
     'file_persetujuan' => [
-        'db' => 'file_lembar_persetujuan',
+        'db' => 'file_persetujuan',
         'status' => 'status_file_persetujuan',
-        'label' => 'Lembar File Pembimbing'
+        'label' => 'Lembar Persetujuan'
     ],
     'file_buku_konsultasi' => [
-        'db' => 'file_bukti_konsultasi',
+        'db' => 'file_buku_konsultasi',
         'status' => 'status_file_buku_konsultasi',
         'label' => 'Buku Konsultasi'
     ],
 ];
 
-// ===============================
-// PROSES UPLOAD REVISI
-// ===============================
+// proses upload revisi
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $updates = [];
@@ -70,13 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (move_uploaded_file($_FILES[$input]['tmp_name'], $target)) {
                 $updates[] = "{$f['db']} = " . $pdo->quote($filename);
-                $updates[] = "{$f['status']} = 'pending'";
+                $updates[] = "{$f['status']} = 'diajukan'";
             }
         }
     }
 
     if ($updates) {
-        // setelah revisi → status kembali ke diajukan
         $sql = "
             UPDATE pengajuan_sempro
             SET " . implode(', ', $updates) . ",
@@ -91,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -159,7 +145,8 @@ foreach ($files as $input => $f):
         $ada_revisi = true;
 ?>
     <label><?= htmlspecialchars($f['label']) ?></label>
-    <input type="file" name="<?= $input ?>" required>
+    <input type="file" name="<?= $input ?>" accept=".pdf,.doc,.docx" required>
+    
 <?php
     endif;
 endforeach;
