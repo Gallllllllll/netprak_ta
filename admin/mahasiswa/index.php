@@ -119,7 +119,7 @@ td{
 .dataTables_paginate .paginate_button{
     padding:6px 12px;margin:20px 2px;
     border-radius:10px;
-    font-size: 14px !important
+    font-size: 14px !important;
 }
 .dataTables_paginate .paginate_button.current{
     background:#ff8c42 !important;
