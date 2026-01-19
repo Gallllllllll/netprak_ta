@@ -24,7 +24,7 @@ function isAnyActive(array $paths)
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets\img\Logo.webp">
+    <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 </head>
 
 <style>
@@ -213,6 +213,7 @@ body {
 .main-content {
     margin-left: 270px;
     padding: 28px 32px;
+    margin-bottom: 60px;
 }
 
 /* HEADER DASHBOARD */

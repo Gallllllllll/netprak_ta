@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
-
+$username = $_SESSION['user']['username'];
 $id = $_GET['id'] ?? null;
 
 $stmt = $pdo->prepare("SELECT * FROM admin WHERE id=?");
@@ -57,6 +57,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Edit Admin</title>
 
 <style>
+
+/* TOP */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
+}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
+}
+
+/* PROFILE */
+.admin-info{
+    display:flex;
+    align-items:left;
+    gap:20px
+}
+.admin-text span{
+    font-size:13px;
+    color:#555
+}
+.admin-text b{
+    color:#ff8c42;
+    font-size:14px
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
 /* CARD */
 .form-card {
     background: #fff;
@@ -140,9 +178,18 @@ input:focus {
 
 <div class="main-content">
 
-    <div class="dashboard-header">
-        <h1>Edit Admin</h1>
-        <p>Perbarui data akun admin</p>
+    <div class="topbar">
+        <h1>Edit Data Admin</h1>
+
+        <div class="admin-info">
+            <div class="admin-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
     </div>
 
     <div class="form-card">
