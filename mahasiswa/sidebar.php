@@ -360,8 +360,8 @@ body {
 
         <!-- CEK NILAI -->
         <li>
-            <a href="<?= base_url('mahasiswa/cek_nilai.php') ?>"
-               class="<?= isActive('/mahasiswa/cek_nilai.php') ? 'active' : '' ?>">
+            <a href="<?= base_url('mahasiswa/semhas/cek_nilai.php') ?>"
+               class="<?= isActive('/mahasiswa/semhas/cek_nilai.php') ? 'active' : '' ?>">
                 <span class="material-symbols-rounded">fact_check</span>
                 <span>Cek Nilai</span>
             </a>

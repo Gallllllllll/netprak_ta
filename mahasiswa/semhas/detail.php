@@ -26,6 +26,17 @@ $data = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$data) {
     die("Data Seminar Hasil tidak ditemukan.");
 }
+
+// helper badge status
+function badgeStatus($status) {
+    return match($status) {
+        'diajukan'  => 'badge-diajukan',
+        'revisi'    => 'badge-revisi',
+        'disetujui' => 'badge-disetujui',
+        'ditolak'   => 'badge-ditolak',
+        default     => 'badge-diajukan'
+    };
+}
 ?>
 
 <!DOCTYPE html>
@@ -44,14 +55,18 @@ if (!$data) {
     box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
 
-.file-list li {
-    margin-bottom:8px;
+.file-item {
+    margin-bottom:16px;
+    padding-bottom:12px;
+    border-bottom:1px dashed #ddd;
 }
-.file-list a {
+
+.file-item a {
     color:#007bff;
     text-decoration:none;
+    font-weight:600;
 }
-.file-list a:hover {
+.file-item a:hover {
     text-decoration:underline;
 }
 
@@ -65,6 +80,15 @@ if (!$data) {
 .badge-revisi   { background:#fff3cd; color:#856404; }
 .badge-disetujui{ background:#d4edda; color:#155724; }
 .badge-ditolak  { background:#f8d7da; color:#721c24; }
+
+.note {
+    margin-top:6px;
+    font-size:14px;
+    color:#444;
+    background:#f8f9fa;
+    padding:8px 12px;
+    border-radius:8px;
+}
 
 .jadwal {
     margin-top:15px;
@@ -107,9 +131,7 @@ if (!$data) {
 
 <div class="card">
 
-    <!-- ===============================
-         ID SEMINAR HASIL
-    =============================== -->
+    <!-- ID SEMHAS -->
     <p>
         <b>ID Seminar Hasil:</b><br>
         <span style="font-size:16px;font-weight:600;">
@@ -120,78 +142,83 @@ if (!$data) {
     <hr>
 
     <!-- ===============================
-         DOKUMEN
+         DOKUMEN & CATATAN PER FILE
     =============================== -->
-    <h3>Dokumen</h3>
-    <ul class="file-list">
+    <h3>Dokumen Seminar Hasil</h3>
 
-        <?php if(!empty($data['file_berita_acara'])): ?>
-            <li>
-                <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_berita_acara']) ?>" target="_blank">
-                    Berita Acara Seminar Hasil
-                </a>
-            </li>
-        <?php endif; ?>
+    <?php if ($data['file_berita_acara']): ?>
+    <div class="file-item">
+        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_berita_acara']) ?>" target="_blank">
+            📄 Berita Acara Seminar Hasil
+        </a><br>
+        <div class="note">
+            <b>Catatan:</b>
+            <?= $data['catatan_file_berita_acara'] ? htmlspecialchars($data['catatan_file_berita_acara']) : '-' ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
-        <?php if(!empty($data['file_persetujuan_laporan'])): ?>
-            <li>
-                <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_persetujuan_laporan']) ?>" target="_blank">
-                    Persetujuan Laporan TA (Form 5)
-                </a>
-            </li>
-        <?php endif; ?>
+    <?php if ($data['file_persetujuan_laporan']): ?>
+    <div class="file-item">
+        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_persetujuan_laporan']) ?>" target="_blank">
+            📄 Persetujuan Laporan TA (Form 5)
+        </a><br>
+        <div class="note">
+            <b>Catatan:</b>
+            <?= $data['catatan_file_persetujuan_laporan'] ? htmlspecialchars($data['catatan_file_persetujuan_laporan']) : '-' ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
-        <?php if(!empty($data['file_pendaftaran_ujian'])): ?>
-            <li>
-                <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_pendaftaran_ujian']) ?>" target="_blank">
-                    Form Pendaftaran Ujian TA (Form 7)
-                </a>
-            </li>
-        <?php endif; ?>
+    <?php if ($data['file_pendaftaran_ujian']): ?>
+    <div class="file-item">
+        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_pendaftaran_ujian']) ?>" target="_blank">
+            📄 Form Pendaftaran Ujian TA (Form 7)
+        </a><br>
+        <div class="note">
+            <b>Catatan:</b>
+            <?= $data['catatan_file_pendaftaran_ujian'] ? htmlspecialchars($data['catatan_file_pendaftaran_ujian']) : '-' ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
-        <?php if(!empty($data['file_buku_konsultasi'])): ?>
-            <li>
-                <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_buku_konsultasi']) ?>" target="_blank">
-                    Buku Konsultasi TA (Form 4)
-                </a>
-            </li>
-        <?php endif; ?>
+    <?php if ($data['file_buku_konsultasi']): ?>
+    <div class="file-item">
+        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_buku_konsultasi']) ?>" target="_blank">
+            📄 Buku Konsultasi TA (Form 4)
+        </a><br>
+        <div class="note">
+            <b>Catatan:</b>
+            <?= $data['catatan_file_buku_konsultasi'] ? htmlspecialchars($data['catatan_file_buku_konsultasi']) : '-' ?>
+        </div>
+    </div>
+    <?php endif; ?>
 
-    </ul>
-
-    <!-- ===============================
-         STATUS
-    =============================== -->
+    <!-- STATUS GLOBAL -->
     <p>
-        <b>Status:</b>
-        <span class="badge badge-<?= $data['status'] ?>">
+        <b>Status Pengajuan:</b>
+        <span class="badge <?= badgeStatus($data['status']) ?>">
             <?= strtoupper($data['status']) ?>
         </span>
     </p>
 
-    <!-- ===============================
-         CATATAN ADMIN
-    =============================== -->
+    <!-- CATATAN GLOBAL -->
     <p>
-        <b>Catatan Admin:</b><br>
+        <b>Catatan Admin (Umum):</b><br>
         <?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?>
     </p>
 
-    <!-- ===============================
-         JADWAL SIDANG (JIKA ADA)
-    =============================== -->
-    <?php if (!empty($data['tanggal_sidang'])): ?>
+    <!-- JADWAL -->
+    <?php if ($data['tanggal_sidang']): ?>
         <div class="jadwal">
-            <b>📅 Jadwal Sidang Seminar Hasil</b><br><br>
+            <b>📅 Jadwal Seminar Hasil</b><br><br>
             <b>Tanggal:</b> <?= date('d M Y', strtotime($data['tanggal_sidang'])) ?><br>
             <b>Jam:</b> <?= substr($data['jam_sidang'], 0, 5) ?> WIB<br>
             <b>Tempat:</b> <?= htmlspecialchars($data['tempat_sidang']) ?>
         </div>
     <?php endif; ?>
 
-    <!-- ===============================
-         ACTION BUTTON
-    =============================== -->
+    <!-- ACTION -->
     <div class="actions">
         <a class="btn-back" href="status.php">Kembali</a>
 
@@ -203,7 +230,6 @@ if (!$data) {
     </div>
 
 </div>
-
 </div>
 
 </body>

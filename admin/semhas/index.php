@@ -59,6 +59,28 @@ a.detail-link {
 }
 a.detail-link:hover { text-decoration:underline; }
 
+a.nilai {
+    color:#6f42c1;
+    border:1px solid #6f42c1;
+    margin-left:6px;
+}
+
+a.nilai:hover {
+    background:#6f42c1;
+    color:#fff;
+}
+
+a.penguji {
+    color:#0d6efd;
+    border:1px solid #0d6efd;
+    margin-left:6px;
+}
+
+a.penguji:hover {
+    background:#0d6efd;
+    color:#fff;
+}
+
 a.penjadwalan {
     color:#28a745;
     margin-left:6px;
@@ -137,11 +159,26 @@ a.penjadwalan:hover {
                         </a>
 
                         <?php if (($p['status'] ?? '') === 'disetujui'): ?>
-                            <a class="detail-link penjadwalan" href="jadwal.php?id=<?= $p['id'] ?>">
+
+                            <a class="detail-link penguji"
+                            href="detail.php?id=<?= $p['id'] ?>">
+                                Plot Penguji
+                            </a>
+
+                            <a class="detail-link penjadwalan"
+                            href="jadwal.php?id=<?= $p['id'] ?>">
                                 Penjadwalan
                             </a>
+
+                            <a class="detail-link nilai"
+                            href="input_nilai_semhas.php?id=<?= $p['id'] ?>">
+                                Input Nilai
+                            </a>
+
                         <?php endif; ?>
+
                     </td>
+
                 </tr>
             <?php endforeach; endif; ?>
 

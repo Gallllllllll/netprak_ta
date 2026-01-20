@@ -32,6 +32,29 @@ $stmt = $pdo->prepare("
 $stmt->execute([$id]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// ===============================
+// CEK PENGUJI SUDAH DIPLOT ATAU BELUM
+// ===============================
+$stmt = $pdo->prepare("
+    SELECT t.*, d.nama
+    FROM tim_semhas t
+    JOIN dosen d ON t.dosen_id = d.id
+    WHERE t.pengajuan_id = ? AND t.peran = 'penguji'
+");
+$stmt->execute([$id]);
+$penguji = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// ===============================
+// DAFTAR DOSEN
+// ===============================
+$dosenList = $pdo->query("
+    SELECT id, nama
+    FROM dosen
+    ORDER BY nama
+")->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 if (!$data) {
     die('Data pengajuan Seminar Hasil tidak ditemukan.');
 }
@@ -149,6 +172,37 @@ a.file-link:hover {
     </p>
     <p><b>Catatan Admin:</b><br><?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?></p>
 </div>
+
+<?php if ($data['status'] === 'disetujui'): ?>
+<div class="card">
+    <h3>Plot Dosen Penguji</h3>
+
+    <?php if ($penguji): ?>
+        <p>
+            <b>Dosen Penguji:</b><br>
+            <?= htmlspecialchars($penguji['nama']) ?>
+        </p>
+        <span class="badge badge-disetujui">Sudah Diplot</span>
+    <?php else: ?>
+        <form action="simpan_penguji.php" method="POST">
+            <input type="hidden" name="pengajuan_id" value="<?= $id ?>">
+
+            <label><b>Pilih Dosen Penguji</b></label>
+            <select name="dosen_id" required>
+                <option value="">-- Pilih Dosen --</option>
+                <?php foreach ($dosenList as $d): ?>
+                    <option value="<?= $d['id'] ?>">
+                        <?= htmlspecialchars($d['nama']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+
+            <button type="submit">Simpan Penguji</button>
+        </form>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
 
 <!-- ===============================
      VERIFIKASI FILE

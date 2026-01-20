@@ -15,16 +15,20 @@ $id = $_GET['id'] ?? 0;
 $stmt = $pdo->prepare("
     SELECT 
         p.*,
+
         MAX(CASE WHEN db.role = 'dosbing_1' THEN d.nama END) AS dosen1_nama,
         MAX(CASE WHEN db.role = 'dosbing_2' THEN d.nama END) AS dosen2_nama
+
     FROM pengajuan_ta p
     LEFT JOIN dosbing_ta db ON p.id = db.pengajuan_id
     LEFT JOIN dosen d ON db.dosen_id = d.id
+
     WHERE p.id = ? AND p.mahasiswa_id = ?
     GROUP BY p.id
 ");
 $stmt->execute([$id, $_SESSION['user']['id']]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
 if (!$data) {
     die("Pengajuan tidak ditemukan.");
@@ -111,16 +115,6 @@ ul.dosen {
 
         <h1>Detail Pengajuan TA</h1>
 
-        <!-- ✅ ID PENGAJUAN -->
-        <p>
-            <b>ID Pengajuan:</b><br>
-            <span style="background:#f1f1f1;padding:4px 10px;border-radius:5px;font-weight:bold;">
-                <?= $data['id_pengajuan']
-                    ? htmlspecialchars($data['id_pengajuan'])
-                    : '-' ?>
-            </span>
-        </p>
-
         <p><b>Judul TA:</b><br>
             <?= htmlspecialchars($data['judul_ta']) ?>
         </p>
@@ -131,7 +125,7 @@ ul.dosen {
             </span>
         </p>
 
-        <p><b>Catatan Admin / Dosen:</b><br>
+        <p><b>Catatan Admin :</b><br>
             <?= $data['catatan_admin']
                 ? htmlspecialchars($data['catatan_admin'])
                 : '-' ?>
@@ -161,25 +155,51 @@ ul.dosen {
                 <a href="<?= base_url('uploads/ta/' . $data['bukti_pembayaran']) ?>" target="_blank">
                     📄 Bukti Pembayaran
                 </a>
+
+                <?php if (!empty($data['catatan_bukti_pembayaran'])): ?>
+                    <div style="color:#dc3545; font-size:13px; margin-left:20px;">
+                        Catatan Admin: <?= htmlspecialchars($data['catatan_bukti_pembayaran']) ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($data['formulir_pendaftaran']): ?>
                 <a href="<?= base_url('uploads/ta/' . $data['formulir_pendaftaran']) ?>" target="_blank">
                     📄 Formulir Pendaftaran
                 </a>
+
+                <?php if (!empty($data['catatan_formulir_pendaftaran'])): ?>
+                    <div style="color:#dc3545; font-size:13px; margin-left:20px;">
+                        Catatan Admin: <?= htmlspecialchars($data['catatan_formulir_pendaftaran']) ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <?php if ($data['transkrip_nilai']): ?>
                 <a href="<?= base_url('uploads/ta/' . $data['transkrip_nilai']) ?>" target="_blank">
                     📄 Transkrip Nilai
                 </a>
+
+                <?php if (!empty($data['catatan_transkrip_nilai'])): ?>
+                    <div style="color:#dc3545; font-size:13px; margin-left:20px;">
+                        Catatan Admin: <?= htmlspecialchars($data['catatan_transkrip_nilai']) ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
+
 
             <?php if ($data['bukti_magang']): ?>
                 <a href="<?= base_url('uploads/ta/' . $data['bukti_magang']) ?>" target="_blank">
                     📄 Bukti Kelulusan Magang
                 </a>
+
+                <?php if (!empty($data['catatan_bukti_magang'])): ?>
+                    <div style="color:#dc3545; font-size:13px; margin-left:20px;">
+                        Catatan Admin: <?= htmlspecialchars($data['catatan_bukti_magang']) ?>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
+
         </div>
 
         <?php if (strtolower($data['status']) === 'revisi'): ?>
