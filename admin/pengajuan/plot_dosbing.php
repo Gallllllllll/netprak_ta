@@ -18,6 +18,30 @@ if (!$id) die("ID tidak valid");
 $dosen = $pdo->query("SELECT * FROM dosen ORDER BY nama")->fetchAll(PDO::FETCH_ASSOC);
 
 // ===============================
+// AMBIL DOSBING YANG SUDAH ADA
+// ===============================
+$existingDosbing = [
+    'dosbing_1' => null,
+    'dosbing_2' => null
+];
+
+$stmt = $pdo->prepare("
+    SELECT dosen_id, role 
+    FROM dosbing_ta 
+    WHERE pengajuan_id = ?
+");
+$stmt->execute([$id]);
+
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    if ($row['role'] === 'dosbing_1') {
+        $existingDosbing['dosbing_1'] = $row['dosen_id'];
+    } elseif ($row['role'] === 'dosbing_2') {
+        $existingDosbing['dosbing_2'] = $row['dosen_id'];
+    }
+}
+
+
+// ===============================
 // SIMPAN PLOT DOSEN
 // ===============================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -138,8 +162,8 @@ button:hover{
     opacity:.9;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <!-- SIDEBAR -->
@@ -155,35 +179,53 @@ button:hover{
             <p>Tentukan dosen pembimbing 1 dan 2</p>
         </div>
 
-        <form method="POST">
+        <form method="POST" id="plotForm">
 
             <label>Dosen Pembimbing 1</label>
-            <select name="dosen1" required>
+            <select name="dosen1" id="dosen1" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
-                    <option value="<?= $d['id'] ?>">
+                    <option value="<?= $d['id'] ?>"
+                        <?= ($existingDosbing['dosbing_1'] == $d['id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($d['nama']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
+
 
             <label>Dosen Pembimbing 2</label>
-            <select name="dosen2" required>
+            <select name="dosen2" id="dosen2" required>
                 <option value="">-- Pilih Dosen --</option>
                 <?php foreach($dosen as $d): ?>
-                    <option value="<?= $d['id'] ?>">
+                    <option value="<?= $d['id'] ?>"
+                        <?= ($existingDosbing['dosbing_2'] == $d['id']) ? 'selected' : '' ?>>
                         <?= htmlspecialchars($d['nama']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-
             <button type="submit">Simpan Plot Dosen</button>
-
         </form>
-
     </div>
-
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('plotForm').addEventListener('submit', function(e) {
+    const dosen1 = document.getElementById('dosen1').value;
+    const dosen2 = document.getElementById('dosen2').value;
+
+    if (dosen1 === dosen2) {
+        e.preventDefault(); // stop submit
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Dosen tidak valid',
+            text: 'Dosen Pembimbing 1 dan 2 tidak boleh sama!',
+            confirmButtonColor: '#ff5f9e'
+        });
+    }
+});
+</script>
 
 </body>
 </html>
