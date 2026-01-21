@@ -84,6 +84,21 @@ th { background:#eee; width:180px; }
     font-weight:bold;
     font-size:13px;
 }
+
+/* ====== BUTTON REVISI ====== */
+.btn-revisi {
+    display:inline-block;
+    padding:10px 16px;
+    background:#dc3545;
+    color:#fff;
+    text-decoration:none;
+    border-radius:4px;
+    font-weight:bold;
+    margin-top: 14px;
+}
+.btn-revisi:hover {
+    background:#c82333;
+}
 </style>
 </head>
 
@@ -122,6 +137,13 @@ th { background:#eee; width:180px; }
     <p><b>Catatan Admin:</b><br>
         <?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?>
     </p>
+
+    <!-- ====== BUTTON UPLOAD REVISI ====== -->
+    <?php if (strtolower($data['status']) === 'revisi' && $_SESSION['user']['role'] === 'mahasiswa'): ?>
+        <a class="btn-revisi" href="<?= base_url('mahasiswa/sempro/revisi.php?id=' . $data['id']) ?>">
+            Upload Revisi
+        </a>
+    <?php endif; ?>
 </div>
 
 <!-- =============================== -->

@@ -156,7 +156,7 @@ ul.files li {
                 </p>
 
                 <p>
-                    <b>Catatan Admin / Dosen:</b><br>
+                    <b>Catatan Admin:</b><br>
                     <?= htmlspecialchars($data['catatan'] ?? '-') ?>
                 </p>
 

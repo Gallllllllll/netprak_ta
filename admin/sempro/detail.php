@@ -113,6 +113,10 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
         <form action="verifikasi_sempro_perfile.php" method="POST">
             <input type="hidden" name="id" value="<?= $data['id'] ?>">
 
+            <!-- Catatan keseluruhan -->
+            <label><b>Catatan Admin (Keseluruhan)</b></label>
+            <textarea name="catatan" placeholder="Catatan untuk keseluruhan pengajuan..."><?= htmlspecialchars($data['catatan'] ?? '') ?></textarea>
+
             <table>
                 <tr>
                     <th>Status & Catatan</th>
@@ -137,13 +141,14 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
                             <option value="disetujui" <?= $st=='disetujui'?'selected':'' ?>>Disetujui</option>
                         </select>
 
-                        <textarea name="catatan[<?= $key ?>]" placeholder="Catatan admin..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?></textarea>
+                        <!-- Catatan per file -->
+                        <textarea name="catatan_file[<?= $key ?>]" placeholder="Catatan admin..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?></textarea>
                     </td>
                     <td>
                         <?php if (!empty($data[$file_field])): ?>
                             <a class="file-link" target="_blank"
-                               href="../../uploads/sempro/<?= htmlspecialchars($data[$file_field]) ?>">
-                               Lihat <?= $label ?>
+                            href="../../uploads/sempro/<?= htmlspecialchars($data[$file_field]) ?>">
+                            Lihat <?= $label ?>
                             </a>
                         <?php else: ?>
                             <em>File belum diupload</em>
@@ -155,6 +160,7 @@ textarea { resize: none; min-height: 70px; margin-top: 6px; }
 
             <button type="submit" class="btn btn-save">Simpan Verifikasi</button>
         </form>
+
     </div>
 </div>
 

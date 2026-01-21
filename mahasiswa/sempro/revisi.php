@@ -1,10 +1,11 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
 // cek role mahasiswa
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
-    header("Location: ../../login.php");
+    header("Location: ".base_url('login.php'));
     exit;
 }
 
@@ -86,18 +87,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Revisi Seminar Proposal</title>
 <link rel="stylesheet" href="../../style.css">
 <style>
+/* ====== Style mengikuti style utama ====== */
 body {
     font-family: Arial, sans-serif;
     background:#f4f6f8;
+}
+.container {
+    display:flex;
+    min-height:100vh;
+}
+.main-content {
+    flex:1;
     padding:20px;
+}
+.card {
+    background:#fff;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+    margin-bottom:20px;
 }
 form {
     background:#fff;
     padding:20px;
-    max-width:650px;
-    margin:auto;
     border-radius:8px;
     box-shadow:0 2px 6px rgba(0,0,0,.1);
+    max-width:650px;
+    margin:auto;
 }
 label {
     display:block;
@@ -119,6 +135,7 @@ button {
     border:none;
     border-radius:6px;
     cursor:pointer;
+    font-weight:bold;
 }
 button:hover {
     background:#218838;
@@ -128,38 +145,46 @@ button:hover {
     padding:15px;
     border-radius:6px;
     margin-bottom:15px;
+    border:1px solid #ffeeba;
 }
 </style>
 </head>
 <body>
 
-<h1>Revisi Pengajuan Seminar Proposal</h1>
+<div class="container">
 
-<form method="POST" enctype="multipart/form-data">
+    <?php include "../sidebar.php"; ?>
 
-<?php
-$ada_revisi = false;
+    <div class="main-content">
+        <h1>Revisi Pengajuan Seminar Proposal</h1>
 
-foreach ($files as $input => $f):
-    if (($data[$f['status']] ?? '') === 'revisi'):
-        $ada_revisi = true;
-?>
-    <label><?= htmlspecialchars($f['label']) ?></label>
-    <input type="file" name="<?= $input ?>" accept=".pdf" required>
-    <small>Format: PDF</small><br>
-    
-<?php
-    endif;
-endforeach;
+        <form method="POST" enctype="multipart/form-data">
 
-if (!$ada_revisi):
-?>
-    <div class="alert">Tidak ada dokumen yang perlu direvisi.</div>
-<?php else: ?>
-    <button type="submit">Upload Revisi</button>
-<?php endif; ?>
+        <?php
+        $ada_revisi = false;
 
-</form>
+        foreach ($files as $input => $f):
+            if (($data[$f['status']] ?? '') === 'revisi'):
+                $ada_revisi = true;
+        ?>
+            <label><?= htmlspecialchars($f['label']) ?></label>
+            <input type="file" name="<?= $input ?>" accept=".pdf" required>
+            <small>Format: PDF</small><br>
+
+        <?php
+            endif;
+        endforeach;
+
+        if (!$ada_revisi):
+        ?>
+            <div class="alert">Tidak ada dokumen yang perlu direvisi.</div>
+        <?php else: ?>
+            <button type="submit">Upload Revisi</button>
+        <?php endif; ?>
+
+        </form>
+    </div>
+</div>
 
 </body>
 </html>

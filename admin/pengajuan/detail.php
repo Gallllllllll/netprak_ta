@@ -188,21 +188,6 @@ button {
         </form>
     </div>
 
-    <!-- PLOT DOSEN -->
-    <div class="card">
-        <h3>Plot Dosen Pembimbing</h3>
-        <?php if($all_approved): ?>
-            <a class="btn-plot enabled"
-               href="plot_dosbing.php?id=<?= $data['id'] ?>">
-                Plot Dosen
-            </a>
-        <?php else: ?>
-            <span class="btn-plot disabled">
-                Semua dokumen harus disetujui
-            </span>
-        <?php endif; ?>
-    </div>
-
 </div>
 
 </body>

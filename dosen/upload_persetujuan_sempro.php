@@ -85,60 +85,106 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <title>Upload Persetujuan Sempro</title>
+
+<!-- Include Sidebar CSS -->
 <link rel="stylesheet" href="<?= base_url('style.css') ?>">
 
 <style>
-.container {
-    max-width: 500px;
-    margin: 60px auto;
-    background: #fff;
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+/* ==============================
+   MAIN CONTENT STYLE
+============================== */
+.main-content {
+    margin-left: 270px;
+    padding: 28px 32px;
+    margin-bottom: 60px;
 }
-h2 { margin-bottom: 10px; }
-label { font-weight: bold; }
+
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+    border: 1px solid #f1dcdc;
+}
+
+.card h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #2f3e55;
+}
+
+.card p {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.form-group {
+    margin-top: 18px;
+}
+
+label {
+    font-weight: 600;
+    color: #2f3e55;
+}
+
 input[type=file] {
     width: 100%;
-    margin: 10px 0;
+    margin-top: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fafafa;
 }
+
 button {
-    padding: 10px 20px;
-    background: #007bff;
+    padding: 12px 20px;
+    background: var(--gradient);
     border: none;
     color: #fff;
-    border-radius: 4px;
+    border-radius: 12px;
     cursor: pointer;
+    font-weight: 600;
+    margin-top: 14px;
 }
+
 button:hover {
-    background: #0056b3;
+    opacity: 0.9;
 }
+
 .error {
-    color: red;
-    margin-bottom: 10px;
+    color: #ff3b3b;
+    margin-top: 12px;
+    font-weight: 600;
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Upload Persetujuan Sempro</h2>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/dosen/sidebar.php'; ?>
 
-    <p>
-        <b>Mahasiswa:</b> <?= htmlspecialchars($data['nama']) ?><br>
-        <b>Judul TA:</b> <?= htmlspecialchars($data['judul_ta']) ?>
-    </p>
+<div class="main-content">
+    <div class="card">
+        <h2>Upload Persetujuan Sempro</h2>
 
-    <?php if ($error): ?>
-        <div class="error"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+        <p>
+            <b>Mahasiswa:</b> <?= htmlspecialchars($data['nama']) ?><br>
+            <b>Judul TA:</b> <?= htmlspecialchars($data['judul_ta']) ?>
+        </p>
 
-    <form method="post" enctype="multipart/form-data">
-        <label>File Persetujuan (PDF)</label>
-        <input type="file" name="file" accept="application/pdf" required>
-        <br><br>
-        <button type="submit">Upload & Setujui</button>
-    </form>
+        <?php if ($error): ?>
+            <div class="error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>File Persetujuan</label>
+                <input type="file" name="file" accept="application/pdf" required>
+                <small>Format: PDF</small><br>
+            </div>
+            <button type="submit">Upload & Setujui</button>
+        </form>
+    </div>
 </div>
 
 </body>

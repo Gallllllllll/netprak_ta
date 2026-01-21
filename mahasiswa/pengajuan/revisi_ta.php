@@ -121,45 +121,129 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Revisi Pengajuan TA</title>
 <link rel="stylesheet" href="../../style.css">
 <style>
-body { font-family:Arial,sans-serif; background:#f4f6f8; padding:20px; }
-form { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); max-width:600px; margin:auto; }
-label { display:block; margin-top:15px; font-weight:bold; }
-input[type=file], input[type=text] { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
-button { margin-top:15px; padding:10px 20px; background:#2563eb; color:#fff; border:none; border-radius:6px; cursor:pointer; }
-button:hover { background:#1d4ed8; }
-.alert { background:#fff3cd; padding:12px; border-radius:6px; margin-bottom:15px; }
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f4f6f8;
+}
+
+.container{
+    display:flex;
+    min-height:100vh;
+}
+
+.main-content{
+    flex:1;
+    padding:30px;
+    background:#fff3e9;
+}
+
+h1{
+    margin-bottom:20px;
+}
+
+.form-box{
+    background:#fff;
+    padding:25px;
+    max-width:600px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(255,140,80,.12);
+}
+
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:600;
+}
+
+input[type=text],
+input[type=file]{
+    width:100%;
+    padding:10px;
+    margin-top:6px;
+    border:1px solid #ddd;
+    border-radius:8px;
+}
+
+input[readonly]{
+    background:#f9fafb;
+}
+
+.hint{
+    font-size:12px;
+    color:#777;
+}
+
+.btn-primary{
+    margin-top:20px;
+    padding:12px 20px;
+    background:#ff8c42;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.btn-primary:hover{
+    background:#ff7a26;
+}
+
+.alert{
+    margin-top:15px;
+    padding:12px;
+    border-radius:8px;
+    font-size:14px;
+}
+
+.alert.warning{
+    background:#fff3cd;
+    color:#856404;
+}
+
 </style>
 </head>
 <body>
 
-<h1>Revisi Pengajuan Tugas Akhir</h1>
+<div class="container">
 
-<form method="POST" enctype="multipart/form-data">
+<?php include "../sidebar.php"; ?>
 
-    <label>Judul TA</label>
-    <input type="text" value="<?= htmlspecialchars($data['judul_ta']) ?>" readonly>
+<div class="main-content">
 
-    <?php
-    $has_revisi = false;
-    foreach ($files as $input => $f):
-        if (($data[$f['status']] ?? '') === 'revisi'):
-            $has_revisi = true;
-    ?>
-        <label><?= htmlspecialchars($f['label']) ?></label>
-        <input type="file" id="<?= $input ?>" name="<?= $input ?>" required accept=".pdf">
-        <small>Format: PDF</small><br>
-    <?php
-        endif;
-    endforeach;
+    <h1>Revisi Pengajuan Tugas Akhir</h1>
 
-    if (!$has_revisi):
-        echo "<div class='alert'>Tidak ada file yang perlu direvisi.</div>";
-    else:
-    ?>
-        <button type="submit">Upload Revisi</button>
-    <?php endif; ?>
+    <form method="POST" enctype="multipart/form-data" class="form-box">
 
-</form>
+        <label>Judul Tugas Akhir</label>
+        <input type="text" value="<?= htmlspecialchars($data['judul_ta']) ?>" readonly>
+        <small class="hint">Judul tidak dapat dibah!</small><br>
+
+        <?php
+        $has_revisi = false;
+        foreach ($files as $input => $f):
+            if (($data[$f['status']] ?? '') === 'revisi'):
+                $has_revisi = true;
+        ?>
+            <label><?= htmlspecialchars($f['label']) ?></label>
+            <input type="file" name="<?= $input ?>" required accept=".pdf">
+            <small class="hint">Format file: PDF</small><br>
+        <?php
+            endif;
+        endforeach;
+
+        if (!$has_revisi):
+            echo "<div class='alert warning'>Tidak ada file yang perlu direvisi.</div>";
+        else:
+        ?>
+            <button type="submit" class="btn-primary">Upload Revisi</button>
+        <?php endif; ?>
+
+    </form>
+
+</div>
+</div>
 
 </body>
+
 </html>
