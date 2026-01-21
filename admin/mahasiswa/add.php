@@ -8,7 +8,7 @@ if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['username'] ?? 'Admin';
 
 $error = '';
 

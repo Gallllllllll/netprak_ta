@@ -27,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user'] = [
                     'id' => $user['id'],
                     'username' => $user['username'],
+                    'nama'     => $user['nama'],
                     'role' => $table
                 ];
                 if ($table==='admin') header("Location: admin/dashboard.php");

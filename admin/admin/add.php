@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
