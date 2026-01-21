@@ -146,7 +146,7 @@ foreach ($files as $input => $f):
 ?>
     <label><?= htmlspecialchars($f['label']) ?></label>
     <input type="file" name="<?= $input ?>" accept=".pdf" required>
-    <small>Format: PDF</small>
+    <small>Format: PDF</small><br>
     
 <?php
     endif;

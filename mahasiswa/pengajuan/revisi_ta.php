@@ -147,7 +147,7 @@ button:hover { background:#1d4ed8; }
     ?>
         <label><?= htmlspecialchars($f['label']) ?></label>
         <input type="file" id="<?= $input ?>" name="<?= $input ?>" required accept=".pdf">
-        <small>Format: PDF</small>
+        <small>Format: PDF</small><br>
     <?php
         endif;
     endforeach;

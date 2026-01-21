@@ -112,7 +112,7 @@ small{color:#6b7280}
     <label>Buku Konsultasi TA</label>
     <input type="file" name="file_buku_konsultasi"
            accept=".pdf" required>
-    <small>Format: PDF</small>
+    <small>Format: PDF</small><br>
 
     <button type="submit">Ajukan Seminar Hasil</button>
 </form>

@@ -152,7 +152,7 @@ button {
 
                 <label>Buku Konsultasi Tugas Akhir</label>
                 <input type="file" name="file_konsultasi" accept="application/pdf" required>
-                <small>Format: PDF</small>
+                <small>Format: PDF</small><br>
 
                 <button type="submit">Ajukan Seminar Proposal</button>
             </form>
