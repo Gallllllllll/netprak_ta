@@ -9,7 +9,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-$username = $_SESSION['user']['username'] ?? 'Admin';
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 
 /* LOAD DATA */
 $no = 1;

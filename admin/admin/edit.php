@@ -8,7 +8,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 $id = $_GET['id'] ?? null;
 
 $stmt = $pdo->prepare("SELECT * FROM admin WHERE id=?");

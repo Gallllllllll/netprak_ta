@@ -12,7 +12,7 @@ $stmt = $pdo->query("
     JOIN mahasiswa m ON p.mahasiswa_id = m.id
     ORDER BY p.created_at DESC
 ");
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 

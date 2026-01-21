@@ -9,7 +9,7 @@ if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     exit;
 }
 
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 
 if(!isset($_GET['id'])) {
     header("Location: index.php");

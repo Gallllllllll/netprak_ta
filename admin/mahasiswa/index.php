@@ -10,7 +10,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 /* LOAD DATA */
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 $no=1;
 $stmt = $pdo->query("SELECT * FROM mahasiswa ORDER BY id ASC");
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -8,7 +8,7 @@ if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
     exit;
 }
-$username = $_SESSION['user']['username'];
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 /* CEK PARAMETER */
 if(!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     header("Location: index.php");
