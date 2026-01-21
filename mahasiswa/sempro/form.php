@@ -142,14 +142,17 @@ button {
                 <!-- HANYA KIRIM ID TA -->
                 <input type="hidden" name="pengajuan_ta_id" value="<?= $ta['id'] ?>">
 
-                <label>Form Pendaftaran Seminar Proposal (PDF)</label>
+                <label>Form Pendaftaran Seminar Proposal</label>
                 <input type="file" name="file_pendaftaran" accept="application/pdf" required>
+                <small>Format: PDF</small>
 
-                <label>Lembar Persetujuan Proposal TA (PDF)</label>
+                <label>Lembar Persetujuan Proposal TA</label>
                 <input type="file" name="file_persetujuan" accept="application/pdf" required>
+                <small>Format: PDF</small>
 
-                <label>Buku Konsultasi Tugas Akhir (PDF)</label>
+                <label>Buku Konsultasi Tugas Akhir</label>
                 <input type="file" name="file_konsultasi" accept="application/pdf" required>
+                <small>Format: PDF</small>
 
                 <button type="submit">Ajukan Seminar Proposal</button>
             </form>

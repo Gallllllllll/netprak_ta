@@ -164,7 +164,8 @@ button:hover {
     ?>
         <label><?= htmlspecialchars($f['label']) ?></label>
         <input type="file" name="<?= $input ?>"
-           accept=".pdf,.doc,.docx" required> 
+           accept=".pdf" required>
+           <small>Format: PDF</small> 
     <?php
         endif;
     endforeach;

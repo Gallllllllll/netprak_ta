@@ -96,23 +96,23 @@ small{color:#6b7280}
 
     <label>Lembar Berita Acara</label>
     <input type="file" name="file_berita_acara"
-           accept=".pdf,.doc,.docx" required>
-    <small>Format: PDF / Word</small>
+           accept=".pdf" required>
+    <small>Format: PDF</small>
 
-    <label>Persetujuan Laporan TA (Form 5)</label>
+    <label>Persetujuan Laporan TA</label>
     <input type="file" name="file_persetujuan_laporan"
-           accept=".pdf,.doc,.docx" required>
-    <small>Format: PDF / Word</small>
+           accept=".pdf" required>
+    <small>Format: PDF</small>
 
-    <label>Form Pendaftaran Ujian TA (Form 7)</label>
+    <label>Form Pendaftaran Ujian TA</label>
     <input type="file" name="file_pendaftaran_ujian"
-           accept=".pdf,.doc,.docx" required>
-    <small>Format: PDF / Word</small>
+           accept=".pdf" required>
+    <small>Format: PDF</small>
 
-    <label>Buku Konsultasi TA (Form 4)</label>
+    <label>Buku Konsultasi TA</label>
     <input type="file" name="file_buku_konsultasi"
-           accept=".pdf,.doc,.docx" required>
-    <small>Format: PDF / Word</small>
+           accept=".pdf" required>
+    <small>Format: PDF</small>
 
     <button type="submit">Ajukan Seminar Hasil</button>
 </form>

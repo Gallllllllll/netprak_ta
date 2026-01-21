@@ -145,7 +145,8 @@ foreach ($files as $input => $f):
         $ada_revisi = true;
 ?>
     <label><?= htmlspecialchars($f['label']) ?></label>
-    <input type="file" name="<?= $input ?>" accept=".pdf,.doc,.docx" required>
+    <input type="file" name="<?= $input ?>" accept=".pdf" required>
+    <small>Format: PDF</small>
     
 <?php
     endif;

@@ -146,7 +146,8 @@ button:hover { background:#1d4ed8; }
             $has_revisi = true;
     ?>
         <label><?= htmlspecialchars($f['label']) ?></label>
-        <input type="file" id="<?= $input ?>" name="<?= $input ?>" required accept=".pdf,.doc,.docx">
+        <input type="file" id="<?= $input ?>" name="<?= $input ?>" required accept=".pdf">
+        <small>Format: PDF</small>
     <?php
         endif;
     endforeach;

@@ -13,7 +13,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $mahasiswa_id = $_SESSION['user']['id'];
 
 // ===============================
-// AMBIL PENGAJUAN SEMHAS MAHASISWA
+// AMBIL PENGAJUAN SEMHAS TERAKHIR
 // ===============================
 $stmt = $pdo->prepare("
     SELECT id, id_semhas
@@ -25,39 +25,64 @@ $stmt = $pdo->prepare("
 $stmt->execute([$mahasiswa_id]);
 $pengajuan = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// FLAG KONDISI
+$popup = null;
+
+// ===============================
+// JIKA BELUM AJU SEMHAS
+// ===============================
 if (!$pengajuan) {
-    die("Pengajuan Seminar Hasil belum tersedia.");
+    $popup = [
+        'title' => 'Oops!',
+        'text'  => 'Anda belum mengajukan Seminar Hasil.',
+        'icon'  => 'warning',
+        'redirect' => '../dashboard.php'
+    ];
+} else {
+
+    $pengajuan_id = $pengajuan['id'];
+
+    // ===============================
+    // AMBIL NILAI SEMHAS
+    // ===============================
+    $stmt = $pdo->prepare("
+        SELECT 
+            n.peran,
+            n.nilai,
+            d.nama
+        FROM nilai_semhas n
+        JOIN dosen d ON n.dosen_id = d.id
+        WHERE n.pengajuan_id = ?
+        ORDER BY FIELD(n.peran,'dosbing_1','dosbing_2','penguji')
+    ");
+    $stmt->execute([$pengajuan_id]);
+    $nilaiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // ===============================
+    // JIKA NILAI BELUM ADA
+    // ===============================
+    if (count($nilaiList) === 0) {
+        $popup = [
+            'title' => 'Informasi',
+            'text'  => 'Nilai Seminar Hasil belum diinput oleh dosen.',
+            'icon'  => 'info',
+            'redirect' => '../dashboard.php'
+        ];
+    } else {
+
+        // ===============================
+        // HITUNG RATA-RATA
+        // ===============================
+        $total = 0;
+        foreach ($nilaiList as $n) {
+            $total += $n['nilai'];
+        }
+
+        $jumlah = count($nilaiList);
+        $rata_rata = round($total / $jumlah, 2);
+        $status = $rata_rata >= 70 ? "LULUS" : "TIDAK LULUS";
+    }
 }
-
-$pengajuan_id = $pengajuan['id'];
-
-// ===============================
-// AMBIL NILAI
-// ===============================
-$stmt = $pdo->prepare("
-    SELECT 
-        n.peran,
-        n.nilai,
-        d.nama
-    FROM nilai_semhas n
-    JOIN dosen d ON n.dosen_id = d.id
-    WHERE n.pengajuan_id = ?
-    ORDER BY FIELD(n.peran,'dosbing_1','dosbing_2','penguji')
-");
-$stmt->execute([$pengajuan_id]);
-$nilaiList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// ===============================
-// HITUNG RATA-RATA
-// ===============================
-$total = 0;
-foreach ($nilaiList as $n) {
-    $total += $n['nilai'];
-}
-
-$jumlah = count($nilaiList);
-$rata_rata = $jumlah ? round($total / $jumlah, 2) : 0;
-$status = $rata_rata >= 70 ? "LULUS" : "TIDAK LULUS";
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +90,10 @@ $status = $rata_rata >= 70 ? "LULUS" : "TIDAK LULUS";
 <head>
 <meta charset="UTF-8">
 <title>Cek Nilai Seminar Hasil</title>
+
 <link rel="stylesheet" href="../../style.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
 .card{
     background:#fff;
@@ -101,13 +129,26 @@ th{background:#f1f3f5;}
 <div class="main-content">
 <h1>Cek Nilai Seminar Hasil</h1>
 
+<?php if ($popup): ?>
+
+<script>
+Swal.fire({
+    title: "<?= $popup['title'] ?>",
+    text: "<?= $popup['text'] ?>",
+    icon: "<?= $popup['icon'] ?>",
+    confirmButtonText: "OK"
+}).then(() => {
+    window.location.href = "<?= $popup['redirect'] ?>";
+});
+</script>
+
+<?php else: ?>
+
 <div class="card">
 
-<p><b>ID Seminar Hasil:</b><br><?= htmlspecialchars($pengajuan['id_semhas']) ?></p>
-
-<?php if (!$nilaiList): ?>
-    <p><i>Nilai belum diinput.</i></p>
-<?php else: ?>
+<p><b>ID Seminar Hasil:</b><br>
+<?= htmlspecialchars($pengajuan['id_semhas']) ?>
+</p>
 
 <table>
 <tr>
@@ -115,6 +156,7 @@ th{background:#f1f3f5;}
     <th>Dosen</th>
     <th>Nilai</th>
 </tr>
+
 <?php foreach ($nilaiList as $n): ?>
 <tr>
     <td><?= strtoupper(str_replace('_',' ', $n['peran'])) ?></td>
@@ -127,14 +169,15 @@ th{background:#f1f3f5;}
 <p style="margin-top:16px">
     <b>Rata-rata:</b> <?= number_format($rata_rata,2) ?><br>
     <b>Status:</b>
-    <span class="badge <?= $status=='LULUS'?'lulus':'tidak' ?>">
+    <span class="badge <?= $status == 'LULUS' ? 'lulus' : 'tidak' ?>">
         <?= $status ?>
     </span>
 </p>
 
+</div>
+
 <?php endif; ?>
 
-</div>
 </div>
 
 </body>
