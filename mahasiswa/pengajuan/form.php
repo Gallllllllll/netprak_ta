@@ -74,7 +74,6 @@ form button:hover { background:#0056b3; }
 
                 <label for="judul">Judul TA:</label>
                 <input type="text" id="judul" name="judul" required>
-                <small>Format: PDF</small>
 
                 <label for="bukti_pembayaran">Bukti Pembayaran:</label>
                 <input type="file" name="bukti_pembayaran" required accept=".pdf">
@@ -90,7 +89,7 @@ form button:hover { background:#0056b3; }
 
                 <label for="magang">Bukti Kelulusan Magang:</label>
                 <input type="file" id="magang" name="magang" required accept=".pdf">
-                <small>Format: PDF</small>
+                <small>Format: PDF</small><br>
 
                 <button type="submit">Ajukan TA</button>
             </form>
