@@ -3,7 +3,9 @@ session_start();
 require "../../config/connection.php";
 require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
 
-// cek role admin
+/* ===============================
+   CEK ROLE ADMIN
+================================ */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: " . base_url('login.php'));
     exit;
@@ -12,7 +14,9 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 $id = $_GET['id'] ?? null;
 if (!$id) die("ID pengajuan tidak diberikan.");
 
-// ambil data pengajuan
+/* ===============================
+   AMBIL DATA PENGAJUAN
+================================ */
 $stmt = $pdo->prepare("
     SELECT p.*, m.nama
     FROM pengajuan_ta p
@@ -23,21 +27,15 @@ $stmt->execute([$id]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$data) die("Data pengajuan tidak ditemukan.");
 
-// list file
+/* ===============================
+   LIST FILE
+================================ */
 $files = [
     'bukti_pembayaran'=>'Bukti Pembayaran',
     'formulir_pendaftaran'=>'Formulir Pendaftaran',
-    'transkrip_nilai'=>'Transkrip Nilai',
+    'transkrip_nilai'=>'Bukti Transkrip Nilai',
     'bukti_magang'=>'Bukti Kelulusan Magang'
 ];
-
-// cek semua disetujui
-$all_approved = (
-    ($data['status_bukti_pembayaran']??'')==='disetujui' &&
-    ($data['status_formulir_pendaftaran']??'')==='disetujui' &&
-    ($data['status_transkrip_nilai']??'')==='disetujui' &&
-    ($data['status_bukti_magang']??'')==='disetujui'
-);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -46,74 +44,150 @@ $all_approved = (
 <title>Detail Pengajuan TA</title>
 
 <style>
-.card {
+:root{
+    --primary:#FF8A8A;
+    --secondary:#FFB27A;
+    --border:#FFB47A;
+    --bg:#FFF3E8;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+/* ================= HEADER ================= */
+.dashboard-header{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    color:#fff;
+    padding:20px 24px;
+    border-radius:14px;
+    margin-bottom:20px;
+}
+.dashboard-header h1{
+    margin:0;
+    font-size:20px;
+}
+.dashboard-header p{
+    margin:6px 0 0;
+    font-size:14px;
+}
+
+/* ================= CARD ================= */
+.card{
     background:#fff;
-    padding:24px;
     border-radius:16px;
-    border:1px solid #f1dcdc;
+    padding:20px;
+    border:2px solid var(--border);
     margin-bottom:20px;
 }
 
-table {
-    width:100%;
-    border-collapse:collapse;
+/* ================= INFO ================= */
+.info-box{
+    border-radius:14px;
+    border:2px solid var(--border);
+    padding:16px;
 }
-th, td {
-    padding:12px;
-    border:1px solid #e5e7eb;
+.info-box p{
+    margin:6px 0;
+    font-size:14px;
+}
+
+/* ================= TABLE ================= */
+table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0 16px;
+}
+th{
+    text-align:left;
+    padding-bottom:10px;
+    border-bottom:2px solid #3b82f6;
+    font-size:14px;
+}
+td{
     vertical-align:top;
 }
-th {
-    background:#f9fafb;
-    width:240px;
-}
 
-select, textarea {
+/* ================= STATUS ================= */
+.status-box{
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+}
+.status-box b{
+    display:block;
+    margin-bottom:6px;
+    font-size:14px;
+}
+select, textarea{
     width:100%;
-    padding:8px;
-    border-radius:8px;
-    border:1px solid #d1d5db;
+    border-radius:10px;
+    padding:8px 0px;
+    border:1px solid #fbc7a1;
     margin-top:6px;
+    font-size:13px;
+}
+textarea{
+    resize:none;
+    height:60px;
 }
 
-textarea { resize:none; }
-
-.file-link {
-    color:#FF983D;
-    font-weight:600;
+/* ================= FILE CARD ================= */
+.file-card{
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.file-info{
+    font-size:13px;
+}
+.file-info b{
+    display:block;
+}
+.file-link{
+    background:#ffe2cf;
+    padding:6px 16px;
+    border-radius:999px;
+    font-size:12px;
+    color:#FF7A00;
     text-decoration:none;
+    font-weight:600;
+}
+.file-link:hover{
+    background:#ffd3b5;
 }
 
-.file-link:hover { text-decoration:underline; }
-
-button {
-    margin-top:16px;
-    padding:10px 18px;
-    border:none;
-    border-radius:12px;
-    background:linear-gradient(135deg,#FF74C7,#FF983D);
+/* ================= BUTTON ================= */
+button{
+    background:linear-gradient(135deg,var(--primary),var(--secondary));
     color:#fff;
+    border:none;
+    padding:10px 24px;
+    border-radius:999px;
     font-weight:600;
     cursor:pointer;
+    margin-top:10px;
 }
 
-.btn-plot {
-    display:inline-block;
-    padding:10px 18px;
-    border-radius:12px;
-    font-weight:600;
-    text-decoration:none;
-}
-
-.btn-plot.enabled {
-    background:#10b981;
-    color:#fff;
-}
-
-.btn-plot.disabled {
-    background:#d1d5db;
-    color:#6b7280;
-    cursor:not-allowed;
+/* ================= RESPONSIVE ================= */
+@media (max-width:768px){
+    table, thead, tbody, tr, td, th{
+        display:block;
+        width:100%;
+    }
+    th{
+        border:none;
+        margin-bottom:10px;
+    }
+    tr{
+        margin-bottom:18px;
+    }
 }
 </style>
 </head>
@@ -132,17 +206,14 @@ button {
     </div>
 
     <!-- INFO MAHASISWA -->
-    <div class="card">
-        <p>
-            <b>ID Pengajuan</b><br>
-            <span style="background:#f3f4f6;padding:6px 12px;border-radius:8px;font-weight:bold;">
-                <?= htmlspecialchars($data['id_pengajuan']) ?>
-            </span>
-        </p>
+    
+    <div class="card info-box ">
+    <p><b>ID Pengajuan</b><br><?= htmlspecialchars($data['id']) ?></p>
 
-        <p><b>Nama Mahasiswa</b><br><?= htmlspecialchars($data['nama']) ?></p>
-        <p><b>Judul TA</b><br><?= htmlspecialchars($data['judul_ta']) ?></p>
-    </div>
+    <p><b>Nama Mahasiswa</b><br><?= htmlspecialchars($data['nama']) ?></p>
+    <p><b>Judul TA</b><br><?= htmlspecialchars($data['judul_ta']) ?></p>
+   </div>
+
 
     <!-- VERIFIKASI -->
     <div class="card">
@@ -153,7 +224,7 @@ button {
 
             <table>
                 <tr>
-                    <th>Status & Catatan</th>
+                    <th>Status dan Catatan</th>
                     <th>Dokumen</th>
                 </tr>
 
@@ -164,21 +235,30 @@ button {
                 ?>
                 <tr>
                     <td>
-                        <b><?= $label ?></b>
-                        <select name="status[<?= $field ?>]">
-                            <?php foreach(['diajukan','revisi','ditolak','disetujui'] as $s): ?>
-                                <option value="<?= $s ?>" <?= ($data[$sf]??'')==$s?'selected':'' ?>>
-                                    <?= ucfirst($s) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <textarea name="catatan[<?= $field ?>]"><?= htmlspecialchars($data[$cf]??'') ?></textarea>
+                        <div class="status-box">
+                            <b><?= $label ?></b>
+                            <select name="status[<?= $field ?>]">
+                                <?php foreach(['diajukan','revisi','ditolak','disetujui'] as $s): ?>
+                                    <option value="<?= $s ?>" <?= ($data[$sf]??'')==$s?'selected':'' ?>>
+                                        <?= ucfirst($s) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <textarea name="catatan[<?= $field ?>]"><?= htmlspecialchars($data[$cf]??'') ?></textarea>
+                        </div>
                     </td>
                     <td>
-                        <a class="file-link" target="_blank"
-                           href="<?= base_url('uploads/ta/'.$data[$field]) ?>">
-                            Lihat <?= $label ?>
-                        </a>
+                        <div class="file-card">
+                            <div class="file-info">
+                                <b><?= $label ?></b>
+                                PDF File
+                            </div>
+                            <a target="_blank"
+                               href="<?= base_url('uploads/ta/'.$data[$field]) ?>"
+                               class="file-link">
+                               Lihat
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -189,6 +269,5 @@ button {
     </div>
 
 </div>
-
 </body>
 </html>
