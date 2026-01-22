@@ -64,9 +64,9 @@ if (!$data) {
 // ===============================
 $files = [
     'berita_acara'        => 'Berita Acara Seminar Hasil',
-    'persetujuan_laporan' => 'Persetujuan Laporan TA (Form 5)',
-    'pendaftaran_ujian'   => 'Form Pendaftaran Ujian TA (Form 7)',
-    'buku_konsultasi'     => 'Buku Konsultasi TA (Form 4)'
+    'persetujuan_laporan' => 'Persetujuan Laporan TA',
+    'pendaftaran_ujian'   => 'Form Pendaftaran Ujian TA',
+    'buku_konsultasi'     => 'Buku Konsultasi TA'
 ];
 ?>
 <!DOCTYPE html>
