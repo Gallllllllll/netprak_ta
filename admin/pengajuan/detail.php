@@ -60,7 +60,6 @@ body{
 /* ================= HEADER ================= */
 .dashboard-header{
     background:linear-gradient(135deg,var(--primary),var(--secondary));
-    
     padding:20px 24px;
     border-radius:14px;
     margin-bottom:20px;
