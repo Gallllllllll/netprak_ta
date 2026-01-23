@@ -60,17 +60,20 @@ body{
 /* ================= HEADER ================= */
 .dashboard-header{
     background:linear-gradient(135deg,var(--primary),var(--secondary));
-    color:#fff;
+    
     padding:20px 24px;
     border-radius:14px;
     margin-bottom:20px;
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
 }
 .dashboard-header h1{
     margin:0;
+    color:#fff !important;
     font-size:20px;
 }
 .dashboard-header p{
     margin:6px 0 0;
+    color:#fff !important;
     font-size:14px;
 }
 
@@ -81,6 +84,7 @@ body{
     padding:20px;
     border:2px solid var(--border);
     margin-bottom:20px;
+    
 }
 
 /* ================= INFO ================= */
@@ -88,10 +92,12 @@ body{
     border-radius:14px;
     border:2px solid var(--border);
     padding:16px;
+    
 }
 .info-box p{
     margin:6px 0;
     font-size:14px;
+    
 }
 
 /* ================= TABLE ================= */
@@ -173,7 +179,9 @@ button{
     font-weight:600;
     cursor:pointer;
     margin-top:10px;
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
 }
+
 
 /* ================= RESPONSIVE ================= */
 @media (max-width:768px){
@@ -208,8 +216,7 @@ button{
     <!-- INFO MAHASISWA -->
     
     <div class="card info-box ">
-    <p><b>ID Pengajuan</b><br><?= htmlspecialchars($data['id']) ?></p>
-
+    <p><b>ID Pengajuan</b><br><?= htmlspecialchars($data['id_pengajuan']) ?></p>
     <p><b>Nama Mahasiswa</b><br><?= htmlspecialchars($data['nama']) ?></p>
     <p><b>Judul TA</b><br><?= htmlspecialchars($data['judul_ta']) ?></p>
    </div>

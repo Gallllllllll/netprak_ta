@@ -5,14 +5,53 @@ require "../../config/connection.php";
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     die("Unauthorized");
 }
+$username = $_SESSION['user']['nama'] ?? 'Admin';
 
-$stmt = $pdo->query("
+/* ===============================
+   PAGINATION SETUP
+================================ */
+$limit = 10;
+$page  = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
+
+/* ===============================
+   SEARCH
+================================ */
+$search = $_GET['search'] ?? '';
+$search_sql = '';
+$params = [];
+
+if ($search !== '') {
+    $search_sql = "WHERE m.nama LIKE ? OR p.judul_ta LIKE ?";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+/* ===============================
+   HITUNG TOTAL DATA
+================================ */
+$countStmt = $pdo->prepare("
+    SELECT COUNT(*) 
+    FROM pengajuan_ta p
+    JOIN mahasiswa m ON p.mahasiswa_id = m.id
+    $search_sql
+");
+$countStmt->execute($params);
+$total_data = $countStmt->fetchColumn();
+$total_page = ceil($total_data / $limit);
+
+/* ===============================
+   AMBIL DATA
+================================ */
+$stmt = $pdo->prepare("
     SELECT p.*, m.nama
     FROM pengajuan_ta p
     JOIN mahasiswa m ON p.mahasiswa_id = m.id
+    $search_sql
     ORDER BY p.created_at DESC
+    LIMIT $limit OFFSET $offset
 ");
-$username = $_SESSION['user']['nama'] ?? 'Admin';
+$stmt->execute($params);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -32,7 +71,11 @@ body{
 }
 /* TOP */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
-.topbar h1{color:#ff8c42;font-size:28px}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px;
+    font-weight: 700;
+}
 
 /* PROFILE */
 .admin-info{display:flex;align-items:left;gap:20px}
@@ -58,12 +101,35 @@ body{
 }
 
 .search-box{
-    background:#fff;padding:10px 15px;
-    border-radius:25px;width:300px;
-    display:flex;box-shadow:0 3px 10px rgba(0,0,0,.15)
+    position: relative;
+    max-width: 300px;
+    margin-top: 50px;
+    margin-bottom: 40px;
+    margin-left: 0px; 
 }
-.search-box input{border:none;outline:none;width:100%}
+.search-box input{
+    padding: 10px 40px 10px 14px;
+    width: 100%;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    box-sizing: border-box;
+    outline:none;
+}
 
+.entries-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.entries-control select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
 /* TABLE CARD */
 .table-wrapper{
     background:white;
@@ -74,7 +140,7 @@ body{
 /* CARD */
 .card{
     background:#fff;border-radius:18px;
-    padding:15px;
+    padding:24px;
     box-shadow:0 5px 15px rgba(0,0,0,.2);
     overflow-x:auto;
 }
@@ -83,6 +149,7 @@ body{
 table{
     width:100%;
     border-collapse:collapse;
+    margin-left: 0px; 
 }
 
 /* GARIS TABLE */
@@ -167,7 +234,7 @@ td{
 .status-disetujui{
     border-color:#22c55e;
     color:white;
-    background:#22c55e;
+    background:#3A7C3A;
     justify-content:center;
 }
 
@@ -202,12 +269,13 @@ td{
 }
 
 .btn-plot{
-    background:#FFAE00;
+    background:#E78F00;
     color:white;
     padding:5px 10px;
     border-radius:12px;
     font-size:14px;
     text-decoration:none;
+    height: 17px; 
 }
 
 /* DISABLED BUTTON */
@@ -225,16 +293,17 @@ td{
     justify-content:flex-end;
     gap:5px;
 }
-.pagination a{
-    padding:5px 10px;
-    border:1px solid #ddd;
-    border-radius:5px;
-    text-decoration:none;
-    font-size:12px;
-    color:#555;
+.pagination a, .pagination span{
+    padding: 8px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+    background: #fff;
 }
 .pagination .active{
-    background:#ff8c42;
+    background:#ff9f43;
     color:white;
 }
 
@@ -269,9 +338,25 @@ table{min-width:650px;}
 <!-- SEARCH -->
 <div class="tools">
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="Search...">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search..." 
+            value="<?= htmlspecialchars($search) ?>"
+        >
     </div>
 </div>
+
+<div class="entries-control">
+        <span>Show</span>
+        <select id="entries">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <span>entries</span>
+    </div>
 
 <!-- TABLE -->
 <div class="table-wrapper card">
@@ -301,7 +386,7 @@ $isApproved = ($status == "disetujui"); // Hanya disetujui yang bisa klik
 ?>
 
 <tr>
-    <td><?= $i+1 ?></td>
+    <td><?= $i + 1 + $offset ?></td>
     <td><?= htmlspecialchars($row['nama']) ?></td>
     <td><?= htmlspecialchars($row['judul_ta']) ?></td>
 
@@ -333,12 +418,26 @@ $isApproved = ($status == "disetujui"); // Hanya disetujui yang bisa klik
 
 <!-- PAGINATION DUMMY -->
 <div class="pagination">
-    <a>Previous</a>
-    <a class="active">1</a>
-    <a>2</a>
-    <a>3</a>
-    <a>4</a>
-    <a>Next</a>
+    <?php if ($page > 1): ?>
+        <a href="?page=<?= $page - 1 ?>&search=<?= urlencode($search) ?>">Previous</a>
+    <?php else: ?>
+        <span style="opacity:0.5; padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: not-allowed;">Previous</span>
+    <?php endif; ?>
+    
+    <?php for ($i = 1; $i <= max(1, $total_page); $i++): ?>
+        <a 
+            href="?page=<?= $i ?>&search=<?= urlencode($search) ?>"
+            class="<?= $i == $page ? 'active' : '' ?>"
+        >
+            <?= $i ?>
+        </a>
+    <?php endfor; ?>
+    
+    <?php if ($page < $total_page): ?>
+        <a href="?page=<?= $page + 1 ?>&search=<?= urlencode($search) ?>">Next</a>
+    <?php else: ?>
+        <span style="opacity:0.5; padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; background: #fff; cursor: not-allowed;">Next</span>
+    <?php endif; ?>
 </div>
 
 </div>
@@ -346,21 +445,14 @@ $isApproved = ($status == "disetujui"); // Hanya disetujui yang bisa klik
 <!-- LIVE SEARCH -->
 <script>
 const searchInput = document.getElementById("searchInput");
-const table = document.getElementById("taTable");
-const rows = table.getElementsByTagName("tr");
+let timeout = null;
 
 searchInput.addEventListener("keyup", function() {
-    let filter = searchInput.value.toLowerCase();
-
-    for (let i = 1; i < rows.length; i++) {
-        let rowText = rows[i].textContent.toLowerCase();
-
-        if (rowText.indexOf(filter) > -1) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        const val = searchInput.value;
+        window.location.href = `?search=${encodeURIComponent(val)}`;
+    }, 800);
 });
 </script>
 
