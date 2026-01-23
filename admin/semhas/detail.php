@@ -11,9 +11,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 $id = $_GET['id'] ?? null;
-if (!$id) {
-    die("ID pengajuan tidak diberikan.");
-}
+if (!$id) die("ID pengajuan tidak diberikan.");
 
 // ===============================
 // AMBIL DATA SEMHAS + MAHASISWA + TA
@@ -32,8 +30,12 @@ $stmt = $pdo->prepare("
 $stmt->execute([$id]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
+if (!$data) {
+    die('Data pengajuan Seminar Hasil tidak ditemukan.');
+}
+
 // ===============================
-// CEK PENGUJI SUDAH DIPLOT ATAU BELUM
+// CEK PENGUJI
 // ===============================
 $stmt = $pdo->prepare("
     SELECT t.*, d.nama
@@ -52,12 +54,6 @@ $dosenList = $pdo->query("
     FROM dosen
     ORDER BY nama
 ")->fetchAll(PDO::FETCH_ASSOC);
-
-
-
-if (!$data) {
-    die('Data pengajuan Seminar Hasil tidak ditemukan.');
-}
 
 // ===============================
 // DAFTAR FILE SEMHAS
@@ -82,7 +78,7 @@ $files = [
     padding:20px;
     border-radius:12px;
     margin-bottom:20px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.08);
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
 table {
     width:100%;
@@ -155,11 +151,9 @@ a.file-link:hover {
     <p>Verifikasi dokumen Seminar Hasil mahasiswa</p>
 </div>
 
-<!-- ===============================
-     INFORMASI UTAMA
-=============================== -->
+<!-- INFORMASI UTAMA -->
 <div class="card">
-    <p><b>ID Pengajuan Semhas:</b><br><?= htmlspecialchars($data['id_semhas']) ?></p>
+    <p><b>ID Seminar Hasil:</b><br><?= htmlspecialchars($data['id_semhas']) ?></p>
     <p><b>Nama Mahasiswa:</b><br><?= htmlspecialchars($data['nama']) ?> (<?= htmlspecialchars($data['nim']) ?>)</p>
     <p><b>Judul Tugas Akhir:</b><br><?= htmlspecialchars($data['judul_ta']) ?></p>
     <p>
@@ -167,21 +161,16 @@ a.file-link:hover {
         <span class="badge badge-<?= $data['status'] ?>">
             <?= strtoupper($data['status']) ?>
         </span>
-
-
     </p>
-    <p><b>Catatan Admin:</b><br><?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?></p>
 </div>
 
+<!-- PLOT PENGUJI -->
 <?php if ($data['status'] === 'disetujui'): ?>
 <div class="card">
     <h3>Plot Dosen Penguji</h3>
 
     <?php if ($penguji): ?>
-        <p>
-            <b>Dosen Penguji:</b><br>
-            <?= htmlspecialchars($penguji['nama']) ?>
-        </p>
+        <p><b>Dosen Penguji:</b><br><?= htmlspecialchars($penguji['nama']) ?></p>
         <span class="badge badge-disetujui">Sudah Diplot</span>
     <?php else: ?>
         <form action="simpan_penguji.php" method="POST">
@@ -203,15 +192,17 @@ a.file-link:hover {
 </div>
 <?php endif; ?>
 
-
-<!-- ===============================
-     VERIFIKASI FILE
-=============================== -->
+<!-- VERIFIKASI FILE -->
 <div class="card">
-<h3>Verifikasi Dokumen Per File</h3>
+<h3>Verifikasi Dokumen Seminar Hasil</h3>
 
 <form action="verifikasi_semhas_perfile.php" method="POST">
 <input type="hidden" name="id" value="<?= $data['id'] ?>">
+
+<!-- CATATAN ADMIN KESELURUHAN -->
+<label><b>Catatan Admin (Keseluruhan)</b></label>
+<textarea name="catatan"
+    placeholder="Catatan untuk keseluruhan pengajuan seminar hasil..."><?= htmlspecialchars($data['catatan'] ?? '') ?></textarea>
 
 <table>
 <tr>
@@ -223,21 +214,22 @@ a.file-link:hover {
     $file_field    = "file_$key";
     $status_field  = "status_file_$key";
     $catatan_field = "catatan_file_$key";
+    $st = $data[$status_field] ?? 'diajukan';
 ?>
 <tr>
 <td>
     <b><?= $label ?></b>
+    <span class="badge badge-<?= $st ?>"><?= $st ?></span>
 
     <select name="status[<?= $key ?>]">
-        <option value="diajukan" <?= $data[$status_field]==='diajukan'?'selected':'' ?>>Diajukan</option>
-        <option value="revisi" <?= $data[$status_field]==='revisi'?'selected':'' ?>>Revisi</option>
-        <option value="disetujui" <?= $data[$status_field]==='disetujui'?'selected':'' ?>>Disetujui</option>
-        <option value="ditolak" <?= $data[$status_field]==='ditolak'?'selected':'' ?>>Ditolak</option>
+        <option value="diajukan" <?= $st=='diajukan'?'selected':'' ?>>Diajukan</option>
+        <option value="revisi" <?= $st=='revisi'?'selected':'' ?>>Revisi</option>
+        <option value="disetujui" <?= $st=='disetujui'?'selected':'' ?>>Disetujui</option>
+        <option value="ditolak" <?= $st=='ditolak'?'selected':'' ?>>Ditolak</option>
     </select>
 
-
-    <textarea name="catatan[<?= $key ?>]"
-        placeholder="Catatan untuk mahasiswa..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?></textarea>
+    <textarea name="catatan_file[<?= $key ?>]"
+        placeholder="Catatan admin untuk file ini..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?></textarea>
 </td>
 <td>
 <?php if (!empty($data[$file_field])): ?>
@@ -253,7 +245,7 @@ a.file-link:hover {
 
 </table>
 
-<button type="submit">Simpan Status Verifikasi</button>
+<button type="submit">Simpan Verifikasi</button>
 </form>
 </div>
 

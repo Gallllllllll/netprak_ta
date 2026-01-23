@@ -12,13 +12,24 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $id           = $_POST['id'] ?? null;
-    $status_all   = $_POST['status'] ?? [];
-    $catatan_all  = $_POST['catatan'] ?? [];
+    $id            = $_POST['id'] ?? null;
+    $status_all    = $_POST['status'] ?? [];
+    $catatan_file  = $_POST['catatan_file'] ?? [];
+    $catatan_all   = $_POST['catatan'] ?? null; // ✅ STRING
 
     if (!$id || empty($status_all)) {
         die("Data tidak lengkap.");
     }
+
+    // ===============================
+    // SIMPAN CATATAN KESELURUHAN
+    // ===============================
+    $stmt = $pdo->prepare("
+        UPDATE pengajuan_semhas 
+        SET catatan = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$catatan_all, $id]);
 
     // ===============================
     // DAFTAR FILE SEMHAS
@@ -39,9 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $catatan_field = "catatan_file_$key";
 
         $status  = $status_all[$key] ?? 'diajukan';
-        $catatan = $catatan_all[$key] ?? '';
+        $catatan = $catatan_file[$key] ?? '';
 
-        // VALIDASI ENUM
         if (!in_array($status, ['diajukan','revisi','disetujui','ditolak'])) {
             die("Status tidak valid.");
         }
@@ -71,27 +81,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data['status_file_buku_konsultasi']
     ];
 
-    // kalau ada 1 yang ditolak -> status keseluruhan ditolak
     if (in_array('ditolak', $statuses)) {
         $overall_status = 'ditolak';
-    }
-    // kalau semua disetujui -> status keseluruhan disetujui
-    elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'disetujui') {
+    } elseif (count(array_unique($statuses)) === 1 && $statuses[0] === 'disetujui') {
         $overall_status = 'disetujui';
-    }
-    // kalau ada yang revisi -> status keseluruhan revisi
-    elseif (in_array('revisi', $statuses)) {
+    } elseif (in_array('revisi', $statuses)) {
         $overall_status = 'revisi';
-    }
-    // selain itu -> tetap diajukan
-    else {
+    } else {
         $overall_status = 'diajukan';
     }
 
     // ===============================
     // UPDATE STATUS KESELURUHAN
     // ===============================
-    $stmt = $pdo->prepare("UPDATE pengajuan_semhas SET status = ? WHERE id = ?");
+    $stmt = $pdo->prepare("
+        UPDATE pengajuan_semhas 
+        SET status = ?
+        WHERE id = ?
+    ");
     $stmt->execute([$overall_status, $id]);
 
     // ===============================
@@ -100,4 +107,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: index.php?id=$id");
     exit;
 }
-?>

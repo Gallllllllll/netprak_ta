@@ -10,15 +10,46 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     exit;
 }
 
+// ===============================
+// NAMA MAHASISWA LOGIN
+// ===============================
+$namaMahasiswa = $_SESSION['user']['nama'] ?? 'Mahasiswa';
+
 $id = $_GET['id'] ?? 0;
 
 // ===============================
-// AMBIL DATA SEMHAS
+// AMBIL DATA SEMHAS + TIM DOSEN
 // ===============================
 $stmt = $pdo->prepare("
-    SELECT *
-    FROM pengajuan_semhas
-    WHERE id = ? AND mahasiswa_id = ?
+    SELECT 
+        ps.*,
+
+        MAX(d1.nama) AS pembimbing_1,
+        MAX(d2.nama) AS pembimbing_2,
+
+        GROUP_CONCAT(DISTINCT dp.nama SEPARATOR ', ') AS tim_penguji
+
+    FROM pengajuan_semhas ps
+
+    LEFT JOIN dosbing_ta db1
+        ON db1.pengajuan_id = ps.pengajuan_ta_id
+        AND db1.role = 'dosbing_1'
+    LEFT JOIN dosen d1 ON db1.dosen_id = d1.id
+
+    LEFT JOIN dosbing_ta db2
+        ON db2.pengajuan_id = ps.pengajuan_ta_id
+        AND db2.role = 'dosbing_2'
+    LEFT JOIN dosen d2 ON db2.dosen_id = d2.id
+
+    LEFT JOIN tim_semhas ts
+        ON ts.pengajuan_id = ps.id
+    LEFT JOIN dosen dp
+        ON ts.dosen_id = dp.id
+
+    WHERE ps.id = ?
+      AND ps.mahasiswa_id = ?
+
+    GROUP BY ps.id
 ");
 $stmt->execute([$id, $_SESSION['user']['id']]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -27,210 +58,387 @@ if (!$data) {
     die("Data Seminar Hasil tidak ditemukan.");
 }
 
-// helper badge status
-function badgeStatus($status) {
+// ===============================
+// FILE
+// ===============================
+$files = [
+    'file_berita_acara' => [
+        'label' => 'Berita Acara Seminar Hasil',
+        'catatan' => 'catatan_file_berita_acara'
+    ],
+    'file_persetujuan_laporan' => [
+        'label' => 'Persetujuan Laporan TA',
+        'catatan' => 'catatan_file_persetujuan_laporan'
+    ],
+    'file_pendaftaran_ujian' => [
+        'label' => 'Form Pendaftaran Ujian TA',
+        'catatan' => 'catatan_file_pendaftaran_ujian'
+    ],
+    'file_buku_konsultasi' => [
+        'label' => 'Buku Konsultasi TA',
+        'catatan' => 'catatan_file_buku_konsultasi'
+    ]
+];
+
+function badgeFileStatus($status) {
     return match($status) {
-        'diajukan'  => 'badge-diajukan',
-        'revisi'    => 'badge-revisi',
-        'disetujui' => 'badge-disetujui',
-        'ditolak'   => 'badge-ditolak',
-        default     => 'badge-diajukan'
+        'diajukan'  => ['class' => 'status-diajukan',  'label' => 'Diajukan'],
+        'revisi'    => ['class' => 'status-revisi',    'label' => 'Revisi'],
+        'disetujui' => ['class' => 'status-disetujui', 'label' => 'Disetujui'],
+        'ditolak'   => ['class' => 'status-ditolak',   'label' => 'Ditolak'],
+        default     => ['class' => 'status-diajukan',  'label' => 'Diajukan']
     };
 }
-?>
 
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detail Seminar Hasil</title>
 <link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-.card {
+body {
+    margin:0;
+    font-family:'Segoe UI', Arial, sans-serif;
+    background:linear-gradient(180deg,#f9b4b4,#ff9f80);
+}
+
+.container {
+    display:flex;
+    min-height:100vh;
+}
+
+.main-content {
+    flex:1;
+    padding:30px;
+}
+
+.page-card {
+    max-width:900px;
+    margin:auto;
+    background:#fff7f3;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.page-title {
+    font-size:22px;
+    font-weight:700;
+    color:#ff6b35;
+}
+
+.subtitle {
+    font-size:14px;
+    color:#777;
+    margin-bottom:20px;
+}
+
+.header-box {
     background:#fff;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 2px 6px rgba(0,0,0,.08);
+    border-radius:14px;
+    padding:18px;
+    border:1px solid #ffe1d6;
 }
 
-.file-item {
-    margin-bottom:16px;
-    padding-bottom:12px;
-    border-bottom:1px dashed #ddd;
-}
-
-.file-item a {
-    color:#007bff;
-    text-decoration:none;
-    font-weight:600;
-}
-.file-item a:hover {
-    text-decoration:underline;
-}
-
-.badge {
-    padding:5px 12px;
+.status-badge {
+    display:inline-block;
+    padding:6px 14px;
     border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.status-diajukan { background:#ffeeba; color:#856404; }
+.status-revisi { background:#bee5eb; color:#0c5460; }
+.status-disetujui { background:#c3e6cb; color:#155724; }
+.status-ditolak { background:#f5c6cb; color:#721c24; }
+
+.id-chip {
+    background:#f1f1f1;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+    color:#555;
+}
+
+.info-grid {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+    margin-top:16px;
+}
+
+.info-item {
+    background:#fffaf7;
+    border:1px solid #ffd9c9;
+    border-radius:12px;
+    padding:12px;
+    text-align:center;
+}
+
+.info-item b {
+    display:block;
     font-size:13px;
+    color:#ff6b35;
+    margin-bottom:6px;
+}
+
+.section {
+    margin-top:24px;
+}
+
+.section h3 {
+    font-size:16px;
+    color:#444;
+    margin-bottom:12px;
+}
+
+.doc-item {
+    background:#fff;
+    border:1px solid #ffd6c4;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.doc-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.doc-title {
     font-weight:600;
 }
-.badge-diajukan { background:#e3f2fd; color:#1565c0; }
-.badge-revisi   { background:#fff3cd; color:#856404; }
-.badge-disetujui{ background:#d4edda; color:#155724; }
-.badge-ditolak  { background:#f8d7da; color:#721c24; }
 
-.note {
-    margin-top:6px;
-    font-size:14px;
-    color:#444;
-    background:#f8f9fa;
+.btn-view {
+    padding:6px 14px;
+    background:linear-gradient(90deg,#ff6b35,#ff9f1c);
+    color:#fff;
+    text-decoration:none;
+    border-radius:20px;
+    font-size:12px;
+}
+
+.note-box {
+    margin-top:8px;
+    font-size:13px;
+    color:#777;
+    background:#fff4ee;
     padding:8px 12px;
-    border-radius:8px;
-}
-
-.jadwal {
-    margin-top:15px;
-    padding:14px;
     border-radius:10px;
-    background:#e9f7ef;
-    font-size:14px;
 }
-.jadwal b { color:#155724; }
 
+.footer-note {
+    margin-top:24px;
+    background:#ffe1e1;
+    border-radius:14px;
+    padding:14px;
+    font-size:13px;
+    color:#a94442;
+}
 .actions {
     margin-top:20px;
 }
-.actions a {
-    display:inline-block;
-    padding:9px 16px;
-    border-radius:8px;
-    font-size:14px;
-    text-decoration:none;
-    margin-right:8px;
-}
 .btn-back {
-    background:#6c757d;
+    padding:10px 18px;
+    background:#6b7280; /* slate-500 */
     color:#fff;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:all .2s ease;
 }
-.btn-revisi {
-    background:#17a2b8;
+
+.btn-back:hover {
+    background:#4b5563; /* slate-700 */
+    transform:translateY(-1px);
+}
+
+
+.btn-update {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:14px 28px;
+    min-width:260px;
+
+    background: linear-gradient(90deg, #ff6fb1, #ffa600);
     color:#fff;
+    font-weight:700;
+    font-size:14px;
+
+    border:none;
+    border-radius:999px;
+    text-decoration:none;
+
+    box-shadow:0 6px 18px rgba(255,111,177,.35);
+    transition:all .25s ease;
 }
+
+.btn-update:hover {
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(255,111,177,.45);
+}
+
+.btn-update i {
+    font-size:16px;
+}
+
 </style>
 </head>
 
 <body>
+<div class="container">
 
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
 
-<h1>Detail Seminar Hasil</h1>
-
-<div class="card">
-
-    <!-- ID SEMHAS -->
-    <p>
-        <b>ID Seminar Hasil:</b><br>
-        <span style="font-size:16px;font-weight:600;">
-            <?= htmlspecialchars($data['id_semhas']) ?>
-        </span>
-    </p>
-
-    <hr>
+<div class="page-card">
 
     <!-- ===============================
-         DOKUMEN & CATATAN PER FILE
+         HEADER + NAMA MAHASISWA
     =============================== -->
-    <h3>Dokumen Seminar Hasil</h3>
-
-    <?php if ($data['file_berita_acara']): ?>
-    <div class="file-item">
-        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_berita_acara']) ?>" target="_blank">
-            📄 Berita Acara Seminar Hasil
-        </a><br>
-        <div class="note">
-            <b>Catatan:</b>
-            <?= $data['catatan_file_berita_acara'] ? htmlspecialchars($data['catatan_file_berita_acara']) : '-' ?>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+            <div class="page-title">Detail Status Seminar Hasil</div>
+            <div class="subtitle">Informasi lengkap pelaksanaan seminar hasil</div>
+        </div>
+        <div style="text-align:right;">
+            <small>Nama Mahasiswa</small><br>
+            <strong style="color:#ff6b35;">
+                <?= htmlspecialchars($namaMahasiswa) ?>
+            </strong>
         </div>
     </div>
-    <?php endif; ?>
 
-    <?php if ($data['file_persetujuan_laporan']): ?>
-    <div class="file-item">
-        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_persetujuan_laporan']) ?>" target="_blank">
-            📄 Persetujuan Laporan TA (Form 5)
-        </a><br>
-        <div class="note">
-            <b>Catatan:</b>
-            <?= $data['catatan_file_persetujuan_laporan'] ? htmlspecialchars($data['catatan_file_persetujuan_laporan']) : '-' ?>
+    <!-- HEADER BOX -->
+    <div class="header-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="status-badge status-<?= $data['status'] ?>">
+                <?= strtoupper($data['status']) ?>
+            </span>
+            <span class="id-chip"><?= htmlspecialchars($data['id_semhas']) ?></span>
+        </div>
+
+        <p style="margin-top:12px">
+            <b>Catatan Admin:</b><br>
+            <?= $data['catatan'] ?: '-' ?>
+        </p>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <b>Tanggal Seminar</b>
+                <?= $data['tanggal_sidang']
+                    ? date('Y-m-d', strtotime($data['tanggal_sidang']))
+                    : '-' ?>
+            </div>
+            <div class="info-item">
+                <b>Waktu Seminar</b>
+                <?= $data['jam_sidang'] ? substr($data['jam_sidang'],0,5) : '-' ?>
+            </div>
+            <div class="info-item">
+                <b>Ruangan Seminar</b>
+                <?= $data['tempat_sidang'] ?: '-' ?>
+            </div>
         </div>
     </div>
-    <?php endif; ?>
 
-    <?php if ($data['file_pendaftaran_ujian']): ?>
-    <div class="file-item">
-        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_pendaftaran_ujian']) ?>" target="_blank">
-            📄 Form Pendaftaran Ujian TA (Form 7)
-        </a><br>
-        <div class="note">
-            <b>Catatan:</b>
-            <?= $data['catatan_file_pendaftaran_ujian'] ? htmlspecialchars($data['catatan_file_pendaftaran_ujian']) : '-' ?>
-        </div>
+    <!-- TIM DOSEN -->
+    <div class="section">
+        <h3>Tim Seminar Hasil</h3>
+        <p><b>Dosen Pembimbing 1:</b> <?= $data['pembimbing_1'] ?: '-' ?></p>
+        <p><b>Dosen Pembimbing 2:</b> <?= $data['pembimbing_2'] ?: '-' ?></p>
+        <p><b>Tim Penguji:</b> <?= $data['tim_penguji'] ?: '-' ?></p>
     </div>
-    <?php endif; ?>
 
-    <?php if ($data['file_buku_konsultasi']): ?>
-    <div class="file-item">
-        <a href="../../uploads/semhas/<?= htmlspecialchars($data['file_buku_konsultasi']) ?>" target="_blank">
-            📄 Buku Konsultasi TA (Form 4)
-        </a><br>
-        <div class="note">
-            <b>Catatan:</b>
-            <?= $data['catatan_file_buku_konsultasi'] ? htmlspecialchars($data['catatan_file_buku_konsultasi']) : '-' ?>
+    <!-- DOKUMEN -->
+    <div class="section">
+        <h3>Daftar Lampiran Berkas</h3>
+
+        <?php foreach ($files as $field => $info): ?>
+        <?php
+            // ambil nama status field
+            $statusField = 'status_' . $field; // contoh: status_file_berita_acara
+            $statusValue = $data[$statusField] ?? 'diajukan';
+            $badge = badgeFileStatus($statusValue);
+        ?>
+        <div class="doc-item">
+            <div class="doc-row">
+                <div class="doc-title"><?= $info['label'] ?></div>
+
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <!-- BADGE STATUS FILE -->
+                    <span class="status-badge <?= $badge['class'] ?>">
+                        <?= $badge['label'] ?>
+                    </span>
+
+                    <!-- TOMBOL LIHAT -->
+                    <?php if (!empty($data[$field])): ?>
+                        <a class="btn-view"
+                        href="../../uploads/semhas/<?= htmlspecialchars($data[$field]) ?>"
+                        target="_blank">
+                            Lihat
+                        </a>
+                    <?php else: ?>
+                        <span style="font-size:12px;color:#aaa">Belum upload</span>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="note-box">
+                Catatan:
+                <?= !empty($data[$info['catatan']])
+                    ? htmlspecialchars($data[$info['catatan']])
+                    : '-' ?>
+            </div>
         </div>
+        <?php endforeach; ?>
+
     </div>
-    <?php endif; ?>
 
-    <!-- STATUS GLOBAL -->
-    <p>
-        <b>Status Pengajuan:</b>
-        <span class="badge <?= badgeStatus($data['status']) ?>">
-            <?= strtoupper($data['status']) ?>
-        </span>
-    </p>
-
-    <!-- CATATAN GLOBAL -->
-    <p>
-        <b>Catatan Admin (Umum):</b><br>
-        <?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?>
-    </p>
-
-    <!-- JADWAL -->
-    <?php if ($data['tanggal_sidang']): ?>
-        <div class="jadwal">
-            <b>📅 Jadwal Seminar Hasil</b><br><br>
-            <b>Tanggal:</b> <?= date('d M Y', strtotime($data['tanggal_sidang'])) ?><br>
-            <b>Jam:</b> <?= substr($data['jam_sidang'], 0, 5) ?> WIB<br>
-            <b>Tempat:</b> <?= htmlspecialchars($data['tempat_sidang']) ?>
+    <?php if (
+        empty($data['tanggal_sidang']) ||
+        empty($data['jam_sidang']) ||
+        empty($data['tempat_sidang'])
+    ): ?>
+        <div class="footer-note">
+            Jadwal seminar akan muncul setelah pengajuan divalidasi dan dikonfirmasi oleh Admin Program Studi.
         </div>
     <?php endif; ?>
 
-    <!-- ACTION -->
     <div class="actions">
-        <a class="btn-back" href="status.php">Kembali</a>
+
+        <?php if ($data['status'] !== 'revisi'): ?>
+            <a class="btn-back" href="status.php">
+            <i class="fa-solid fa-arrow-left"></i>
+            Kembali
+        </a>
+        <?php endif; ?>
 
         <?php if ($data['status'] === 'revisi'): ?>
-            <a class="btn-revisi" href="revisi.php?id=<?= $data['id'] ?>">
-                Revisi Dokumen
-            </a>
+            <div style="margin-top:24px;text-align:center;">
+                <a class="btn-update" href="revisi.php?id=<?= $data['id'] ?>">
+                    <i class="fa-solid fa-rotate"></i> Update Berkas Sekarang
+                </a>
+            </div>
         <?php endif; ?>
+
     </div>
 
-</div>
-</div>
 
+</div>
+</div>
+</div>
 </body>
 </html>
