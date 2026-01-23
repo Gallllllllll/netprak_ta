@@ -226,7 +226,7 @@ input[type="file"] {
 /* INFO BOX */
 .info-box {
     background: #FFDFE0;
-    color: #FF983D;
+    color: #FF3A3D;
     border: 1px solid rgba(255, 152, 61, 0.35);
     border-radius: 14px;
     padding: 16px 18px;

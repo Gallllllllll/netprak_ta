@@ -7,7 +7,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: " . base_url('login.php'));
     exit;
 }
-
+$username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
 $mahasiswa_id = $_SESSION['user']['id'];
 
 $pesan_error  = '';
@@ -32,26 +32,378 @@ if ($pengajuan) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Form Pengajuan TA</title>
-<link rel="stylesheet" href="<?= base_url('style.css') ?>">
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#f4f6f8; }
-.container { display:flex; min-height:100vh; }
-.content { flex:1; padding:20px; }
-form, .card { 
-    background:#fff;
-    padding:20px;
-    border-radius:8px;
-    box-shadow:0 2px 5px rgba(0,0,0,0.1);
-    max-width:700px;
-    margin:auto;
+:root {
+    --pink: #FF74C7;
+    --orange: #FF983D;
+    --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
 }
-form h2, .card h2 { margin-top:0; margin-bottom:20px; }
-form label { display:block; margin-top:15px; font-weight:bold; }
-form input[type="text"],
-form input[type="file"] { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:4px; }
-form button { margin-top:20px; padding:12px 20px; background:#007bff; color:#fff; border:none; border-radius:6px; cursor:pointer; font-size:16px; }
-form button:hover { background:#0056b3; }
+/* TOP */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
+}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
+}
+
+/* PROFILE */
+.mhs-info{
+    display:flex;
+    align-items:left;
+    gap:20px
+}
+.mhs-text span{
+    font-size:13px;
+    color:#555
+}
+.mhs-text b{
+    color:#ff8c42;
+    font-size:14px
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* CARD */
+.card {
+    background:#fff;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+    overflow-x: hidden;
+}
+
+.form-card h2{
+    text-align: center;
+    color: #ff8c42;
+}
+/* INFO BOX */
+.info-box {
+    background: #5F5F5F;
+    color: #ffffff;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.info-box strong {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.info-box li {
+    margin-bottom:4px;
+    color:#ffffff;
+}
+
+.info-box p{
+    border: solid 1px #ff8c42;
+    padding:10px;
+    border-radius:8px;
+    background:#ffffff;
+    color:#555;
+}
+
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100% !important;
+    background: #FF983D;
+    display: block;
+    margin: 12px 0;
+}
+
+.pretty-ol {
+    list-style: none;        /* hilangkan nomor default */
+    padding-left: 0;
+    margin: 0;
+    counter-reset: step;     /* reset counter */
+}
+
+.pretty-ol li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #fff;             /* teks kalau background gelap */
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* BOX angka */
+.pretty-ol li::before {
+    content: counter(step);
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid #fff;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* message BOX */
+.message-box {
+    background: #FFDFE0;
+    color: #FF3A3D;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.message-box strong {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size: 13px;
+}
+
+/* ==============================
+   FORM UI (VERSI BARU - 2 KOLOM)
+============================== */
+form{
+    padding: 0 15px;
+}
+
+.ta-form-card {
+    background: #ffffff;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 152, 61, 0.25);
+    box-shadow: 0 8px 22px rgba(0,0,0,.10);
+    padding: 22px;
+    margin-top: 20px;
+}
+
+.ta-form-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255, 152, 61, 0.25);
+    margin-bottom: 18px;
+}
+
+.ta-form-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: #374151;
+}
+
+.ta-form-subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.ta-badge {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(255, 152, 61, 0.14);
+    color: #FF983D;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    white-space: nowrap;
+}
+
+/* FIELD COMMON */
+.ta-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.ta-label {
+    font-size: 14px;
+    font-weight: 800;
+    color: #000000;
+    letter-spacing: .3px;
+}
+
+.ta-input {
+    width: auto;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+    background: #fff;
+    transition: .2s ease;
+}
+
+.ta-input:focus {
+    outline: none;
+    border-color: #FF983D;
+    box-shadow: 0 0 0 3px rgba(255,152,61,.20);
+}
+
+/* UPLOAD GRID */
+.ta-upload-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.ta-upload-item {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 240px;
+}
+
+/* UPLOAD BOX */
+.ta-upload-box {
+    position: relative;
+    background: #fff7f1;
+    border: 1px dashed rgba(255, 152, 61, 0.7);
+    border-radius: 16px;
+    padding: 16px;
+    transition: .2s ease;
+}
+
+.ta-upload-box:hover {
+    border-color: #FF74C7;
+    background: rgba(255, 116, 199, 0.07);
+}
+
+.ta-upload-inner {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.ta-upload-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(255,116,199,.25), rgba(255,152,61,.22));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+}
+
+.ta-upload-icon span {
+    color: #FF983D;
+    font-size: 24px;
+}
+
+.ta-upload-text {
+    flex: 1;
+}
+
+.ta-upload-text strong {
+    display: block;
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 2px;
+}
+
+.ta-upload-text small {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* INPUT FILE HIDDEN FULL COVER */
+.ta-upload-box input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* ===== STATUS FILE ===== */
+.file-status {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.file-status.uploaded {
+    color: #16a34a;
+    font-weight: 700;
+}
+
+/* optional: kalau sudah upload, box jadi solid */
+.ta-upload-box.is-uploaded {
+    border-style: solid;
+    border-color: rgba(22, 163, 74, 0.6);
+    background: rgba(22, 163, 74, 0.06);
+}
+
+
+/* ACTION */
+.ta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 152, 61, 0.25);
+}
+
+.ta-btn {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    letter-spacing: .3px;
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #ffffff;
+    border:1px solid #FF983D;
+    cursor: pointer;
+}
+.ta-btn-primary:hover {
+    opacity: .9;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .ta-upload-item {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .ta-actions {
+        flex-direction: column;
+    }
+
+    .ta-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 .alert { background:#fff3cd; color:#856404; padding:15px; border-radius:6px; margin-bottom:15px; }
 </style>
 </head>
@@ -61,41 +413,193 @@ form button:hover { background:#0056b3; }
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
 
     <div class="main-content">
+        <div class="topbar">
+            <h1>Pengajuan Tugas Akhir</h1>
+
+            <div class="mhs-info">
+                <div class="mhs-text">
+                    <span>Selamat Datang,</span><br>
+                    <b><?= htmlspecialchars($username) ?></b>
+                </div>
+                <div class="avatar">
+                    <span class="material-symbols-rounded" style="color:#fff">person</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>
+                <span class="material-symbols-rounded">info</span> 
+                    Informasi Penting
+                </strong>
+                <hr class="divider">
+            <ol class="pretty-ol">
+                <li>Upload Transkrip Nilai dengan IPK >= 2.50, SKS minimal 100, nilai C tidak lebih dari 5 mata kuliah dan tidak ada nilai D atau E</li>
+                <li>Upload Surat dengan format PDF</li>
+                <li>Format penamaan dokumen: NIM_Nama File_Nama (Contoh: K3522029_Bukti Transkrip Nilai_Anthony)</li>
+                <li>Maksimal ukuran dokumen 2 MB</li>
+                <li>Pastikan dokumen yang akan diupload sudah benar</li>
+            </ol>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
         <?php if ($pesan_error): ?>
-            <div class="card">
-                <h2>Pengajuan TA</h2>
+            <div class="form-card">
+                <h2>Pengajuan Tugas Akhir</h2>
+                <hr class="divider">
                 <div class="alert">
                     <?= $pesan_error ?>
                 </div>
             </div>
         <?php elseif ($boleh_upload): ?>
-            <form action="simpan.php" method="POST" enctype="multipart/form-data">
-                <h2>Form Pengajuan Tugas Akhir</h2>
+        <div class="form-card">
+            <h2>Pengajuan Tugas Akhir</h2>
+            <hr class="divider">
+        </div>
 
-                <label for="judul">Judul TA:</label>
-                <input type="text" id="judul" name="judul" required>
+    <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
-                <label for="bukti_pembayaran">Bukti Pembayaran:</label>
-                <input type="file" name="bukti_pembayaran" required accept=".pdf">
-                <small>Format: PDF</small>
+        <div class="ta-field">
+            <label class="ta-label" for="judul">Judul Tugas Akhir</label>
+            <input
+                type="text"
+                id="judul"
+                name="judul"
+                class="ta-input"
+                placeholder="Masukkan judul tugas akhir Anda disini ... (Gunakan HURUF KAPITAL)"
+                required
+            >
+        </div>
 
-                <label for="formulir">Formulir Pendaftaran:</label>
-                <input type="file" id="formulir" name="formulir" required accept=".pdf">
-                <small>Format: PDF</small>
+        <div class="ta-upload-grid">
 
-                <label for="transkrip">Transkrip Nilai:</label>
-                <input type="file" id="transkrip" name="transkrip" required accept=".pdf">
-                <small>Format: PDF</small>
+            <div class="ta-upload-item">
+                <div class="ta-field">
+                    <label class="ta-label">Formulir Pendaftaran & Persetujuan Tema</label>
+                    <label class="ta-upload-box">
+                        <div class="ta-upload-inner">
+                            <div class="ta-upload-icon">
+                                <span class="material-symbols-rounded">upload</span>
+                            </div>
+                            <div class="ta-upload-text">
+                                <strong>Klik untuk pilih file</strong>
+                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                <div class="file-status" id="status-formulir">Tidak ada file yang dipilih</div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-formulir" name="formulir" required accept=".pdf">
+                    </label>
+                </div>
+            </div>
 
-                <label for="magang">Bukti Kelulusan Magang:</label>
-                <input type="file" id="magang" name="magang" required accept=".pdf">
-                <small>Format: PDF</small><br>
+            <div class="ta-upload-item">
+                <div class="ta-field">
+                    <label class="ta-label">Bukti Pembayaran</label>
+                    <label class="ta-upload-box">
+                        <div class="ta-upload-inner">
+                            <div class="ta-upload-icon">
+                                <span class="material-symbols-rounded">upload</span>
+                            </div>
+                            <div class="ta-upload-text">
+                                <strong>Klik untuk pilih file</strong>
+                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                <div class="file-status" id="status-bayar">Tidak ada file yang dipilih</div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-bayar" name="bukti_pembayaran" required accept=".pdf">
+                    </label>
+                </div>
+            </div>
 
-                <button type="submit">Ajukan TA</button>
-            </form>
+            <div class="ta-upload-item">
+                <div class="ta-field">
+                    <label class="ta-label">Transkrip Nilai</label>
+                    <label class="ta-upload-box">
+                        <div class="ta-upload-inner">
+                            <div class="ta-upload-icon">
+                                <span class="material-symbols-rounded">upload</span>
+                            </div>
+                            <div class="ta-upload-text">
+                                <strong>Klik untuk pilih file</strong>
+                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                <div class="file-status" id="status-transkrip">Tidak ada file yang dipilih</div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-transkrip" name="transkrip" required accept=".pdf">
+                    </label>
+                </div>
+            </div>
+
+            <div class="ta-upload-item">
+                <div class="ta-field">
+                    <label class="ta-label">Bukti Kelulusan Mata Kuliah Magang / PI</label>
+                    <label class="ta-upload-box">
+                        <div class="ta-upload-inner">
+                            <div class="ta-upload-icon">
+                                <span class="material-symbols-rounded">upload</span>
+                            </div>
+                            <div class="ta-upload-text">
+                                <strong>Klik untuk pilih file</strong>
+                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                <div class="file-status" id="status-magang">Tidak ada file yang dipilih</div>
+                            </div>
+                        </div>
+                        <input type="file" id="file-magang" name="magang" required accept=".pdf">
+                    </label>
+                </div>
+            </div>
+
+        </div>
+        <div class="message-box">
+            <strong>
+                <span class="material-symbols-rounded">info</span> 
+                Kesalahan data atau dokumen yang diupload dapat menyebabkan penolakan pendaftaran. Pastikan semua berkas adalah dokumen asli yang telah discan.
+            </strong>
+        </div>
+        <div class="ta-actions">
+            <button type="submit" class="ta-btn ta-btn-primary">
+                <span class="material-symbols-rounded">send</span>
+                Kirim Pengajuan Tugas Akhir
+            </button>
+        </div>
+
+    </form>
+</div>
         <?php endif; ?>
     </div>
+    </div>
 </div>
+<script>
+function setFileStatus(inputId, statusId) {
+    const input = document.getElementById(inputId);
+    const status = document.getElementById(statusId);
+
+    if (!input || !status) return;
+
+    input.addEventListener("change", function () {
+        const wrapper = input.closest(".ta-upload-box");
+
+        if (this.files && this.files.length > 0) {
+            const fileName = this.files[0].name;
+
+            status.textContent = "File dipilih: " + fileName;
+            status.classList.add("uploaded");
+
+            if(wrapper) wrapper.classList.add("is-uploaded");
+        } else {
+            status.textContent = "Tidak ada file yang dipilih";
+            status.classList.remove("uploaded");
+
+            if(wrapper) wrapper.classList.remove("is-uploaded");
+        }
+    });
+}
+
+setFileStatus("file-formulir", "status-formulir");
+setFileStatus("file-bayar", "status-bayar");
+setFileStatus("file-transkrip", "status-transkrip");
+setFileStatus("file-magang", "status-magang");
+</script>
 
 </body>
 </html>

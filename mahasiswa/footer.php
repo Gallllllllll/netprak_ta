@@ -14,8 +14,8 @@
     height: 40px;
     line-height: 40px;
 
-    background: #e5e7eb; /* abu-abu soft */
-    color: #4b5563;
+    background: var(--gradient);
+    color: #ffffff;
     font-size: 13px;
     text-align: center;
 
