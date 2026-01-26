@@ -369,6 +369,40 @@ $files = [
     gap:6px;
 }
 
+.card-text {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #ffffff;
+    border: 1px solid #FF983D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    width: fit-content;  /* biar tombol otomatis sesuai konten */
+    margin: 0 auto 20px auto; /* center horizontal + jarak bawah */
+    transition: opacity 0.3s, transform 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+
 /* =========================
    RESPONSIVE META INFO
    ========================= */
@@ -533,12 +567,12 @@ $files = [
 
             <?php endforeach; ?>
         <?php else: ?>
-            <div class="card">
-                <p>
-                    Belum ada pengajuan TA.
-                    <a href="form.php" class="button">Ajukan TA Baru</a>
-                </p>
-            </div>
+        <div class="card">
+            <p class="card-text">
+                Belum ada pengajuan TA.
+            </p>
+            <a href="form.php" class="btn">Ajukan TA Baru</a>
+        </div>
         <?php endif; ?>
 
     </div>
