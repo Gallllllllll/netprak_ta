@@ -24,7 +24,10 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Daftar Admin</title>
 
-<!-- MATERIAL ICON -->
+<!-- FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
 
 <!-- DATATABLES CSS -->
@@ -80,17 +83,32 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 .search-box{
-    background:#fff;
-    padding:10px 15px;
-    border-radius:25px;
-    width:300px;
-    display:flex;
-    box-shadow:0 3px 10px rgba(0,0,0,.15)
+    position: relative;
+    max-width: 320px;
 }
 .search-box input{
-    border:none;
-    outline:none;
-    width:100%
+    width: 100%;
+    padding: 12px 20px;
+    padding-right: 45px;
+    border-radius: 30px;
+    border: 1px solid #e1e1e1;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    outline: none;
+    transition: all 0.3s ease;
+}
+.search-box input:focus {
+    border-color: #ff8c42;
+    box-shadow: 0 4px 15px rgba(255, 140, 66, 0.15);
+}
+.search-box .material-symbols-rounded{
+    position: absolute;
+    right: -55px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
 }
 
 /* BUTTON */
@@ -247,6 +265,7 @@ table.dataTable td:last-child {
     <div class="action-row">
         <div class="search-box">
             <input type="text" id="search" placeholder="Search...">
+            <span class="material-symbols-rounded">search</span>
         </div>
 
         <div>

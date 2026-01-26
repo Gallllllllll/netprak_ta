@@ -84,52 +84,234 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Penjadwalan Seminar Hasil</title>
-<link rel="stylesheet" href="../../style.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
-body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
-.card { 
-    background:#fff; 
-    padding:20px; 
-    border-radius:8px; 
-    max-width:600px; 
-    margin:auto; 
-    box-shadow:0 2px 6px rgba(0,0,0,.1); 
+:root {
+    --primary: #ff5f9e;
+    --secondary: #ff9f43;
+    --bg-color: #fde9d9;
+    --card-accent: #ff8c42;
+    --border-color: #ffd4b8;
 }
-label { display:block; margin-top:12px; font-weight:600; }
-input { width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; margin-top:6px; }
-button { margin-top:16px; padding:10px 22px; border-radius:8px; background:#28a745; color:#fff; border:none; cursor:pointer; font-weight:600; }
-button:hover { background:#218838; }
-.alert { background:#fde68a; padding:12px; border-radius:6px; margin-bottom:12px; }
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.main-content {
+    padding: 25px;
+    margin-left: 310px; /* Diperlebar agar lebih mepet ke kanan */
+}
+
+/* ================= HEADER ================= */
+.dashboard-header {
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    padding:20px 24px;
+    border-radius:14px;
+    margin-bottom:20px;
+}
+
+.dashboard-header h1 {
+    margin:0;
+    color:#fff !important;
+    font-size:20px;
+}
+
+.dashboard-header p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    opacity: 0.9;
+    color:#fff !important;
+}
+
+/* ================= CARD ================= */
+.card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    border-left: 10px solid var(--card-accent);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+/* ================= INFO ================= */
+.info-row {
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.info-row b {
+    color: var(--card-accent);
+    display: inline-block;
+    width: 120px;
+}
+
+.info-row span {
+    color: #333;
+}
+
+/* ================= FORM ================= */
+label {
+    display: block;
+    margin-top: 20px;
+    font-weight: 600;
+    color: var(--card-accent);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 40px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    font-size: 14px;
+    outline: none;
+    transition: 0.3s;
+    background: #fff;
+}
+
+input:focus {
+    border-color: var(--card-accent);
+}
+
+.input-group span {
+    position: absolute;
+    right: 15px;
+    color: var(--card-accent);
+    font-size: 20px;
+}
+
+/* ================= INFO BOX ================= */
+.info-note {
+    background: #fff7f0;
+    padding: 20px;
+    border-radius: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.info-note span {
+    color: var(--card-accent);
+    font-size: 24px;
+}
+
+.info-note .text b {
+    display: block;
+    color: var(--card-accent);
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.info-note .text p {
+    margin: 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* ================= BUTTON ================= */
+.btn-save {
+    background: linear-gradient(90deg, #ff8181, #ff9f43);
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 15px;
+    box-shadow: 0 5px 15px rgba(255, 129, 129, 0.3);
+    transition: 0.3s;
+    margin-top: 20px;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 129, 129, 0.4);
+}
+
+.alert {
+    background: #ffe0e0;
+    color: #d63031;
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border-left: 5px solid #d63031;
+}
 </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Penjadwalan Seminar Hasil</h2>
-    <p><b>Mahasiswa:</b> <?= htmlspecialchars($data['nama']) ?></p>
-    <p><b>Judul TA:</b> <?= htmlspecialchars($data['judul_ta']) ?></p>
-    <p><b>Tanggal Sempro:</b> <?= $minDate ?></p>
+<?php include "../sidebar.php"; ?>
 
-    <?php if ($error): ?>
-        <div class="alert"><?= $error ?></div>
-    <?php endif; ?>
+<div class="main-content">
+    <div class="dashboard-header">
+        <h1>Penjadwalan Seminar Hasil</h1>
+        <p>Berisi penentuan jadwal Seminar Hasil</p>
+    </div>
 
-    <form method="POST">
-        <label>Tanggal Semhas</label>
-        <input type="date" name="tanggal_semhas" value="<?= $data['tanggal_sidang'] ?? '' ?>" min="<?= $minDate ?>" required>
+    <div class="card">
+        <div class="info-row">
+            <b>Mahasiswa</b>
+            <span>: <?= htmlspecialchars($data['nama']) ?></span>
+        </div>
+        <div class="info-row">
+            <b>Judul TA</b>
+            <span>: <?= htmlspecialchars($data['judul_ta']) ?></span>
+        </div>
+        <div class="info-row">
+            <b>Tanggal Sempro</b>
+            <span>: <?= $minDate ?></span>
+        </div>
 
-        <label>Jam Semhas</label>
-        <input type="time" name="jam_semhas" value="<?= $data['jam_sidang'] ?? '' ?>" required>
+        <?php if ($error): ?>
+            <div class="alert"><?= $error ?></div>
+        <?php endif; ?>
 
-        <label>Ruangan Semhas</label>
-        <input type="text" name="ruangan_semhas" 
-               value="<?= htmlspecialchars($data['tempat_sidang'] ?? '') ?>" 
-               placeholder="Ruang / Online" required>
+        <form method="POST">
+            <label>Tanggal Seminar Hasil</label>
+            <div class="input-group">
+                <input type="date" name="tanggal_semhas" value="<?= $data['tanggal_sidang'] ?? '' ?>" min="<?= $minDate ?>" required>
+            </div>
 
-        <button type="submit">
-            <?= $data['tanggal_sidang'] ? 'Update Jadwal' : 'Simpan Jadwal' ?>
-        </button>
-    </form>
+            <label>Jam Seminar Hasil</label>
+            <div class="input-group">
+                <input type="time" name="jam_semhas" value="<?= $data['jam_sidang'] ?? '' ?>" required>
+            </div>
+
+            <label>Ruangan Seminar Hasil</label>
+            <div class="input-group">
+                <input type="text" name="ruangan_semhas" 
+                       value="<?= htmlspecialchars($data['tempat_sidang'] ?? '') ?>" 
+                       placeholder="Masukkan Ruangan" required>
+            </div>
+
+            <div class="info-note">
+                <span class="material-symbols-rounded">info</span>
+                <div class="text">
+                    <b>Informasi Penting</b>
+                    <p>Pastikan seluruh data jadwal telah diverifikasi dengan teliti sebelum memberikan persetujuan</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save">
+                Simpan Penjadwalan
+            </button>
+        </form>
+    </div>
 </div>
 
 </body>
