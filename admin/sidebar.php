@@ -429,6 +429,7 @@ body {
     margin-left: 280px;
     padding: 32px;
     min-height: 100vh;
+    margin-bottom: 50px;
 }
 
 /* HEADER DASHBOARD */
