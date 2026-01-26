@@ -24,6 +24,24 @@ $username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
     --orange: #FF983D;
     --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
 }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
+
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
+
 /* TOP */
 .topbar{
     display:flex;
