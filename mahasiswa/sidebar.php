@@ -7,9 +7,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
 
 // Fungsi menu aktif
-function isActive($path)
+function isActive(...$paths)
 {
-    return strpos($_SERVER['REQUEST_URI'], $path) !== false;
+    foreach ($paths as $path) {
+        if (strpos($_SERVER['REQUEST_URI'], $path) !== false) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function isAnyActive(array $paths)
