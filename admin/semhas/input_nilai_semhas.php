@@ -1,20 +1,54 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
 
-// ===============================
-// CEK ADMIN
-// ===============================
+/* ===============================
+   CEK LOGIN ADMIN
+================================ */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    die("Unauthorized");
+    header("Location: " . base_url('login.php'));
+    exit;
 }
 
-$pengajuan_id = $_GET['id'] ?? 0;
-if (!$pengajuan_id) die("ID tidak valid");
+/* ===============================
+   VALIDASI ID SEMHAS
+================================ */
+$id_semhas = $_GET['id'] ?? null;
+if (!$id_semhas) die("ID tidak valid");
+
+// ===============================
+// AMBIL DATA SEMHAS + PENGAJUAN TA
+// ===============================
+$stmt = $pdo->prepare("
+    SELECT 
+        s.id AS semhas_id,
+        s.pengajuan_ta_id,
+        m.nama AS nama_mahasiswa,
+        m.nim,
+        p.judul_ta
+    FROM pengajuan_semhas s
+    JOIN mahasiswa m ON s.mahasiswa_id = m.id
+    JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
+    WHERE s.id = ?
+");
+$stmt->execute([$id_semhas]);
+$data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$data) {
+    die("Data semhas tidak ditemukan");
+}
+
+// ===============================
+// PENTING: pengajuan_id di nilai_semhas = semhas_id
+// ===============================
+$pengajuan_id = $data['semhas_id'];
 
 // ===============================
 // AMBIL TIM SEMHAS
 // ===============================
+$semhas_id = $data['semhas_id'];
+
 $stmt = $pdo->prepare("
     SELECT 
         'dosbing_1' AS peran,
@@ -44,16 +78,17 @@ $stmt = $pdo->prepare("
     JOIN dosen d ON t.dosen_id = d.id
     WHERE t.pengajuan_id = ?
 ");
-$stmt->execute([$pengajuan_id, $pengajuan_id, $pengajuan_id]);
+$stmt->execute([$semhas_id, $semhas_id, $semhas_id]);
+
 $tim = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if (!$tim) {
     die("Tim semhas belum ditentukan");
 }
 
-// ===============================
-// CEK ADA PENGUJI ATAU TIDAK
-// ===============================
+/* ===============================
+   CEK ADA PENGUJI ATAU TIDAK
+================================ */
 $adaPenguji = false;
 foreach ($tim as $t) {
     if ($t['peran'] === 'penguji') {
@@ -62,10 +97,10 @@ foreach ($tim as $t) {
     }
 }
 
-// ===============================
-// AMBIL NILAI YANG SUDAH ADA
-// ===============================
-$nilai = [];
+/* ===============================
+   AMBIL NILAI LAMA (JIKA ADA)
+================================ */
+$nilaiLama = [];
 $stmt = $pdo->prepare("
     SELECT peran, nilai
     FROM nilai_semhas
@@ -74,47 +109,54 @@ $stmt = $pdo->prepare("
 $stmt->execute([$pengajuan_id]);
 
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $n) {
-    $nilai[$n['peran']] = $n['nilai'];
+    $nilaiLama[$n['peran']] = $n['nilai'];
 }
 
-// ===============================
-// SIMPAN NILAI
-// ===============================
+/* ===============================
+   SIMPAN NILAI
+================================ */
+$error = null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $pdo->beginTransaction();
-    try {
+    if (!isset($_POST['nilai']) || !is_array($_POST['nilai'])) {
+        $error = "Data nilai tidak valid.";
+    } else {
 
-        foreach ($_POST['nilai'] as $peran => $data) {
+        $pdo->beginTransaction();
 
-            $nilaiAngka = floatval($data['nilai']);
+        try {
+            foreach ($_POST['nilai'] as $peran => $item) {
 
-            // VALIDASI KERAS BACKEND
-            if ($nilaiAngka < 0 || $nilaiAngka > 100) {
-                throw new Exception("Nilai harus antara 0 - 100");
+                $nilai    = floatval($item['nilai']);
+                $dosen_id = intval($item['dosen_id']);
+
+                if ($nilai < 0 || $nilai > 100) {
+                    throw new Exception("Nilai harus antara 0 – 100");
+                }
+
+                $stmt = $pdo->prepare("
+                    INSERT INTO nilai_semhas (pengajuan_id, dosen_id, peran, nilai)
+                    VALUES (?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE nilai = VALUES(nilai)
+                ");
+
+                $stmt->execute([
+                    $pengajuan_id,
+                    $dosen_id,
+                    $peran,
+                    $nilai
+                ]);
             }
 
-            $stmt = $pdo->prepare("
-                INSERT INTO nilai_semhas (pengajuan_id, dosen_id, peran, nilai)
-                VALUES (?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE nilai = VALUES(nilai)
-            ");
+            $pdo->commit();
+            header("Location: index.php?success=1");
+            exit;
 
-            $stmt->execute([
-                $pengajuan_id,
-                $data['dosen_id'],
-                $peran,
-                $nilaiAngka
-            ]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $error = $e->getMessage();
         }
-
-        $pdo->commit();
-        header("Location: index.php");
-        exit;
-
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        $error = $e->getMessage();
     }
 }
 ?>
@@ -123,111 +165,112 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Input Nilai Semhas</title>
-<link rel="stylesheet" href="../../style.css">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<title>Input Nilai SEMHAS</title>
 <style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f8;
+    padding:30px;
+}
 .card{
     background:#fff;
-    padding:28px;
-    border-radius:18px;
     max-width:700px;
     margin:auto;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,.1);
+}
+h2{margin-bottom:15px}
+.info{
+    background:#f1f5f9;
+    padding:12px;
+    border-radius:6px;
+    margin-bottom:15px;
+    font-size:14px;
 }
 label{
-    font-weight:600;
-    margin-top:18px;
     display:block;
+    margin-top:15px;
+    font-weight:bold;
 }
 input[type=number]{
     width:100%;
-    padding:10px;
-    border-radius:10px;
+    padding:8px;
     margin-top:6px;
-    border:1px solid #ccc;
 }
 button{
-    margin-top:25px;
-    padding:10px 24px;
+    margin-top:20px;
+    padding:10px 16px;
     border:none;
-    border-radius:999px;
-    background:linear-gradient(90deg,#ff5f9e,#ff9f43);
+    background:#2563eb;
     color:#fff;
     font-weight:600;
+    border-radius:6px;
     cursor:pointer;
+}
+button:hover{opacity:.9}
+.error{
+    background:#fee2e2;
+    color:#991b1b;
+    padding:10px;
+    border-radius:6px;
+    margin-bottom:15px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<?php include "../sidebar.php"; ?>
-
-<?php if (!$adaPenguji): ?>
-<script>
-Swal.fire({
-    icon: 'warning',
-    title: 'Penguji Belum Ditentukan',
-    text: 'Silakan tentukan dosen penguji terlebih dahulu sebelum input nilai.',
-    confirmButtonText: 'Kembali',
-    allowOutsideClick: false
-}).then(() => {
-    window.location.href = 'index.php';
-});
-</script>
-<?php endif; ?>
-
-<?php if (isset($error)): ?>
-<script>
-Swal.fire({
-    icon: 'error',
-    title: 'Gagal Menyimpan',
-    text: '<?= htmlspecialchars($error) ?>'
-});
-</script>
-<?php endif; ?>
-
-<div class="main-content">
 <div class="card">
+    <h2>Input Nilai Seminar Hasil</h2>
 
-<h2>Input Nilai Seminar Hasil</h2>
+    <div class="info">
+        <b>Mahasiswa :</b> <?= htmlspecialchars($data['nama_mahasiswa'] ?? '-') ?><br>
+        <b>NIM :</b> <?= htmlspecialchars($data['nim'] ?? '-') ?><br>
+        <b>Judul TA :</b><br>
+        <?= htmlspecialchars($data['judul_ta'] ?? '-') ?>
+    </div>
 
-<form method="POST" <?= !$adaPenguji ? 'style="display:none"' : '' ?>>
+    <?php if (!$adaPenguji): ?>
+        <div class="error">
+            Penguji belum ditentukan. Silakan tentukan dosen penguji terlebih dahulu.
+        </div>
+    <?php endif; ?>
 
-<?php foreach ($tim as $t): ?>
-    <label>
-        <?= strtoupper(str_replace('_',' ', $t['peran'])) ?>
-        (<?= htmlspecialchars($t['nama']) ?>)
-    </label>
+    <?php if ($error): ?>
+        <div class="error"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
 
-    <input type="hidden"
-           name="nilai[<?= $t['peran'] ?>][dosen_id]"
-           value="<?= $t['dosen_id'] ?>">
+    <form method="POST" <?= !$adaPenguji ? 'style="display:none"' : '' ?>>
+        <?php foreach ($tim as $t): ?>
+            <label>
+                <?= strtoupper(str_replace('_',' ', $t['peran'])) ?>
+                (<?= htmlspecialchars($t['nama']) ?>)
+            </label>
 
-    <input type="number"
-           name="nilai[<?= $t['peran'] ?>][nilai]"
-           step="0.01"
-           min="0"
-           max="100"
-           value="<?= $nilai[$t['peran']] ?? '' ?>"
-           required>
-<?php endforeach; ?>
+            <input type="hidden"
+                   name="nilai[<?= $t['peran'] ?>][dosen_id]"
+                   value="<?= $t['dosen_id'] ?>">
 
-<button type="submit">Simpan Nilai</button>
+            <input type="number"
+                name="nilai[<?= $t['peran'] ?>][nilai]"
+                min="0"
+                max="100"
+                step="0.01"
+                required
+                value="<?= $nilaiLama[$t['peran']] ?? '' ?>"
+                oninput="this.value = Math.min(100, Math.max(0, this.value))">
+        <?php endforeach; ?>
 
-</form>
-
+        <button type="submit">Simpan Nilai</button>
+    </form>
 </div>
-</div>
 
-<!-- LOCK NILAI > 100 DI FRONTEND -->
 <script>
-document.querySelectorAll('input[type="number"]').forEach(input => {
-    input.addEventListener('input', function () {
-        if (this.value > 100) this.value = 100;
-        if (this.value < 0) this.value = 0;
+document.querySelectorAll('input[type="number"]').forEach(el=>{
+    el.addEventListener('input',()=>{
+        if(el.value>100) el.value=100;
+        if(el.value<0) el.value=0;
     });
 });
 </script>
