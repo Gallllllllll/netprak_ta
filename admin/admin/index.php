@@ -13,7 +13,7 @@ $username = $_SESSION['user']['nama'] ?? 'Admin';
 $no = 1;
 
 /* LOAD DATA ADMIN */
-$stmt = $pdo->query("SELECT id, nip, nama, username FROM admin ORDER BY id ASC");
+$stmt = $pdo->query("SELECT id, nip, nama, email, username FROM admin ORDER BY id ASC");
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -282,6 +282,7 @@ table.dataTable td:last-child {
                     <th>No</th>
                     <th>Nama</th>
                     <th>NIP</th>
+                    <th>Email</th>
                     <th>Username</th>
                     <th>Aksi</th>
                 </tr>
@@ -292,6 +293,7 @@ table.dataTable td:last-child {
                     <td><?= $no++ ?></td>
                     <td><?= htmlspecialchars($a['nama']) ?></td>
                     <td><?= htmlspecialchars($a['nip']) ?></td>
+                    <td><?= htmlspecialchars($a['email']) ?></td>
                     <td><?= htmlspecialchars($a['username']) ?></td>
                     <td>
                         <div class="action-btn">

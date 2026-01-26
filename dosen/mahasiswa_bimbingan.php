@@ -252,14 +252,14 @@ tbody tr:hover{
         ? '<span class="badge badge-hijau">'.date('d M Y',strtotime($row['tanggal_sempro'])).'</span>'
         : '<span class="badge badge-belum">Belum</span>' ?></td>
     <td>
-        <?php
-        if (!$row['tanggal_sidang']) {
-            echo '<span class="badge badge-belum">Belum</span>';
-        } else {
-            echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sidang'])) . '</span>';
-        }
-        ?>
-    </td>
+    <?php
+    if (!$row['tanggal_sidang']) {
+        echo '<span class="badge badge-belum">Belum</span>';
+    } else {
+        echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sidang'])) . '</span>';
+    }
+    ?>
+</td>
 
     <td>
         <?php if($row['status_persetujuan']!=='disetujui'): ?>
