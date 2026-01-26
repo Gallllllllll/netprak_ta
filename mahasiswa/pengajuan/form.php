@@ -16,13 +16,12 @@ $boleh_upload = false;
 /* ================================
    CEK SUDAH PERNAH PENGAJUAN TA
 ================================ */
-$cek = $pdo->prepare("SELECT id, judul_ta FROM pengajuan_ta WHERE mahasiswa_id = ? LIMIT 1");
+$cek = $pdo->prepare("SELECT id, judul_ta, id_pengajuan, created_at FROM pengajuan_ta WHERE mahasiswa_id = ? LIMIT 1");
 $cek->execute([$mahasiswa_id]);
 $pengajuan = $cek->fetch(PDO::FETCH_ASSOC);
 
 if ($pengajuan) {
-    $pesan_error = "Anda sudah pernah mengajukan Tugas Akhir.<br>
-                    Judul TA: <b>" . htmlspecialchars($pengajuan['judul_ta']) . "</b>";
+    $pesan_error = "<b>" . htmlspecialchars($pengajuan['judul_ta']) . "</b>";
 } else {
     $boleh_upload = true;
 }
@@ -255,6 +254,12 @@ form{
     font-size: 14px;
     background: #fff;
     transition: .2s ease;
+    font-style: normal;
+}
+
+.ta-input::placeholder{
+    font-size: 13px;
+    font-style: italic;
 }
 
 .ta-input:focus {
@@ -387,6 +392,106 @@ form{
     opacity: .9;
 }
 
+/* ==============================
+   ERROR CARD (SUDAH PERNAH AJUAN)
+============================== */
+.ta-error-card{
+    background: #FFDFE0;
+    border-radius: 18px;
+    padding: 15px 15px;
+    border: #FF3A3D 1px solid;
+    box-shadow: 0 3px 15px rgba(0,0,0,.10);
+}
+
+.ta-error-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: auto;
+}
+
+.ta-error-icon{
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #fff;
+    border: 1px solid #FF3A3D;
+    flex-shrink: 0;
+}
+
+.ta-error-icon span{
+    color:#FF3A3D;
+    font-size: 22px;
+}
+
+.ta-error-title{
+    margin:0;
+    font-size: 16px;
+    font-weight: 800;
+    color:#FF3A3D;
+}
+
+.ta-error-desc{
+    margin: 2px 0 0;
+    font-size: 14px;
+    color:#6b7280;
+}
+
+/* isi message */
+.ta-error-body{
+    background: #f5f5f5;
+    border: 1px solid #9f9f9f;
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: #555;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.ta-error-label{
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff8c42;
+}
+
+.ta-textbox { 
+    background:#f5f5f5; 
+    color:#555;
+    font-size:14px;
+    font-weight:700; 
+    padding:8px; 
+    border-radius:6px;
+    margin-top:8px;
+    margin-bottom:15px; 
+    width: fit-content; }
+
+/* tombol */
+.ta-error-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top: 14px;
+}
+.ta-btn-secondary{
+    background:#e5e7eb;
+    color:#374151;
+    border:none;
+    padding:10px 16px;
+    border-radius:12px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+    font-size:13px;
+}
+.ta-btn-secondary:hover{
+    opacity:.9;
+}
+
+
 /* MOBILE */
 @media (max-width: 768px) {
     .ta-upload-item {
@@ -403,8 +508,6 @@ form{
         justify-content: center;
     }
 }
-
-.alert { background:#fff3cd; color:#856404; padding:15px; border-radius:6px; margin-bottom:15px; }
 </style>
 </head>
 <body>
@@ -427,146 +530,182 @@ form{
             </div>
         </div>
 
-        <div class="info-box">
+        <?php if ($boleh_upload): ?>
+        <!-- INFO UMUM (DI LUAR CARD) -->
+        <div class="info-box" style="margin-top:20px;">
             <strong>
-                <span class="material-symbols-rounded">info</span> 
-                    Informasi Penting
-                </strong>
-                <hr class="divider">
+                <span class="material-symbols-rounded">info</span>
+                Informasi Penting
+            </strong>
+            <hr class="divider">
             <ol class="pretty-ol">
-                <li>Upload Transkrip Nilai dengan IPK >= 2.50, SKS minimal 100, nilai C tidak lebih dari 5 mata kuliah dan tidak ada nilai D atau E</li>
+                <li>Upload Transkrip Nilai dengan IPK ≥ 2.50, SKS minimal 100, nilai C tidak lebih dari 5 mata kuliah dan tidak ada nilai D atau E</li>
                 <li>Upload Surat dengan format PDF</li>
-                <li>Format penamaan dokumen: NIM_Nama File_Nama (Contoh: K3522029_Bukti Transkrip Nilai_Anthony)</li>
+                <li>Format penamaan dokumen: NIM_Nama File_Nama</li>
                 <li>Maksimal ukuran dokumen 2 MB</li>
-                <li>Pastikan dokumen yang akan diupload sudah benar</li>
+                <li>Pastikan dokumen yang diunggah sudah benar</li>
             </ol>
         </div>
+        <?php endif; ?>
+
 
         <div class="card" style="margin-top:20px;">
         <?php if ($pesan_error): ?>
             <div class="form-card">
                 <h2>Pengajuan Tugas Akhir</h2>
                 <hr class="divider">
-                <div class="alert">
-                    <?= $pesan_error ?>
+
+                <div class="ta-error-card">
+                    <div class="ta-error-head">
+                        <div class="ta-error-icon">
+                            <span class="material-symbols-rounded">error_outline</span>
+                        </div>
+                        <div>
+                            <h3 class="ta-error-title">INFORMASI SISTEM!</h3>
+                            <p class="ta-error-desc">Anda sudah pernah mengajukan Tugas Akhir. Saat ini sistem membatasi pengajuan hanya satu kali per periode hingga pengajuan selesai diproses.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="ta-error-label">Judul Tugas Akhir</p>
+                    <div class="ta-error-body">
+                        <?= $pesan_error ?>
+                    </div>
+                    <p class="ta-error-label">ID Tugas Akhir</p>
+                    <div class="ta-textbox">
+                        <?= htmlspecialchars($pengajuan['id_pengajuan']) ?>
+                    </div>
+                    <p class="ta-error-label">Tanggal Pengajuan</p>
+                    <div class="ta-textbox">
+                        <?= date('d F Y, H:i:s', strtotime($pengajuan['created_at'])) ?>
+                    </div>
+                    <div class="ta-actions">
+                        <a href="<?= base_url('mahasiswa/pengajuan/status.php') ?>" 
+                        class="ta-btn ta-btn-primary">
+                            <span class="material-symbols-rounded">history</span>
+                            Lihat Riwayat Ajuan
+                        </a>
+                    </div>
+
                 </div>
             </div>
+        </div>
+
         <?php elseif ($boleh_upload): ?>
         <div class="form-card">
             <h2>Pengajuan Tugas Akhir</h2>
             <hr class="divider">
         </div>
 
-    <form action="simpan.php" method="POST" enctype="multipart/form-data">
+        <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
-        <div class="ta-field">
-            <label class="ta-label" for="judul">Judul Tugas Akhir</label>
-            <input
-                type="text"
-                id="judul"
-                name="judul"
-                class="ta-input"
-                placeholder="Masukkan judul tugas akhir Anda disini ... (Gunakan HURUF KAPITAL)"
-                required
-            >
-        </div>
-
-        <div class="ta-upload-grid">
-
-            <div class="ta-upload-item">
-                <div class="ta-field">
-                    <label class="ta-label">Formulir Pendaftaran & Persetujuan Tema</label>
-                    <label class="ta-upload-box">
-                        <div class="ta-upload-inner">
-                            <div class="ta-upload-icon">
-                                <span class="material-symbols-rounded">upload</span>
-                            </div>
-                            <div class="ta-upload-text">
-                                <strong>Klik untuk pilih file</strong>
-                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
-                                <div class="file-status" id="status-formulir">Tidak ada file yang dipilih</div>
-                            </div>
-                        </div>
-                        <input type="file" id="file-formulir" name="formulir" required accept=".pdf">
-                    </label>
-                </div>
+            <div class="ta-field">
+                <label class="ta-label" for="judul">Judul Tugas Akhir</label>
+                <input
+                    type="text"
+                    id="judul"
+                    name="judul"
+                    class="ta-input"
+                    placeholder="Masukkan judul tugas akhir Anda disini ... (Gunakan HURUF KAPITAL)"
+                    required
+                >
             </div>
 
-            <div class="ta-upload-item">
-                <div class="ta-field">
-                    <label class="ta-label">Bukti Pembayaran</label>
-                    <label class="ta-upload-box">
-                        <div class="ta-upload-inner">
-                            <div class="ta-upload-icon">
-                                <span class="material-symbols-rounded">upload</span>
+            <div class="ta-upload-grid">
+
+                <div class="ta-upload-item">
+                    <div class="ta-field">
+                        <label class="ta-label">Formulir Pendaftaran & Persetujuan Tema</label>
+                        <label class="ta-upload-box">
+                            <div class="ta-upload-inner">
+                                <div class="ta-upload-icon">
+                                    <span class="material-symbols-rounded">upload</span>
+                                </div>
+                                <div class="ta-upload-text">
+                                    <strong>Klik untuk pilih file</strong>
+                                    <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                    <div class="file-status" id="status-formulir">Tidak ada file yang dipilih</div>
+                                </div>
                             </div>
-                            <div class="ta-upload-text">
-                                <strong>Klik untuk pilih file</strong>
-                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
-                                <div class="file-status" id="status-bayar">Tidak ada file yang dipilih</div>
-                            </div>
-                        </div>
-                        <input type="file" id="file-bayar" name="bukti_pembayaran" required accept=".pdf">
-                    </label>
+                            <input type="file" id="file-formulir" name="formulir" required accept=".pdf">
+                        </label>
+                    </div>
                 </div>
+
+                <div class="ta-upload-item">
+                    <div class="ta-field">
+                        <label class="ta-label">Bukti Pembayaran</label>
+                        <label class="ta-upload-box">
+                            <div class="ta-upload-inner">
+                                <div class="ta-upload-icon">
+                                    <span class="material-symbols-rounded">upload</span>
+                                </div>
+                                <div class="ta-upload-text">
+                                    <strong>Klik untuk pilih file</strong>
+                                    <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                    <div class="file-status" id="status-bayar">Tidak ada file yang dipilih</div>
+                                </div>
+                            </div>
+                            <input type="file" id="file-bayar" name="bukti_pembayaran" required accept=".pdf">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ta-upload-item">
+                    <div class="ta-field">
+                        <label class="ta-label">Transkrip Nilai</label>
+                        <label class="ta-upload-box">
+                            <div class="ta-upload-inner">
+                                <div class="ta-upload-icon">
+                                    <span class="material-symbols-rounded">upload</span>
+                                </div>
+                                <div class="ta-upload-text">
+                                    <strong>Klik untuk pilih file</strong>
+                                    <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                    <div class="file-status" id="status-transkrip">Tidak ada file yang dipilih</div>
+                                </div>
+                            </div>
+                            <input type="file" id="file-transkrip" name="transkrip" required accept=".pdf">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ta-upload-item">
+                    <div class="ta-field">
+                        <label class="ta-label">Bukti Kelulusan Mata Kuliah Magang / PI</label>
+                        <label class="ta-upload-box">
+                            <div class="ta-upload-inner">
+                                <div class="ta-upload-icon">
+                                    <span class="material-symbols-rounded">upload</span>
+                                </div>
+                                <div class="ta-upload-text">
+                                    <strong>Klik untuk pilih file</strong>
+                                    <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
+                                    <div class="file-status" id="status-magang">Tidak ada file yang dipilih</div>
+                                </div>
+                            </div>
+                            <input type="file" id="file-magang" name="magang" required accept=".pdf">
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            <div class="message-box">
+                <strong>
+                    <span class="material-symbols-rounded">info</span> 
+                    Kesalahan data atau dokumen yang diupload dapat menyebabkan penolakan pendaftaran. Pastikan semua berkas adalah dokumen asli yang telah discan.
+                </strong>
+            </div>
+            <div class="ta-actions">
+                <button type="submit" class="ta-btn ta-btn-primary">
+                    <span class="material-symbols-rounded">send</span>
+                    Kirim Pengajuan Tugas Akhir
+                </button>
             </div>
 
-            <div class="ta-upload-item">
-                <div class="ta-field">
-                    <label class="ta-label">Transkrip Nilai</label>
-                    <label class="ta-upload-box">
-                        <div class="ta-upload-inner">
-                            <div class="ta-upload-icon">
-                                <span class="material-symbols-rounded">upload</span>
-                            </div>
-                            <div class="ta-upload-text">
-                                <strong>Klik untuk pilih file</strong>
-                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
-                                <div class="file-status" id="status-transkrip">Tidak ada file yang dipilih</div>
-                            </div>
-                        </div>
-                        <input type="file" id="file-transkrip" name="transkrip" required accept=".pdf">
-                    </label>
-                </div>
-            </div>
-
-            <div class="ta-upload-item">
-                <div class="ta-field">
-                    <label class="ta-label">Bukti Kelulusan Mata Kuliah Magang / PI</label>
-                    <label class="ta-upload-box">
-                        <div class="ta-upload-inner">
-                            <div class="ta-upload-icon">
-                                <span class="material-symbols-rounded">upload</span>
-                            </div>
-                            <div class="ta-upload-text">
-                                <strong>Klik untuk pilih file</strong>
-                                <small>File yang boleh diunggah format <b>.pdf</b> dan maksimal ukuran 2MB</small>
-                                <div class="file-status" id="status-magang">Tidak ada file yang dipilih</div>
-                            </div>
-                        </div>
-                        <input type="file" id="file-magang" name="magang" required accept=".pdf">
-                    </label>
-                </div>
-            </div>
-
-        </div>
-        <div class="message-box">
-            <strong>
-                <span class="material-symbols-rounded">info</span> 
-                Kesalahan data atau dokumen yang diupload dapat menyebabkan penolakan pendaftaran. Pastikan semua berkas adalah dokumen asli yang telah discan.
-            </strong>
-        </div>
-        <div class="ta-actions">
-            <button type="submit" class="ta-btn ta-btn-primary">
-                <span class="material-symbols-rounded">send</span>
-                Kirim Pengajuan Tugas Akhir
-            </button>
-        </div>
-
-    </form>
-</div>
+        </form>
         <?php endif; ?>
-    </div>
     </div>
 </div>
 <script>

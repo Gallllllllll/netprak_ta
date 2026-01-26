@@ -7,9 +7,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
 
 // Fungsi menu aktif
-function isActive($path)
+function isActive(...$paths)
 {
-    return strpos($_SERVER['REQUEST_URI'], $path) !== false;
+    foreach ($paths as $path) {
+        if (strpos($_SERVER['REQUEST_URI'], $path) !== false) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function isAnyActive(array $paths)
@@ -290,7 +295,7 @@ body {
 
                 <li>
                     <a href="<?= base_url('mahasiswa/pengajuan/status.php') ?>"
-                       class="<?= isActive('/mahasiswa/pengajuan/status.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/mahasiswa/pengajuan/status.php', '/mahasiswa/pengajuan/detail.php') ? 'active' : '' ?>">
                        <span class="material-symbols-rounded">assignment_turned_in</span> 
                        <span>Status & Feedback</span>
                     </a>
