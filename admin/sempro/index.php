@@ -411,7 +411,7 @@ tbody tr:hover {
                 <?php if ($p['status'] === 'disetujui'): ?>
                     <a href="input_nilai_sempro.php?pengajuan_id=<?= $p['id'] ?>"
                     class="btn-action btn-nilai">
-                        Input Nilai
+                        Input nilai
                     </a>
 
                     <a href="jadwal.php?id=<?= $p['id'] ?>"
