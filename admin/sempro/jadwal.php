@@ -91,6 +91,7 @@ body {
 
 .main-content {
     padding: 25px;
+    margin-left: 310px; /* Diperlebar agar lebih mepet ke kanan */
 }
 
 /* ================= HEADER ================= */
@@ -266,7 +267,7 @@ input:focus {
         <?php endif; ?>
 
         <form method="POST">
-            <label>Tanggal Seminar</label>
+            <label>Tanggal Seminar Proposal</label>
             <div class="input-group">
                 <input type="date" name="tanggal_sempro" value="<?= $tanggal_value ?>" required>
             </div>
@@ -274,13 +275,11 @@ input:focus {
             <label>Jam Seminar</label>
             <div class="input-group">
                 <input type="time" name="jam_sempro" value="<?= $jam_value ?>" required>
-                <span class="material-symbols-rounded">schedule</span>
             </div>
 
-            <label>Ruangan Seminar</label>
+            <label>Ruangan Seminar Proposal</label>
             <div class="input-group">
                 <input type="text" name="ruangan_sempro" value="<?= $ruangan_value ?>" placeholder="Ruang Sidang 1" required>
-                <span class="material-symbols-rounded">calendar_today</span>
             </div>
 
             <div class="info-note">
