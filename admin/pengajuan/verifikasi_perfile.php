@@ -12,6 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? null;
     $status_all = $_POST['status'] ?? [];
     $catatan_all = $_POST['catatan'] ?? [];
+    $catatan_admin = $_POST['catatan_admin'] ?? null;
+
 
     if (!$id || empty($status_all)) {
         die("Data tidak lengkap.");
@@ -82,7 +84,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ");
     $stmt->execute([$overall_status, $id]);
 
+    // ✅ SIMPAN CATATAN ADMIN KESELURUHAN
+    $catatan_admin = $_POST['catatan_admin'] ?? null;
+
+    $stmt = $pdo->prepare("
+        UPDATE pengajuan_ta
+        SET catatan_admin = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$catatan_admin, $id]);
+
     header("Location: index.php?id=$id");
     exit;
+
 }
 ?>

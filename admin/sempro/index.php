@@ -53,16 +53,24 @@ $stmt = $pdo->prepare("
         s.status,
         s.created_at,
         m.nama,
-        p.judul_ta
+        p.judul_ta,
+
+        MAX(CASE WHEN ns.peran = 'dosbing_1' THEN ns.nilai END) AS nilai_dosbing_1,
+        MAX(CASE WHEN ns.peran = 'dosbing_2' THEN ns.nilai END) AS nilai_dosbing_2
+
     FROM pengajuan_sempro s
     JOIN mahasiswa m ON s.mahasiswa_id = m.id
     JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
+    LEFT JOIN nilai_sempro ns ON ns.pengajuan_id = s.id
+
     $search_sql
+    GROUP BY s.id
     ORDER BY s.created_at DESC
     LIMIT $limit OFFSET $offset
 ");
 $stmt->execute($params);
 $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -401,49 +409,52 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <div class="card">
-        <table>
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>ID SEMPRO</th>
-                    <th>Nama</th>
-                    <th>Judul Seminar Proposal</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody id="table-body">
-            <?php if (empty($pengajuan_list)): ?>
-                <tr><td colspan="6" style="width: 100%; border: none;">Data tidak ditemukan.</td></tr>
-            <?php else: 
-                $no = $offset + 1;
-                foreach ($pengajuan_list as $p):
-                    $status_class = 'status-' . ($p['status'] ?? 'diajukan');
-            ?>
-                <tr>
-                    <td><?= $no++ ?></td>
-                    <td><b><?= htmlspecialchars($p['id_sempro']) ?></b></td>
-                    <td><?= htmlspecialchars($p['nama']) ?></td>
-                    <td><?= htmlspecialchars($p['judul_ta']) ?></td>
-                    <td>
-                        <span class="status-badge <?= $status_class ?>">
-                            <?= $p['status'] ?? 'diajukan' ?>
-                        </span>
-                    </td>
-                    <td>
-                        <a href="detail.php?id=<?= $p['id'] ?>" class="btn-action btn-detail">Detail</a>
-                        <?php if ($p['status'] === 'disetujui'): ?>
-                            <a href="jadwal.php?id=<?= $p['id'] ?>" class="btn-action btn-jadwal">Penjadwalan</a>
-                        <?php else: ?>
-                            <span class="btn-action btn-jadwal disabled" title="Belum disetujui">Penjadwalan</span>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-            <?php endforeach; endif; ?>
-            </tbody>
-        </table>
-    </div>
+<div class="card">
+
+
+    <table id="table th">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>ID SEMPRO</th>
+                <th>Nama Mahasiswa</th>
+                <th>Judul Seminar Proposal</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+        <?php if (empty($pengajuan_list)): ?>
+            <tr><td colspan="6">Data tidak ditemukan.</td></tr>
+        <?php else: 
+            $no = $offset + 1;
+            foreach ($pengajuan_list as $p):
+                $status_class = 'status-' . ($p['status'] ?? 'diajukan');
+        ?>
+            <tr>
+                <td><?= $no++ ?></td>
+                <td><b><?= htmlspecialchars($p['id_sempro']) ?></b></td>
+                <td><?= htmlspecialchars($p['nama']) ?></td>
+                <td><?= htmlspecialchars($p['judul_ta']) ?></td>
+                <td>
+                    <span class="status-badge <?= $status_class ?>">
+                        <?= $p['status'] ?? 'diajukan' ?>
+                    </span>
+                </td>
+                <td>
+                    <a href="detail.php?id=<?= $p['id'] ?>" class="btn-action btn-detail">Detail</a>
+                    <?php if ($p['status'] === 'disetujui'): ?>
+                        <a href="jadwal.php?id=<?= $p['id'] ?>" class="btn-action btn-jadwal">Penjadwalan</a>
+                    <?php endif; ?>
+                </td>
+            </tr>
+        <?php endforeach; endif; ?>
+        </tbody>
+    </table>
+
+
+
+</div>
 
     <div class="pagination-container">
         <div class="pagination">
