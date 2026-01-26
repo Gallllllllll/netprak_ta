@@ -36,16 +36,16 @@ if (!$data) {
 
 $docs = [
     [
+        'label'  => 'Formulir Pendaftaran & Persetujuan Tema',
+        'file'   => $data['formulir_pendaftaran'],
+        'note'   => $data['catatan_formulir_pendaftaran'],
+        'status' => $data['status_formulir_pendaftaran']
+    ],
+    [
         'label'  => 'Bukti Pembayaran',
         'file'   => $data['bukti_pembayaran'],
         'note'   => $data['catatan_bukti_pembayaran'],
         'status' => $data['status_bukti_pembayaran']
-    ],
-    [
-        'label'  => 'Formulir Pendaftaran',
-        'file'   => $data['formulir_pendaftaran'],
-        'note'   => $data['catatan_formulir_pendaftaran'],
-        'status' => $data['status_formulir_pendaftaran']
     ],
     [
         'label'  => 'Transkrip Nilai',
@@ -54,7 +54,7 @@ $docs = [
         'status' => $data['status_transkrip_nilai']
     ],
     [
-        'label'  => 'Bukti Kelulusan Magang',
+        'label'  => 'Bukti Kelulusan Mata Kuliah Magang / PI',
         'file'   => $data['bukti_magang'],
         'note'   => $data['catatan_bukti_magang'],
         'status' => $data['status_bukti_magang']
@@ -69,6 +69,24 @@ foreach ($docs as $doc) {
         break;
     }
 }
+function getPengajuanBadgeClass($status)
+{
+    switch (strtolower($status)) {
+        case 'disetujui':
+            return 'badge-disetujui';
+        case 'revisi':
+            return 'badge-revisi';
+        case 'ditolak':
+            return 'badge-ditolak';
+        case 'proses':
+        case 'diajukan':
+        default:
+            return 'badge-proses';
+    }
+}
+
+$badgeClass = getPengajuanBadgeClass($data['status'] ?? 'proses');
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -350,17 +368,55 @@ foreach ($docs as $doc) {
     color:#2563EB;
 }
 
+.actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top: 10px;
+}
+
 .btn-revisi {
     display:inline-flex;
     align-items:center;
     gap:8px;
     margin-top:20px;
-    padding:12px 22px;
+    padding:10px 15px;
     border-radius:999px;
     background: linear-gradient(135deg,#FF74C7,#FF983D);
     color:#fff;
-    font-weight:800;
+    font-weight:600;
     text-decoration:none;
+    font-size: 14px;
+}
+
+.btn-admin {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:20px;
+    padding:10px 15px;
+    border-radius:999px;
+    text-decoration:none;
+    font-size: 14px;
+    font-weight:600;
+    text-decoration:none;
+    background:#FF983D26;
+    color:#FF983D;
+    border:1px solid #FF983D;
+}
+
+/* info bawah */
+.info-warning {
+    background:#FFE4E5;
+    border:1px solid rgba(255,58,61,.35);
+    border-radius:18px;
+    padding:16px 18px;
+    color:#FF3A3D;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:20px;
 }
 
 </style>
@@ -497,15 +553,27 @@ foreach ($docs as $doc) {
             </div>
         <?php endforeach; ?>
         </div>
-
+                        
+        <div class="actions">
         <?php if ($adaRevisi): ?>
             <a href="<?= base_url('mahasiswa/pengajuan/revisi_ta.php?id='.$data['id']) ?>"
             class="btn-revisi">
                 <span class="material-symbols-rounded">sync</span>
                 Update Judul & Berkas Sekarang
             </a>
+            <a href="https://wa.me/628112951003" target="_blank"
+            class="btn-admin">
+                <span class="material-symbols-rounded">call</span>
+                Hubungi Admin
+            </a>
         <?php endif; ?>
+        </div>
     </div>
+    <!-- INFO GLOBAL -->
+            <div class="info-warning">
+                <span class="material-symbols-rounded">info</span>
+                Status pengajuan Anda diperbarui secara berkala oleh tim Admin Prodi.
+            </div>
 </div>
 
 </body>
