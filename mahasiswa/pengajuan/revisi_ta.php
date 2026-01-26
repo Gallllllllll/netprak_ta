@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once "../../config/base_url.php";
 
 // ===============================
 // CEK ROLE MAHASISWA
@@ -9,6 +10,8 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
     exit;
 }
+
+$username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
 
 $id = $_GET['id'] ?? 0;
 $upload_dir = "../../uploads/ta/";
@@ -118,87 +121,201 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Revisi Pengajuan TA</title>
-<link rel="stylesheet" href="../../style.css">
 <style>
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f4f6f8;
-}
-
-.container{
+/* TOP */
+.topbar{
     display:flex;
-    min-height:100vh;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
+}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
 }
 
-.main-content{
-    flex:1;
-    padding:30px;
-    background:#fff3e9;
+/* PROFILE */
+.mhs-info{
+    display:flex;
+    align-items:left;
+    gap:20px
+}
+.mhs-text span{
+    font-size:13px;
+    color:#555
+}
+.mhs-text b{
+    color:#ff8c42;
+    font-size:14px
 }
 
-h1{
-    margin-bottom:20px;
-}
-
-.form-box{
-    background:#fff;
-    padding:25px;
-    max-width:600px;
-    border-radius:14px;
-    box-shadow:0 10px 25px rgba(255,140,80,.12);
-}
-
-label{
-    display:block;
-    margin-top:15px;
-    font-weight:600;
-}
-
-input[type=text],
-input[type=file]{
-    width:100%;
-    padding:10px;
-    margin-top:6px;
-    border:1px solid #ddd;
-    border-radius:8px;
-}
-
-input[readonly]{
-    background:#f9fafb;
-}
-
-.hint{
-    font-size:12px;
-    color:#777;
-}
-
-.btn-primary{
-    margin-top:20px;
-    padding:12px 20px;
+.avatar{
+    width:42px;
+    height:42px;
     background:#ff8c42;
-    color:#fff;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.card {
+    background:#fff;
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+    overflow-x: hidden;
+}
+
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100% !important;
+    background: #FF983D;
+    display: block;
+    margin: 12px 0;
+
+}.revisi-wrapper {
+    max-width:auto;
+    margin:auto;
+}
+
+.label-muted {
+    font-size:13px;
+    font-weight:700;
+    color:#999;
+}
+
+.readonly-box {
+    margin-top:8px;
+    background:#FFF7F1;
+    border:1px solid #FF8C42;
+    padding:14px;
+    border-radius:12px;
     font-weight:600;
-}
-
-.btn-primary:hover{
-    background:#ff7a26;
-}
-
-.alert{
-    margin-top:15px;
-    padding:12px;
-    border-radius:8px;
+    width: auto;
     font-size:14px;
 }
 
-.alert.warning{
-    background:#fff3cd;
-    color:#856404;
+.doc-revisi-item {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#F9FAFB;
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:12px;
+}
+
+.doc-left {
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.doc-icon {
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    background:#FFE4E6;
+    color:#EF4444;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+}
+
+.btn-file {
+    background:#3B82F6;
+    color:#fff;
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.center-action {
+    display:flex;
+    justify-content:center;
+    margin:25px 0;
+}
+
+.btn-gradient {
+    background:linear-gradient(135deg,#FF74C7,#FF983D);
+    color:#fff;
+    padding:14px 34px;
+    border-radius:999px;
+    border:none;
+    font-weight:600;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.btn-gradient:hover {
+    opacity:0.9;
+}
+
+.info-box {
+    background:#EAF2FF;
+    border:1px solid #93C5FD;
+    border-radius:16px;
+    padding:16px;
+    color:#2563EB;
+    font-size:13px;
+    display:flex;
+}
+
+.info-box span{
+    font-size:18px;
+    margin-right:8px;
+}
+
+.judul-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: auto;
+}
+
+.judul-icon{
+    width: 25px;
+    height: 25px;
+    border-radius: 8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #FFF7F1;
+    border: 1px solid #FF8C42;
+    flex-shrink: 0;
+    padding:6px;
+}
+
+.judul-icon span{
+    color:#FF8C42;
+}
+
+.judul-title{
+    margin:0;
+    font-size: 16px;
+    font-weight: 800;
+    color:#FF8C42;
+}
+
+.file-updated {
+    color:#16A34A;
+    font-weight:700;
+}
+
+.doc-icon.success {
+    background:#DCFCE7;
+    color:#16A34A;
+}
+
+.btn-file.success {
+    background:#16A34A;
 }
 
 </style>
@@ -210,14 +327,45 @@ input[readonly]{
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
+    <div class="topbar">
+        <h1>Form Revisi Pengajuan</h1>
 
-    <h1>Revisi Pengajuan Tugas Akhir</h1>
+        <div class="mhs-info">
+            <div class="mhs-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
+    </div>
 
-    <form method="POST" enctype="multipart/form-data" class="form-box">
+    <form method="POST" enctype="multipart/form-data" class="revisi-wrapper">
 
-        <label>Judul Tugas Akhir</label>
-        <input type="text" value="<?= htmlspecialchars($data['judul_ta']) ?>" readonly>
-        <small class="hint">Judul tidak dapat dibah!</small><br>
+    <div class="card">
+        <div class="judul-head">
+            <div class="judul-icon">
+                <span class="material-symbols-rounded">docs</span>
+            </div>
+            <h4 class="judul-title">Penyesuaian Judul TA</h4>
+        </div>
+        <hr class="divider">
+
+        <label class="label-muted">JUDUL (Tidak bisa diganti)</label>
+        <div class="readonly-box">
+            <?= htmlspecialchars($data['judul_ta']) ?>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+        <div class="judul-head">
+            <div class="judul-icon">
+                <span class="material-symbols-rounded">file_upload</span>
+            </div>
+            <h4 class="judul-title">Unggah Ulang Dokumen</h4>
+        </div>
+        <hr class="divider">
 
         <?php
         $has_revisi = false;
@@ -225,24 +373,85 @@ input[readonly]{
             if (($data[$f['status']] ?? '') === 'revisi'):
                 $has_revisi = true;
         ?>
-            <label><?= htmlspecialchars($f['label']) ?></label>
-            <input type="file" name="<?= $input ?>" required accept=".pdf">
-            <small class="hint">Format file: PDF</small><br>
+            <div class="doc-revisi-item">
+                <div class="doc-left">
+                    <div class="doc-icon">
+                        <span class="material-symbols-rounded">close</span>
+                    </div>
+                    <div>
+                        <strong><?= htmlspecialchars($f['label']) ?></strong><br>
+                        <small class="file-current">
+                            File saat ini: <?= htmlspecialchars($data[$f['db']]) ?>
+                        </small>
+
+                    </div>
+                </div>
+
+                <label class="btn-file">
+                    Pilih File Baru
+                    <input type="file" name="<?= $input ?>" accept=".pdf" hidden>
+                </label>
+            </div>
         <?php
             endif;
         endforeach;
-
-        if (!$has_revisi):
-            echo "<div class='alert warning'>Tidak ada file yang perlu direvisi.</div>";
-        else:
         ?>
-            <button type="submit" class="btn-primary">Upload Revisi</button>
+
+        <?php if (!$has_revisi): ?>
+            <div class="info-box">
+                Tidak ada dokumen yang perlu direvisi.
+            </div>
         <?php endif; ?>
+    </div>
+
+    <?php if ($has_revisi): ?>
+        <div class="center-action">
+            <button type="submit" class="btn-gradient">
+                Upload Revisi
+            </button>
+        </div>
+    <?php endif; ?>
 
     </form>
+    <!-- INFO -->
+    <div class="info-box">
+        <span class="material-symbols-rounded">info</span>
+        Pastikan dokumen yang diunggah ulang sudah dalam format PDF dan memiliki ukuran maksimal 2MB per file.
+    </div>
+
+    </div>
+    
+
+</form>
 
 </div>
 </div>
+<script>
+document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function () {
+        if (!this.files.length) return;
+
+        const fileName = this.files[0].name;
+
+        const item = this.closest('.doc-revisi-item');
+        const text = item.querySelector('.file-current');
+        const icon = item.querySelector('.doc-icon');
+        const iconSpan = icon.querySelector('span');
+        const button = item.querySelector('.btn-file');
+
+        // update text
+        text.textContent = 'File baru: ' + fileName;
+        text.classList.add('file-updated');
+
+        // update icon
+        icon.classList.add('success');
+        iconSpan.textContent = 'check';
+
+        // update button color
+        button.classList.add('success');
+    });
+});
+</script>
 
 </body>
 
