@@ -253,23 +253,14 @@ tbody tr:hover{
         : '<span class="badge badge-belum">Belum</span>' ?></td>
     <td>
         <?php
-        if(!$row['tanggal_sidang']){
+        if (!$row['tanggal_sidang']) {
             echo '<span class="badge badge-belum">Belum</span>';
-        }else{
-            $today=new DateTime();
-            $sidang=new DateTime($row['tanggal_sidang']);
-            $diff=$today->diff($sidang)->days;
-            $isLewat=$sidang<$today;
-
-            if($isLewat){$b='badge-merah';$l='Terlewat';}
-            elseif($diff<=3){$b='badge-merah';$l='H-'.$diff;}
-            elseif($diff<=7){$b='badge-kuning';$l='H-'.$diff;}
-            else{$b='badge-hijau';$l=date('d M Y',strtotime($row['tanggal_sidang']));}
-
-            echo "<span class='badge $b'>$l</span>";
+        } else {
+            echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sidang'])) . '</span>';
         }
         ?>
     </td>
+
     <td>
         <?php if($row['status_persetujuan']!=='disetujui'): ?>
             <a class="btn-upload" href="upload_persetujuan_sempro.php?id=<?= $row['dosbing_id'] ?>">Upload</a>
