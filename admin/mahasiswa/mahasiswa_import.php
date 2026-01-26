@@ -17,6 +17,7 @@ $error = '';
 $success = 0;
 
 /* HANDLE IMPORT */
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
 
     $file = $_FILES['excel'];
