@@ -269,8 +269,14 @@ button{
                 </tr>
                 <?php endforeach; ?>
             </table>
-
+            <!-- CATATAN ADMIN KESELURUHAN -->
+            <div class="status-box" style="margin-top:20px">
+                <b>Catatan Admin (Keseluruhan)</b>
+                <textarea name="catatan_admin"
+                        placeholder="Tulis catatan umum untuk pengajuan TA ini..."><?= htmlspecialchars($data['catatan_admin'] ?? '') ?></textarea>
+            </div>
             <button type="submit">Simpan Verifikasi</button>
+
         </form>
     </div>
 

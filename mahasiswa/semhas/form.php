@@ -3,22 +3,37 @@ session_start();
 require "../../config/connection.php";
 require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
 
+/* ===============================
+   CEK LOGIN MAHASISWA
+================================ */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ".base_url('login.php'));
     exit;
 }
 
-$pesan_error = '';
+/* ===============================
+   FUNGSI NILAI HURUF
+================================ */
+function nilaiHuruf($nilai) {
+    if ($nilai >= 85) return 'A';
+    if ($nilai >= 75) return 'B';
+    if ($nilai >= 65) return 'C';
+    if ($nilai >= 50) return 'D';
+    return 'E';
+}
+
+$pesan_error  = '';
 $boleh_upload = false;
 
 /* ===============================
-   CEK TA
+   CEK TUGAS AKHIR
 ================================ */
 $stmt = $pdo->prepare("
     SELECT id, judul_ta, status 
     FROM pengajuan_ta 
     WHERE mahasiswa_id = ?
-    ORDER BY created_at DESC LIMIT 1
+    ORDER BY created_at DESC
+    LIMIT 1
 ");
 $stmt->execute([$_SESSION['user']['id']]);
 $ta = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,34 +41,58 @@ $ta = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$ta || $ta['status'] !== 'disetujui') {
     $pesan_error = "Tugas Akhir belum disetujui.";
 } else {
+
     /* ===============================
-       CEK SEMPRO
+       CEK SEMINAR PROPOSAL
     ================================ */
     $cek = $pdo->prepare("
-        SELECT status 
-        FROM pengajuan_sempro 
-        WHERE mahasiswa_id = ?
-        ORDER BY created_at DESC LIMIT 1
+        SELECT 
+            sp.status,
+            ns.nilai
+        FROM pengajuan_sempro sp
+        LEFT JOIN nilai_sempro ns 
+            ON sp.id = ns.pengajuan_id
+        WHERE sp.mahasiswa_id = ?
+        ORDER BY sp.created_at DESC
+        LIMIT 1
     ");
     $cek->execute([$_SESSION['user']['id']]);
     $sempro = $cek->fetch(PDO::FETCH_ASSOC);
 
     if (!$sempro || $sempro['status'] !== 'disetujui') {
-        $pesan_error = "Seminar Proposal belum disetujui.";
-    } else {
-        /* ===============================
-           CEK SUDAH SEMHAS
-        ================================ */
-        $cek = $pdo->prepare("
-            SELECT id FROM pengajuan_semhas 
-            WHERE mahasiswa_id = ? LIMIT 1
-        ");
-        $cek->execute([$_SESSION['user']['id']]);
 
-        if ($cek->rowCount() > 0) {
-            $pesan_error = "Anda sudah mengajukan Seminar Hasil.";
+        $pesan_error = "Seminar Proposal belum disetujui.";
+
+    } elseif ($sempro['nilai'] === null) {
+
+        $pesan_error = "Nilai Seminar Proposal belum tersedia.";
+
+    } else {
+
+        $nilai_huruf = nilaiHuruf($sempro['nilai']);
+
+        if (in_array($nilai_huruf, ['D', 'E'])) {
+
+            $pesan_error = "Anda tidak lulus Seminar Proposal, sehingga tidak dapat mengajukan Seminar Hasil.";
+
         } else {
-            $boleh_upload = true;
+
+            /* ===============================
+               CEK SUDAH AJUKAN SEMHAS
+            ================================ */
+            $cek = $pdo->prepare("
+                SELECT id 
+                FROM pengajuan_semhas
+                WHERE mahasiswa_id = ?
+                LIMIT 1
+            ");
+            $cek->execute([$_SESSION['user']['id']]);
+
+            if ($cek->rowCount() > 0) {
+                $pesan_error = "Anda sudah mengajukan Seminar Hasil.";
+            } else {
+                $boleh_upload = true;
+            }
         }
     }
 }
@@ -95,23 +134,19 @@ small{color:#6b7280}
 <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
     <label>Lembar Berita Acara</label>
-    <input type="file" name="file_berita_acara"
-           accept=".pdf" required>
+    <input type="file" name="file_berita_acara" accept=".pdf" required>
     <small>Format: PDF</small>
 
     <label>Persetujuan Laporan TA</label>
-    <input type="file" name="file_persetujuan_laporan"
-           accept=".pdf" required>
+    <input type="file" name="file_persetujuan_laporan" accept=".pdf" required>
     <small>Format: PDF</small>
 
     <label>Form Pendaftaran Ujian TA</label>
-    <input type="file" name="file_pendaftaran_ujian"
-           accept=".pdf" required>
+    <input type="file" name="file_pendaftaran_ujian" accept=".pdf" required>
     <small>Format: PDF</small>
 
     <label>Buku Konsultasi TA</label>
-    <input type="file" name="file_buku_konsultasi"
-           accept=".pdf" required>
+    <input type="file" name="file_buku_konsultasi" accept=".pdf" required>
     <small>Format: PDF</small><br>
 
     <button type="submit">Ajukan Seminar Hasil</button>

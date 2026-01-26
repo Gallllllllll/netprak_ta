@@ -249,7 +249,10 @@ button{
 
 
     </p>
-    <p><b>Catatan Admin:</b><br><?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?></p>
+    <form action="simpan_catatan_semhas.php" method="POST">
+    <input type="hidden" name="id" value="<?= $data['id'] ?>">
+</form>
+
 </div>
 
 <?php if ($data['status'] === 'disetujui'): ?>
@@ -315,8 +318,9 @@ button{
     </select>
 
 
-    <textarea name="catatan[<?= $key ?>]"
-        placeholder="Catatan untuk mahasiswa..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?></textarea>
+    <textarea name="catatan_file[<?= $key ?>]"
+        placeholder="Catatan untuk mahasiswa..."><?= htmlspecialchars($data[$catatan_field] ?? '') ?>
+    </textarea>
 </td>
 <td>
 <?php if (!empty($data[$file_field])): ?>
@@ -331,6 +335,10 @@ button{
 <?php endforeach; ?>
 
 </table>
+<div class="status-box" style="margin-top:20px;">
+    <b>Catatan Admin (Keseluruhan)</b>
+    <textarea name="catatan" placeholder="Catatan untuk keseluruhan pengajuan..."><?= htmlspecialchars($data['catatan'] ?? '') ?></textarea>
+</div>
 
 <button type="submit">Simpan Status Verifikasi</button>
 </form>
