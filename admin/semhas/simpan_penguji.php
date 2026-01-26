@@ -32,5 +32,5 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$pengajuan_id, $dosen_id]);
 
-header("Location: detail.php?id=" . $pengajuan_id);
+header("Location: index.php?id=" . $pengajuan_id);
 exit;

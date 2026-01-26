@@ -53,16 +53,24 @@ $stmt = $pdo->prepare("
         s.status,
         s.created_at,
         m.nama,
-        p.judul_ta
+        p.judul_ta,
+
+        MAX(CASE WHEN ns.peran = 'dosbing_1' THEN ns.nilai END) AS nilai_dosbing_1,
+        MAX(CASE WHEN ns.peran = 'dosbing_2' THEN ns.nilai END) AS nilai_dosbing_2
+
     FROM pengajuan_sempro s
     JOIN mahasiswa m ON s.mahasiswa_id = m.id
     JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
+    LEFT JOIN nilai_sempro ns ON ns.pengajuan_id = s.id
+
     $search_sql
+    GROUP BY s.id
     ORDER BY s.created_at DESC
     LIMIT $limit OFFSET $offset
 ");
 $stmt->execute($params);
 $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -256,6 +264,18 @@ tbody tr:hover {
     margin: 2px;
 }
 
+.btn-nilai {
+    background: #10b981; /* hijau */
+    color: #fff;
+    border-radius:12px;
+    height: 17px;
+}
+
+.btn-nilai:hover {
+    background: #059669;
+}
+
+
 .btn-detail {
     background: #3b82f6;
     color: #fff;
@@ -386,11 +406,22 @@ tbody tr:hover {
                     </span>
                 </td>
                 <td>
-                    <a href="detail.php?id=<?= $p['id'] ?>" class="btn-action btn-detail">Detail</a>
-                    <?php if ($p['status'] === 'disetujui'): ?>
-                        <a href="jadwal.php?id=<?= $p['id'] ?>" class="btn-action btn-jadwal">Penjadwalan</a>
-                    <?php endif; ?>
-                </td>
+                <a href="detail.php?id=<?= $p['id'] ?>" class="btn-action btn-detail">Detail</a>
+
+                <?php if ($p['status'] === 'disetujui'): ?>
+                    <a href="input_nilai_sempro.php?pengajuan_id=<?= $p['id'] ?>"
+                    class="btn-action btn-nilai">
+                        Input Nilai
+                    </a>
+
+                    <a href="jadwal.php?id=<?= $p['id'] ?>"
+                    class="btn-action btn-jadwal">
+                        Penjadwalan
+                    </a>
+                <?php endif; ?>
+
+            </td>
+
             </tr>
         <?php endforeach; endif; ?>
         </tbody>

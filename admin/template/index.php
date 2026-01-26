@@ -286,9 +286,16 @@ table.dataTable td:last-child{
                     <td>
                         <div class="action-btn">
                             <a href="edit.php?id=<?= $t['id'] ?>" class="btn edit">Edit</a>
+
+                            <a href="toggle.php?id=<?= $t['id'] ?>"
+                            class="btn"
+                            style="background:<?= $t['is_visible'] ? '#6b7280' : '#22c55e' ?>">
+                                <?= $t['is_visible'] ? 'Sembunyikan' : 'Tampilkan' ?>
+                            </a>
+
                             <a href="delete.php?id=<?= $t['id'] ?>"
-                               onclick="return confirm('Yakin ingin menghapus template ini?')"
-                               class="btn delete">Hapus</a>
+                            onclick="return confirm('Yakin ingin menghapus template ini?')"
+                            class="btn delete">Hapus</a>
                         </div>
                     </td>
                 </tr>

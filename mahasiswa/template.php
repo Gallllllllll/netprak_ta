@@ -13,8 +13,15 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 // ===============================
 // AMBIL SEMUA TEMPLATE
 // ===============================
-$stmt = $pdo->query("SELECT * FROM template ORDER BY created_at DESC");
+$stmt = $pdo->prepare("
+    SELECT *
+    FROM template
+    WHERE is_visible = 1
+    ORDER BY created_at DESC
+");
+$stmt->execute();
 $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
