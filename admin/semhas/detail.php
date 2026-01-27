@@ -97,7 +97,10 @@ body{
 .dashboard-header h1{
     margin:0;
     color:#fff !important;
-    font-size:20px;
+    -webkit-text-fill-color: initial !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    font-size: 20px;
 }
 .dashboard-header p{
     margin:6px 0 0;

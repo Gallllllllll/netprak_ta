@@ -106,6 +106,9 @@ body {
 .dashboard-header h1 {
     margin:0;
     color:#fff !important;
+    -webkit-text-fill-color: initial !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
     font-size:20px;
 }
 

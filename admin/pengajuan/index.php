@@ -112,21 +112,30 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
             gap: 15px;
         }
 
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: #ff8c42;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
+        /* PROFILE */
+.admin-info{
+    display:flex;
+    align-items:left;
+    gap:20px
+}
+.admin-text span{
+    font-size:13px;
+    color:#555
+}
+.admin-text b{
+    color:#ff8c42;
+    font-size:14px
+}
 
-        .avatar span {
-            color: white;
-            font-size: 30px;
-        }
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
 
         /* ================= SEARCH & ENTRIES ================= */
         .controls-row {
