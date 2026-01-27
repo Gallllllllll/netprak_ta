@@ -164,113 +164,219 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Input Nilai SEMHAS</title>
-<style>
-body{
-    font-family: Arial, sans-serif;
-    background:#f4f6f8;
-    padding:30px;
-}
-.card{
-    background:#fff;
-    max-width:700px;
-    margin:auto;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 4px 12px rgba(0,0,0,.1);
-}
-h2{margin-bottom:15px}
-.info{
-    background:#f1f5f9;
-    padding:12px;
-    border-radius:6px;
-    margin-bottom:15px;
-    font-size:14px;
-}
-label{
-    display:block;
-    margin-top:15px;
-    font-weight:bold;
-}
-input[type=number]{
-    width:100%;
-    padding:8px;
-    margin-top:6px;
-}
-button{
-    margin-top:20px;
-    padding:10px 16px;
-    border:none;
-    background:#2563eb;
-    color:#fff;
-    font-weight:600;
-    border-radius:6px;
-    cursor:pointer;
-}
-button:hover{opacity:.9}
-.error{
-    background:#fee2e2;
-    color:#991b1b;
-    padding:10px;
-    border-radius:6px;
-    margin-bottom:15px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Nilai SEMHAS</title>
+    <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(90deg, #ff5f9e, #ff9f43);
+            --bg-beige: #FDF2E9;
+            --white: #FFFFFF;
+            --text-dark: #2D3436;
+            --text-muted: #636E72;
+            --border-color: #f1dcdc;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-beige);
+            margin: 0;
+            color: var(--text-dark);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+        .dashboard-header {
+            background: var(--primary-gradient) !important;
+            border-radius: 20px;
+            padding: 24px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(255, 95, 158, 0.15);
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            color: #fff !important;
+            -webkit-text-fill-color: initial !important;
+            background: none !important;
+            -webkit-background-clip: initial !important;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: #fff !important;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        /* CARD */
+        .form-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 850px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .info-header b { color: #ff5f9e; }
+
+        /* FORM FIELD */
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .input-control {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: 1.5px solid #ff9f43;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            color: #666;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-color: #ff5f9e;
+            box-shadow: 0 0 0 4px rgba(255, 95, 158, 0.1);
+        }
+
+        .input-control::placeholder {
+            color: #ccc;
+        }
+
+        /* BUTTON */
+        .btn-submit {
+            background: var(--primary-gradient);
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(255, 95, 158, 0.2);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 95, 158, 0.3);
+            opacity: 0.95;
+        }
+
+        /* MESSAGES */
+        .error-msg {
+            background: #fff5f5;
+            color: #e53e3e;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #e53e3e;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { margin-left: 0; padding: 20px; }
+            .form-card { padding: 25px; }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="card">
-    <h2>Input Nilai Seminar Hasil</h2>
+<?php include "../sidebar.php"; ?>
 
-    <div class="info">
-        <b>Mahasiswa :</b> <?= htmlspecialchars($data['nama_mahasiswa'] ?? '-') ?><br>
-        <b>NIM :</b> <?= htmlspecialchars($data['nim'] ?? '-') ?><br>
-        <b>Judul TA :</b><br>
-        <?= htmlspecialchars($data['judul_ta'] ?? '-') ?>
+<div class="main-content">
+    
+    <div class="dashboard-header">
+        <h1>Input Nilai</h1>
+        <p>Tempat Penguji Menginput nilai</p>
     </div>
 
-    <?php if (!$adaPenguji): ?>
-        <div class="error">
-            Penguji belum ditentukan. Silakan tentukan dosen penguji terlebih dahulu.
+    <div class="form-card">
+        
+        <div class="info-header">
+            Mahasiswa: <b><?= htmlspecialchars($data['nama_mahasiswa']) ?></b><br>
+            NIM: <b><?= htmlspecialchars($data['nim']) ?></b><br>   
+            Judul: <i><?= htmlspecialchars($data['judul_ta']) ?></i>
         </div>
-    <?php endif; ?>
 
-    <?php if ($error): ?>
-        <div class="error"><?= htmlspecialchars($error) ?></div>
-    <?php endif; ?>
+        <?php if (!$adaPenguji): ?>
+            <div class="error-msg">
+                Penguji belum ditentukan. Silakan tentukan dosen penguji terlebih dahulu.
+            </div>
+        <?php endif; ?>
 
-    <form method="POST" <?= !$adaPenguji ? 'style="display:none"' : '' ?>>
-        <?php foreach ($tim as $t): ?>
-            <label>
-                <?= strtoupper(str_replace('_',' ', $t['peran'])) ?>
-                (<?= htmlspecialchars($t['nama']) ?>)
-            </label>
+        <?php if ($error): ?>
+            <div class="error-msg"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
 
-            <input type="hidden"
-                   name="nilai[<?= $t['peran'] ?>][dosen_id]"
-                   value="<?= $t['dosen_id'] ?>">
+        <form method="POST" <?= !$adaPenguji ? 'style="display:none"' : '' ?>>
+            <?php foreach ($tim as $t): ?>
+                <div class="input-group">
+                    <label>
+                        <?= strtoupper(str_replace('_',' ', $t['peran'])) ?> 
+                        - <?= htmlspecialchars($t['nama']) ?>
+                    </label>
 
-            <input type="number"
-                name="nilai[<?= $t['peran'] ?>][nilai]"
-                min="0"
-                max="100"
-                step="0.01"
-                required
-                value="<?= $nilaiLama[$t['peran']] ?? '' ?>"
-                oninput="this.value = Math.min(100, Math.max(0, this.value))">
-        <?php endforeach; ?>
+                    <input type="hidden"
+                           name="nilai[<?= $t['peran'] ?>][dosen_id]"
+                           value="<?= $t['dosen_id'] ?>">
 
-        <button type="submit">Simpan Nilai</button>
-    </form>
+                    <input type="number"
+                        class="input-control"
+                        name="nilai[<?= $t['peran'] ?>][nilai]"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        placeholder="input nilai disini"
+                        required
+                        value="<?= $nilaiLama[$t['peran']] ?? '' ?>">
+                </div>
+            <?php endforeach; ?>
+
+            <button type="submit" class="btn-submit">Simpan Nilai</button>
+        </form>
+    </div>
 </div>
 
 <script>
 document.querySelectorAll('input[type="number"]').forEach(el=>{
     el.addEventListener('input',()=>{
-        if(el.value>100) el.value=100;
-        if(el.value<0) el.value=0;
+        if(el.value > 100) el.value = 100;
+        if(el.value < 0) el.value = 0;
     });
 });
 </script>
