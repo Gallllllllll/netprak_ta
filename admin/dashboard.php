@@ -227,18 +227,21 @@ function time_ago($timestamp) {
             margin: 0 auto;
         }
 
-        /* QUEUE LIST */
+        /* QUEUE LIST REDESIGN */
         .queue-card {
             background: var(--white);
             border-radius: 24px;
             padding: 30px;
             box-shadow: var(--shadow);
+            max-width: 900px;
+            margin: 0 auto;
         }
 
         .queue-card h4 {
             margin: 0 0 25px;
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: 700;
             color: #2d3436;
         }
 
@@ -246,45 +249,92 @@ function time_ago($timestamp) {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 0;
-            border-bottom: 1px solid #f1f1f1;
+            padding: 18px 25px;
+            background: #F8F9FA;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            transition: transform 0.2s ease;
         }
 
-        .queue-item:last-child { border-bottom: none; }
+        .queue-item:hover {
+            transform: scale(1.01);
+        }
 
         .m-avatar {
-            width: 45px;
-            height: 45px;
-            background: #fff5f0;
-            border: 1px solid #ffe5d9;
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #FF74C7, #FF983D);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--accent-orange);
-            font-weight: 700;
-            font-size: 18px;
+            color: white;
+            font-weight: 800;
+            font-size: 22px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(255, 116, 199, 0.2);
         }
 
         .m-info { flex: 1; margin-left: 20px; }
-        .m-info b { font-size: 15px; color: #2d3436; }
-        .m-info p { margin: 4px 0 0; font-size: 13px; color: var(--text-muted); font-style: italic; }
+        .m-info b { font-size: 16px; color: #2d3436; display: block; margin-bottom: 2px; }
+        .m-info p { margin: 0; font-size: 14px; color: var(--text-muted); font-weight: 400; }
 
         .m-status { text-align: right; }
-        .m-status small { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 11px; }
 
-        .badge {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: capitalize;
+        .status-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2D3436;
         }
 
-        .badge.disetujui { background: #E3FCEF; color: #006644; }
-        .badge.diajukan, .badge.menunggu { background: #FFF9E6; color: #916A00; }
-        .badge.ditolak { background: #FFEBEB; color: #BF2600; }
-        .badge.direvisi { background: #EAE6FF; color: #403294; }
+        .status-badge {
+            padding: 8px 18px;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-badge.disetujui {
+            background: #E6FAF1;
+            color: #2ECC71;
+        }
+
+        .status-badge.ditolak {
+            background: #FFECEC;
+            color: #E74C3C;
+        }
+
+        .status-badge.diajukan {
+            background: #FFF4E5;
+            color: #FF983D;
+        }
+
+        .status-badge.revisi {
+            background: #EBF4FF;
+            color: #3498DB;
+        }
+
+        .btn-more {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #FF74C7, #FF983D);
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 116, 199, 0.2);
+        }
+
+        .btn-more:hover {
+            opacity: 0.95;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 116, 199, 0.3);
+        }
 
         @media screen and (max-width: 1024px) {
             .main-content { margin-left: 0; padding: 100px 20px 40px; }
@@ -390,17 +440,14 @@ function time_ago($timestamp) {
 
     <!-- QUEUE LIST -->
     <div class="queue-card">
-        <h4>Antrean Validasi Terkini</h4>
+        <h4>Antrian Validasi Terkini</h4>
         
         <?php if (!$antrian): ?>
             <p style="text-align:center; color:#999; padding:20px">No recent activity detected.</p>
         <?php else: ?>
             <?php foreach ($antrian as $row): 
                 $badge_class = strtolower($row['status']);
-                if ($badge_class == 'disetujui') $st_class = 'disetujui';
-                elseif ($badge_class == 'ditolak') $st_class = 'ditolak';
-                elseif ($badge_class == 'revisi') $st_class = 'direvisi';
-                else $st_class = 'diajukan';
+                $display_status = $row['status'] ?: 'Pending';
             ?>
                 <div class="queue-item">
                     <div class="m-avatar"><?= substr($row['nama'], 0, 1) ?></div>
@@ -409,13 +456,24 @@ function time_ago($timestamp) {
                         <p><?= htmlspecialchars($row['tipe']) ?></p>
                     </div>
                     <div class="m-status">
-                        <small><?= time_ago($row['created_at']) ?></small>
-                        <span class="badge <?= $st_class ?>"><?= $row['status'] ?: 'Diajukan' ?></span>
+                        <?php 
+                            $st_lower = strtolower($display_status);
+                            if ($st_lower === 'disetujui' || $st_lower === 'approved'): 
+                        ?>
+                            <span class="status-badge disetujui">Disetujui</span>
+                        <?php elseif ($st_lower === 'ditolak' || $st_lower === 'rejected'): ?>
+                            <span class="status-badge ditolak">Ditolak</span>
+                        <?php elseif ($st_lower === 'revisi'): ?>
+                            <span class="status-badge revisi">Revisi</span>
+                        <?php else: ?>
+                            <span class="status-badge diajukan"><?= ucwords($display_status) ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>
 
+        <a href="verifikasi.php" class="btn-more">Selengkapnya</a>
     </div>
 
 </div>
