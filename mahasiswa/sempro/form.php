@@ -13,6 +13,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
 $username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
 $pesan_error  = '';
 $boleh_upload = false;
+$can_proceed = false;
 
 /* ===============================
    CEK PENGAJUAN TA TERAKHIR
@@ -26,6 +27,34 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$_SESSION['user']['id']]);
 $ta = $stmt->fetch(PDO::FETCH_ASSOC);
+$dosen = null;
+
+if ($ta) {
+    $stmt = $pdo->prepare("
+        SELECT
+            MAX(CASE WHEN db.role = 'dosbing_1' THEN d.nama END) AS dosen1_nama,
+            MAX(CASE WHEN db.role = 'dosbing_2' THEN d.nama END) AS dosen2_nama,
+            MAX(CASE WHEN db.role = 'dosbing_1' THEN db.status_persetujuan END) AS dosen1_status,
+            MAX(CASE WHEN db.role = 'dosbing_2' THEN db.status_persetujuan END) AS dosen2_status,
+
+            MAX(CASE WHEN db.role = 'dosbing_1' THEN db.persetujuan_sempro END) AS dosen1_file,
+            MAX(CASE WHEN db.role = 'dosbing_2' THEN db.persetujuan_sempro END) AS dosen2_file
+
+        FROM dosbing_ta db
+        LEFT JOIN dosen d ON d.id = db.dosen_id
+        WHERE db.pengajuan_id = ?
+    ");
+    $stmt->execute([$ta['id']]);
+    $dosen = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+function badgeStatus($status) {
+    return match ($status) {
+        'disetujui' => '<span class="status-ok">DISETUJUI</span>',
+        'pending'  => '<span class="status-wait">MENUNGGU</span>',
+        default     => '<span class="status-wait">MENUNGGU</span>',
+    };
+}
+
 
 /* ===============================
    VALIDASI ALUR TA
@@ -53,7 +82,7 @@ if (!$ta) {
 
     if ($stmt->fetchColumn() < 2) {
 
-        $pesan_error = "Pengajuan Seminar Proposal belum dapat dilakukan.\nMenunggu persetujuan dari Dosen Pembimbing 1 dan 2.";
+        $pesan_error = "Pengajuan Seminar Proposal belum dapat dilakukan. Anda memerlukan persetujuan dari kedua Dosen Pembimbing untuk melanjutkan.";
 
     } else {
 
@@ -77,6 +106,7 @@ if (!$ta) {
             // ⬅️ TIDAK ADA PEMBUATAN ID APA PUN DI SINI
             $boleh_upload = true;
         }
+        $can_proceed = $boleh_upload;
     }
 }
 ?>
@@ -342,7 +372,197 @@ if (!$ta) {
     cursor:pointer;
     white-space:nowrap;
 }
+/* ACTION */
+.ta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 152, 61, 0.25);
+}
 
+.ta-btn {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 16px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    text-decoration:none;
+    letter-spacing: .3px;
+    background: linear-gradient(135deg, #FF74C7, #FF983D);
+    color: #ffffff;
+    border:1px solid #FF983D;
+    cursor: pointer;
+    width: fit-content;
+    margin: auto;
+}
+.ta-btn-primary:hover {
+    opacity: .9;
+}
+/* message BOX */
+.message-box {
+    background: #FFDFE0;
+    color: #FF3A3D;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.message-box strong {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size: 13px;
+}
+
+/* ==============================
+   ERROR CARD (SUDAH PERNAH AJUAN)
+============================== */
+.ta-error-card{
+    background: #FFDFE0;
+    border-radius: 18px;
+    padding: 15px 15px;
+    border: #FF3A3D 1px solid;
+    box-shadow: 0 3px 15px rgba(0,0,0,.10);
+}
+
+.ta-error-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom: auto;
+}
+
+.ta-error-icon{
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background: #fff;
+    border: 1px solid #FF3A3D;
+    flex-shrink: 0;
+}
+
+.ta-error-icon span{
+    color:#FF3A3D;
+    font-size: 22px;
+}
+
+.ta-error-title{
+    margin:0;
+    font-size: 16px;
+    font-weight: 800;
+    color:#FF3A3D;
+}
+
+.ta-error-desc{
+    margin: 2px 0 0;
+    font-size: 14px;
+    color:#6b7280;
+}
+
+/* isi message */
+.ta-error-body{
+    background: #f5f5f5;
+    border: 1px solid #9f9f9f;
+    border-radius: 14px;
+    padding: 14px 16px;
+    color: #555;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.ta-error-label{
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff8c42;
+}
+/* ===============================
+   DOSEN VALIDATION
+================================ */
+.dosen-section {
+    margin-top:20px;
+}
+
+.dosen-item {
+    border:1px dashed #E5E7EB;
+    border-radius:14px;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.dosen-left {
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.dosen-avatar {
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:#E5E7EB;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#6B7280;
+}
+
+.dosen-name {
+    font-weight:700;
+    font-size:13px;
+    color:#374151;
+}
+
+.dosen-role {
+    font-size:11px;
+    color:#9CA3AF;
+}
+
+/* STATUS BADGE */
+.status-wait {
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    color:#FB923C;
+    border:1px solid #FDBA74;
+    background:#FFF7ED;
+}
+
+.status-ok {
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    color:#22C55E;
+    border:1px solid #86EFAC;
+    background:#ECFDF5;
+}
+
+/* INFO FOOTER */
+.info-footer {
+    margin-top:18px;
+    background:#EFF6FF;
+    border:1px solid #BFDBFE;
+    border-radius:16px;
+    padding:16px;
+    color:#2563EB;
+    font-size:13px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
 
 
 
@@ -415,16 +635,130 @@ button {
         <hr class="divider">
 
         <?php if ($pesan_error): ?>
-            <div class="alert">
-                <?= htmlspecialchars($pesan_error) ?>
+        <div class="ta-error-card">
+            <div class="ta-error-head">
+                <div class="ta-error-icon">
+                    <span class="material-symbols-rounded">error_outline</span>
+                </div>
+                <div>
+                    <h3 class="ta-error-title">AKSES TERKUNCI!</h3>
+                    <p class="ta-error-desc"><?= nl2br(htmlspecialchars($pesan_error)) ?></p>
+                </div>
             </div>
+        </div>
+        <div class="ta-info-header" style="margin-top:20px;">
+                    <span class="material-symbols-rounded">description</span>
+                    <span>INFORMASI TUGAS AKHIR</span>
+
+                    <?php
+                    $statusClass = match ($ta['status']) {
+                        'disetujui' => 'badge-green',
+                        'diajukan'  => 'badge-blue',
+                        'revisi'    => 'badge-orange',
+                        'ditolak'   => 'badge-red',
+                        default     => 'badge-gray',
+                    };
+                    ?>
+                    <span class="ta-badge <?= $statusClass ?>">
+                        <?= strtoupper($ta['status']) ?>
+                    </span>
+                </div>
+                <div>
+                    <div class="ta-judul">Judul Tugas Akhir</div>
+                    <div class="ta-judul-box">
+                        <?= htmlspecialchars($ta['judul_ta']) ?>
+                    </div>
+                    <hr class="divider">
+                </div>
+                            <div class="dosen-section">
+                <div class="ta-info-header">
+                    <span class="material-symbols-rounded">assignment_turned_in</span>
+                    VALIDASI DOSEN PEMBIMBING
+                </div>
+
+                <?php if ($dosen): ?>
+                <!-- DOSEN 1 -->
+                <div class="dosen-item">
+                    <div class="dosen-left">
+                        <div class="dosen-avatar">
+                            <span class="material-symbols-rounded">person</span>
+                        </div>
+                        <div>
+                            <div class="dosen-role">DOSEN PEMBIMBING 1</div>
+                            <?= htmlspecialchars($dosen['dosen1_nama'] ?? '-') ?>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                    <?= badgeStatus($dosen['dosen1_status'] ?? 'menunggu') ?>
+
+                    <?php if (!empty($dosen['dosen1_file'])): ?>
+                        <a href="<?= base_url('uploads/persetujuan_sempro/' . $dosen['dosen1_file']) ?>"
+                        class="ta-btn"
+                        target="_blank">
+                            <span class="material-symbols-rounded">download</span>
+                            Unduh
+                        </a>
+                    <?php endif; ?>
+                </div>
+                </div>
+
+                <!-- DOSEN 2 -->
+                <div class="dosen-item">
+                    <div class="dosen-left">
+                        <div class="dosen-avatar">
+                            <span class="material-symbols-rounded">person</span>
+                        </div>
+                        <div>
+                            <div class="dosen-role">DOSEN PEMBIMBING 2</div>
+                            <?= htmlspecialchars($dosen['dosen2_nama'] ?? '-') ?>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                    <?= badgeStatus($dosen['dosen2_status'] ?? 'menunggu') ?>
+
+                    <?php if (!empty($dosen['dosen2_file'])): ?>
+                        <a href="<?= base_url('uploads/persetujuan_sempro/' . $dosen['dosen2_file']) ?>"
+                        class="ta-btn"
+                        target="_blank">
+                            <span class="material-symbols-rounded">download</span>
+                            Unduh
+                        </a>
+                    <?php endif; ?>
+                </div>
+                </div>
+                <div class="ta-actions">
+                    <button
+                        id="btnLanjut"
+                        class="ta-btn ta-btn-primary"
+                        <?= $can_proceed ? '' : 'disabled' ?>
+                        style="<?= $can_proceed ? '' : 'opacity:.5;cursor:not-allowed;' ?>"
+                    >
+                        <span class="material-symbols-rounded">arrow_forward</span>
+                        Lanjut Ajukan Seminar Proposal
+                    </button>
+                </div>
+
+                <?php endif; ?>
+
+            <div class="info-footer">
+                <span class="material-symbols-rounded">info</span>
+                <div>
+                    Silakan lakukan bimbingan draf proposal Anda. Tombol pendaftaran akan terbuka otomatis setelah kedua dosen melakukan validasi di sistem.
+                </div>
+            </div>
+
+            </div>
+
+
+
         <?php endif; ?>
 
+
         <?php if ($boleh_upload): ?>
-            <div>
+            <div id="formSempro" style="display:none;">
                 <div class="ta-info-header">
                     <span class="material-symbols-rounded">description</span>
-                    <span>Informasi Tugas Akhir</span>
+                    <span>INFORMASI TUGAS AKHIR</span>
 
                     <?php
                     $statusClass = match ($ta['status']) {
@@ -447,10 +781,6 @@ button {
                     <hr class="divider">
                 </div>
             </div>
-
-
-
-
 
             <div class="ta-info-header">
                 <span class="material-symbols-rounded">upload</span>
@@ -517,8 +847,18 @@ button {
                         </label>
                     </div>
                 </div>
-
-                <button type="submit">Ajukan Seminar Proposal</button>
+            <div class="message-box">
+                <strong>
+                    <span class="material-symbols-rounded">info</span> 
+                    Pastikan semua dokumen telah ditandatangani dan distempel jika diperlukan. Kesalahan dokumen dapat memperlambat proses pendaftaran.
+                </strong>
+            </div>
+            <div class="ta-actions">
+                <button type="submit" class="ta-btn ta-btn-primary">
+                    <span class="material-symbols-rounded">send</span>
+                    Ajukan Seminar Proposal
+                </button>
+            </div>
             </form>
 
         <?php endif; ?>
@@ -541,6 +881,18 @@ document.querySelectorAll('.upload-item input[type="file"]').forEach(input => {
         status.style.fontWeight = '600';
     });
 });
+</script>
+<script>
+const btn = document.getElementById('btnLanjut');
+const form = document.getElementById('formSempro');
+
+if (btn && !btn.disabled) {
+    btn.addEventListener('click', function () {
+        form.style.display = 'block';
+        this.style.display = 'none';
+        form.scrollIntoView({ behavior: 'smooth' });
+    });
+}
 </script>
 
 </body>
