@@ -8,6 +8,36 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dosen') {
     exit;
 }
 
+$dosen_id = $_SESSION['user']['id']; // ⬅️ WAJIB
+
+$where = [];
+$params = [$dosen_id];
+
+// filter status
+if (!empty($_GET['status'])) {
+    $where[] = "d.status_persetujuan = ?";
+    $params[] = $_GET['status'];
+}
+
+// filter jenis sidang
+if (!empty($_GET['jenis'])) {
+    if ($_GET['jenis'] === 'sempro') {
+        $where[] = "sempro.id IS NOT NULL";
+    } elseif ($_GET['jenis'] === 'semhas') {
+        $where[] = "s.id IS NOT NULL";
+    } elseif ($_GET['jenis'] === 'belum') {
+        $where[] = "sempro.id IS NULL AND s.id IS NULL";
+    }
+}
+
+// filter nama mahasiswa
+if (!empty($_GET['nama'])) {
+    $where[] = "m.nama LIKE ?";
+    $params[] = "%" . $_GET['nama'] . "%";
+}
+
+$whereSQL = $where ? " AND " . implode(" AND ", $where) : "";
+
 $stmt = $pdo->prepare("
     SELECT 
         d.id AS dosbing_id,
@@ -23,11 +53,14 @@ $stmt = $pdo->prepare("
     LEFT JOIN pengajuan_semhas s ON s.mahasiswa_id = m.id
     LEFT JOIN pengajuan_sempro sempro ON sempro.mahasiswa_id = m.id
     WHERE d.dosen_id = ?
-    ORDER BY m.nama ASC
+    $whereSQL
+    ORDER BY p.id DESC
 ");
-$stmt->execute([$_SESSION['user']['id']]);
+
+$stmt->execute($params);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -194,6 +227,29 @@ tbody tr:hover{
     background:#ffe4d5;
 }
 
+/* FILTER BAR */
+.filter-bar{
+    display:flex;
+    gap:12px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+}
+.filter-bar select,
+.filter-bar input{
+    padding:10px 14px;
+    border-radius:12px;
+    border:1px solid #e5e7eb;
+    font-size:14px;
+    outline:none;
+    transition:.2s;
+}
+.filter-bar select:focus,
+.filter-bar input:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(255,140,80,.15);
+}
+
+
 /* RESPONSIVE */
 @media(max-width:768px){
     .main-content{padding:20px}
@@ -222,6 +278,24 @@ tbody tr:hover{
 
 <?php if ($data): ?>
 <div class="table-wrapper">
+    <div class="filter-bar">
+        <select id="filterStatus">
+            <option value="">Semua Status</option>
+            <option value="pending">Pending</option>
+            <option value="disetujui">Disetujui</option>
+        </select>
+
+        <select id="filterJenis">
+            <option value="">Semua Jenis</option>
+            <option value="sempro">Sempro</option>
+            <option value="semhas">Semhas</option>
+            <option value="belum">Belum Sidang</option>
+        </select>
+
+        <input type="text" id="filterNama" placeholder="Cari mahasiswa...">
+    </div>
+
+
 <table>
 <thead>
 <tr>
@@ -349,6 +423,46 @@ document.querySelectorAll("th[data-sort]").forEach((th, index) => {
     });
 });
 
+</script>
+<script>
+const filterStatus = document.getElementById("filterStatus");
+const filterJenis  = document.getElementById("filterJenis");
+const filterNama   = document.getElementById("filterNama");
+
+function applyLiveFilter(){
+    const statusVal = filterStatus.value;
+    const jenisVal  = filterJenis.value;
+    const namaVal   = filterNama.value.toLowerCase();
+
+    filteredRows = rows.filter(row => {
+        const nama   = row.children[1].innerText.toLowerCase();
+        const status = row.children[4].innerText.toLowerCase();
+        const sempro = row.children[5].innerText.toLowerCase();
+        const sidang = row.children[6].innerText.toLowerCase();
+
+        // filter nama
+        if (namaVal && !nama.includes(namaVal)) return false;
+
+        // filter status
+        if (statusVal === "pending" && !status.includes("menunggu")) return false;
+        if (statusVal === "disetujui" && !status.includes("disetujui")) return false;
+
+        // filter jenis
+        if (jenisVal === "sempro" && sempro.includes("belum")) return false;
+        if (jenisVal === "semhas" && sidang.includes("belum")) return false;
+        if (jenisVal === "belum" && (!sempro.includes("belum") || !sidang.includes("belum"))) return false;
+
+        return true;
+    });
+
+    currentPage = 1;
+    render();
+    paginate();
+}
+
+filterStatus.addEventListener("change", applyLiveFilter);
+filterJenis.addEventListener("change", applyLiveFilter);
+filterNama.addEventListener("keyup", applyLiveFilter);
 </script>
 
 </body>
