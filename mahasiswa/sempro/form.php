@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once '../../config/base_url.php';
 
 /* ===============================
    CEK LOGIN MAHASISWA
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: " . base_url('login.php'));
     exit;
 }
-
+$username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
 $pesan_error  = '';
 $boleh_upload = false;
 
@@ -85,16 +85,267 @@ if (!$ta) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Pengajuan Seminar Proposal</title>
 
 <style>
+:root {
+    --pink: #FF74C7;
+    --orange: #FF983D;
+    --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
+}
+/* TOP */
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px
+}
+.topbar h1{
+    color:#ff8c42;
+    font-size:28px
+}
+
+/* PROFILE */
+.mhs-info{
+    display:flex;
+    align-items:left;
+    gap:20px
+}
+.mhs-text span{
+    font-size:13px;
+    color:#555
+}
+.mhs-text b{
+    color:#ff8c42;
+    font-size:14px
+}
+
+.avatar{
+    width:42px;
+    height:42px;
+    background:#ff8c42;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* CARD */
 .card {
     background:#fff;
-    padding:26px;
-    max-width:720px;
-    border-radius:16px;
-    box-shadow:0 6px 14px rgba(0,0,0,.08);
+    border-radius:18px;
+    padding:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+    overflow-x: hidden;
 }
+.card h2{
+    text-align: center;
+    color:#ff8c42;
+}
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100% !important;
+    background: #FF983D;
+    display: block;
+    margin: 12px 0;
+}
+/* INFO BOX */
+.info-box {
+    background: #5F5F5F;
+    color: #ffffff;
+    border: 1px solid rgba(255, 152, 61, 0.35);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.info-box strong {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.info-box li {
+    margin-bottom:4px;
+    color:#ffffff;
+}
+
+.info-box p{
+    border: solid 1px #ff8c42;
+    padding:10px;
+    border-radius:8px;
+    background:#ffffff;
+    color:#555;
+}
+
+.divider {
+    border: none;
+    height: 0.5px;
+    width: 100% !important;
+    background: #FF983D;
+    display: block;
+    margin: 12px 0;
+}
+
+.pretty-ol {
+    list-style: none;        /* hilangkan nomor default */
+    padding-left: 0;
+    margin: 0;
+    counter-reset: step;     /* reset counter */
+}
+
+.pretty-ol li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #fff;             /* teks kalau background gelap */
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* BOX angka */
+.pretty-ol li::before {
+    content: counter(step);
+    min-width: 28px;
+    height: 28px;
+    border: 1px solid #fff;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+.ta-info-header {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:700;
+    color:#ff8c42;
+    margin-bottom:12px;
+}
+
+.ta-info-header .material-symbols-rounded {
+    font-size:20px;
+}
+
+.ta-badge {
+    margin-left:auto;
+    padding:6px 14px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+    border:1px solid;
+}
+
+/* STATUS COLORS */
+.badge-green {
+    color:#16A34A;
+    background:rgba(22,163,74,.15);
+    border-color:rgba(22,163,74,.4);
+}
+.badge-blue {
+    color:#2563EB;
+    background:rgba(37,99,235,.15);
+    border-color:rgba(37,99,235,.4);
+}
+.badge-orange {
+    color:#FF983D;
+    background:rgba(255,152,61,.18);
+    border-color:rgba(255,152,61,.4);
+}
+.badge-red {
+    color:#DC2626;
+    background:rgba(220,38,38,.15);
+    border-color:rgba(220,38,38,.4);
+}
+.badge-gray {
+    color:#6B7280;
+    background:#f3f4f6;
+    border-color:#d1d5db;
+}
+.ta-judul {
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:6px;
+    color:#ff8c42;
+}
+.ta-judul-box {
+    background:#f9fafb;
+    border-radius:12px;
+    padding:14px 16px;
+    font-size:14px;
+    font-weight:600;
+    color:#444;
+    line-height:1.5;
+}
+
+.material-symbols-rounded {
+    font-size: 20px;
+    vertical-align: middle;
+}
+.upload-list {
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    margin-top:20px;
+}
+
+.upload-item {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border:1px dashed rgba(255,152,61,.5);
+    padding:14px 16px;
+    border-radius:14px;
+    background:#fffaf6;
+}
+
+.upload-left {
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.upload-icon {
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:rgba(255,152,61,.15);
+    color:#FF983D;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.upload-status {
+    font-size:12px;
+    color:#999;
+    font-style:italic;
+}
+
+.btn-upload {
+    background: var(--gradient);
+    color:#fff;
+    padding:8px 18px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+
+
+
 .alert {
     background:#fff7ed;
     color:#9a3412;
@@ -127,46 +378,170 @@ button {
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
+    <div class="topbar">
+        <h1>Pengajuan Seminar Proposal</h1>
 
-    <h1>Pengajuan Seminar Proposal</h1>
+        <div class="mhs-info">
+            <div class="mhs-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
+    </div>
 
-    <div class="card">
+    <?php if ($boleh_upload): ?>
+    <!-- INFO UMUM (DI LUAR CARD) -->
+    <div class="info-box" style="margin-top:20px;">
+        <strong>
+            <span class="material-symbols-rounded">info</span>
+            Informasi Penting
+        </strong>
+        <hr class="divider">
+        <ol class="pretty-ol">
+            <li>Maksimal ukuran dokumen 2 MB</li>
+            <li>Upload wajib dengan format PDF</li>
+            <li>Format penamaan dokumen: NIM_Nama File_Nama</li>
+            <li>Dokumen terlihat jelas (HD)</li>
+            <li>Pastikan dokumen yang diunggah sudah benar</li>
+        </ol>
+    </div>
+    <?php endif; ?>
+
+    <div class="card" style="margin-top:20px;">
+        <h2>Pengajuan Tugas Akhir</h2>
+        <hr class="divider">
 
         <?php if ($pesan_error): ?>
-            <div class="alert"><?= htmlspecialchars($pesan_error) ?></div>
+            <div class="alert">
+                <?= htmlspecialchars($pesan_error) ?>
+            </div>
+        <?php endif; ?>
 
-        <?php elseif ($boleh_upload): ?>
+        <?php if ($boleh_upload): ?>
+            <div>
+                <div class="ta-info-header">
+                    <span class="material-symbols-rounded">description</span>
+                    <span>Informasi Tugas Akhir</span>
+
+                    <?php
+                    $statusClass = match ($ta['status']) {
+                        'disetujui' => 'badge-green',
+                        'diajukan'  => 'badge-blue',
+                        'revisi'    => 'badge-orange',
+                        'ditolak'   => 'badge-red',
+                        default     => 'badge-gray',
+                    };
+                    ?>
+                    <span class="ta-badge <?= $statusClass ?>">
+                        <?= strtoupper($ta['status']) ?>
+                    </span>
+                </div>
+                <div>
+                    <div class="ta-judul">Judul Tugas Akhir</div>
+                    <div class="ta-judul-box">
+                        <?= htmlspecialchars($ta['judul_ta']) ?>
+                    </div>
+                    <hr class="divider">
+                </div>
+            </div>
+
+
+
+
+
+            <div class="ta-info-header">
+                <span class="material-symbols-rounded">upload</span>
+                Unggah Dokumen Pendaftaran Seminar Proposal
+            </div>
 
             <form action="simpan.php" method="POST" enctype="multipart/form-data">
 
                 <!-- HANYA KIRIM ID TA -->
                 <input type="hidden" name="pengajuan_ta_id" value="<?= $ta['id'] ?>">
 
-                <label>Form Pendaftaran Seminar Proposal</label>
-                <input type="file" name="file_pendaftaran" accept="application/pdf" required>
-                <small>Format: PDF</small>
+                <div class="upload-list">
+                    <!-- ITEM 1 -->
+                    <div class="upload-item">
+                        <div class="upload-left">
+                            <div class="upload-icon">
+                                <span class="material-symbols-rounded">description</span>
+                            </div>
+                            <div>
+                                <strong>Form Pendaftaran Seminar Proposal</strong><br>
+                                <small class="upload-status">Belum ada file</small>
+                            </div>
+                        </div>
 
-                <label>Lembar Persetujuan Proposal TA</label>
-                <input type="file" name="file_persetujuan" accept="application/pdf" required>
-                <small>Format: PDF</small>
+                        <label class="btn-upload">
+                            Pilih File
+                            <input type="file" name="file_pendaftaran" accept="application/pdf" hidden required>
+                        </label>
+                    </div>
 
-                <label>Buku Konsultasi Tugas Akhir</label>
-                <input type="file" name="file_konsultasi" accept="application/pdf" required>
-                <small>Format: PDF</small><br>
+                    <!-- ITEM 2 -->
+                    <div class="upload-item">
+                        <div class="upload-left">
+                            <div class="upload-icon">
+                                <span class="material-symbols-rounded">description</span>
+                            </div>
+                            <div>
+                                <strong>Lembar Persetujuan Proposal TA</strong><br>
+                                <small class="upload-status">Belum ada file</small>
+                            </div>
+                        </div>
+
+                        <label class="btn-upload">
+                            Pilih File
+                            <input type="file" name="file_persetujuan" accept="application/pdf" hidden required>
+                        </label>
+                    </div>
+
+                    <!-- ITEM 3 -->
+                    <div class="upload-item">
+                        <div class="upload-left">
+                            <div class="upload-icon">
+                                <span class="material-symbols-rounded">description</span>
+                            </div>
+                            <div>
+                                <strong>Buku Konsultasi Tugas Akhir</strong><br>
+                                <small class="upload-status">Belum ada file</small>
+                            </div>
+                        </div>
+
+                        <label class="btn-upload">
+                            Pilih File
+                            <input type="file" name="file_konsultasi" accept="application/pdf" hidden required>
+                        </label>
+                    </div>
+                </div>
 
                 <button type="submit">Ajukan Seminar Proposal</button>
             </form>
 
         <?php endif; ?>
 
-        <?php if ($ta): ?>
-            <hr>
-            <p><b>Judul TA:</b><br><?= htmlspecialchars($ta['judul_ta']) ?></p>
-            <p><b>Status TA:</b> <?= htmlspecialchars($ta['status']) ?></p>
-        <?php endif; ?>
+
 
     </div>
 </div>
+<script>
+document.querySelectorAll('.upload-item input[type="file"]').forEach(input => {
+    input.addEventListener('change', function () {
+        if (!this.files.length) return;
+
+        const item = this.closest('.upload-item');
+        const status = item.querySelector('.upload-status');
+
+        status.textContent = 'File dipilih: ' + this.files[0].name;
+        status.style.color = '#16A34A';
+        status.style.fontStyle = 'normal';
+        status.style.fontWeight = '600';
+    });
+});
+</script>
 
 </body>
 </html>
