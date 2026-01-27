@@ -34,6 +34,7 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!-- DATATABLES CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
 
@@ -350,6 +351,24 @@ $(document).ready(function () {
     });
 });
 </script>
+<?php if (isset($_GET['imported'])): ?>
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Import Berhasil',
+    html: `
+        <b><?= (int)$_GET['imported'] ?></b> data berhasil diimpor
+        <?php if (!empty($_GET['duplicate'])): ?>
+            <br><br>
+            <span style="color:#e74c3c">
+                <?= (int)$_GET['duplicate'] ?> data duplikat tidak diimpor
+            </span>
+        <?php endif; ?>
+    `,
+    confirmButtonText: 'OK'
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>

@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
 
                 $pdo->beginTransaction();
                 $count = 0;
+                $duplicate = 0;
 
                 for ($i = 1; $i < count($rows); $i++) {
 
@@ -64,11 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
                             $nama, $email
                         ]);
                         $count++;
+                    } else {
+                        $duplicate++;
                     }
                 }
 
                 $pdo->commit();
-                header("Location: index.php?imported=$count");
+                header("Location: index.php?imported=$count&duplicate=$duplicate");
                 exit;
 
             } catch (Throwable $e) {
