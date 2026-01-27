@@ -8,13 +8,13 @@
 .app-footer {
     position: fixed;
     bottom: 0;
-    left: 250px; /* sesuai lebar sidebar */
+    left: 250px;
     right: 0;
 
     height: 40px;
     line-height: 40px;
 
-    background: var(--gradient); /* 🔥 GRADIENT */
+    background: var(--gradient);
     color: #ffffff;
     font-size: 13px;
     text-align: center;

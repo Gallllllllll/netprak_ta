@@ -59,6 +59,30 @@ $files = [
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Status Pengajuan TA</title>
 <style>
+
+:root {
+    --pink: #FF74C7;
+    --orange: #FF983D;
+    --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
+
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
+
 /* TOP */
 .topbar{
     display:flex;
@@ -239,9 +263,9 @@ $files = [
     align-items:center;
     justify-content:center;
     gap:6px;
-    font-size:16px;
+    font-size:13px;
     font-weight:800;
-    color:#ff8c42;
+    color: #ff8c42;
     margin-bottom:10px;
 }
 
@@ -274,12 +298,14 @@ $files = [
     display: flex;
     flex-direction: column;
     justify-content: start;
-    font-size:14px;
+    font-size:15px;
+    font-weight: 600;
+    color: #5F5F5F;
 }
 .dosen-info p{
     margin: 0;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 800;
     color: #FF3A3D;
 }
 /* CATATAN ADMIN */
@@ -289,10 +315,11 @@ $files = [
     border-radius:16px;
     padding:14px 16px;
     margin-top:18px;
+    font-size: 12px;
 }
 
 .catatan-title {
-    font-size:12px;
+    font-size: 12px;
     font-weight:800;
     color:#FF3A3D;
     margin-bottom:6px;
@@ -523,14 +550,14 @@ $files = [
                         <li>
                             <div class="dosen-num">1</div>
                             <div class="dosen-info">
-                                <p> Dosen Pembimbing 1 </p>
+                                <p> DOSEN PEMBIMBING 1 </p>
                                 <?= htmlspecialchars($data['dosen1_nama'] ?? '-') ?>
                             </div>
                         </li>
                         <li>
                             <div class="dosen-num">2</div>
                             <div class="dosen-info">
-                                <p> Dosen Pembimbing 2 </p>
+                                <p> DOSEN PEMBIMBING 2 </p>
                                 <?= htmlspecialchars($data['dosen2_nama'] ?? '-') ?>
                             </div>
                         </li>
