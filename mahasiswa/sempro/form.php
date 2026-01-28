@@ -675,7 +675,7 @@ button {
                     <span class="material-symbols-rounded">error_outline</span>
                 </div>
                 <div>
-                    <h3 class="ta-error-title">INFORMASI SISTEM</h3>
+                    <h3 class="ta-error-title">INFORMASI SISTEM!</h3>
                     <p class="ta-error-desc"><?= nl2br(htmlspecialchars($pesan_error)) ?></p>    
                 </div>
             </div>
