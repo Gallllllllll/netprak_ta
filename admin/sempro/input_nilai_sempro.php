@@ -12,37 +12,40 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
 }
 
 /* ===============================
-   VALIDASI ID PENGAJUAN
+   VALIDASI ID SEMPRO
 ================================ */
-$pengajuan_id = $_GET['pengajuan_id'] ?? null;
-if (!$pengajuan_id) die("ID tidak valid");
+$sempro_id = $_GET['pengajuan_id'] ?? null;
+if (!$sempro_id) die("ID tidak valid");
 
+/* ===============================
+   AMBIL DATA SEMPRO + TA
+================================ */
 $stmt = $pdo->prepare("
     SELECT 
-        s.id AS pengajuan_sempro_id,
-        s.id_sempro,
-        s.status,
-
+        s.tanggal_sempro,
+        s.pengajuan_ta_id,
         m.nama AS nama_mahasiswa,
         m.nim,
-
         p.judul_ta
     FROM pengajuan_sempro s
     JOIN mahasiswa m ON s.mahasiswa_id = m.id
     JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
     WHERE s.id = ?
 ");
-$stmt->execute([$pengajuan_id]);
+$stmt->execute([$sempro_id]);
 $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$data) {
-    die("Data sempro tidak ditemukan");
-}
+if (!$data) die("Data sempro tidak ditemukan");
 
-
+$pengajuan_ta_id = $data['pengajuan_ta_id'];
 
 /* ===============================
-   AMBIL DOSBING 1 & 2
+   CEK AKSES
+================================ */
+$akses_ditutup = empty($data['tanggal_sempro']);
+
+/* ===============================
+   AMBIL DOSBING (PAKAI ID TA ✅)
 ================================ */
 $stmt = $pdo->prepare("
     SELECT 
@@ -53,16 +56,19 @@ $stmt = $pdo->prepare("
     JOIN dosen d ON db.dosen_id = d.id
     WHERE db.pengajuan_id = ?
       AND db.role IN ('dosbing_1','dosbing_2')
+    ORDER BY 
+        CASE db.role
+            WHEN 'dosbing_1' THEN 1
+            WHEN 'dosbing_2' THEN 2
+        END
 ");
-$stmt->execute([$pengajuan_id]);
+$stmt->execute([$pengajuan_ta_id]);
 $dosbing = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (!$dosbing) {
-    die("Dosen pembimbing belum ditentukan.");
-}
+if (!$dosbing) die("Dosen pembimbing belum ditentukan");
 
 /* ===============================
-   AMBIL NILAI LAMA (JIKA ADA)
+   NILAI LAMA (BERDASARKAN SEMPRO)
 ================================ */
 $nilaiLama = [];
 $stmt = $pdo->prepare("
@@ -70,8 +76,7 @@ $stmt = $pdo->prepare("
     FROM nilai_sempro
     WHERE pengajuan_id = ?
 ");
-$stmt->execute([$pengajuan_id]);
-
+$stmt->execute([$sempro_id]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $n) {
     $nilaiLama[$n['peran']] = $n['nilai'];
 }
@@ -81,46 +86,31 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $n) {
 ================================ */
 $error = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
+    $pdo->beginTransaction();
+    try {
+        foreach ($_POST['nilai'] as $peran => $item) {
+            $nilai = floatval($item['nilai']);
+            $dosen_id = intval($item['dosen_id']);
 
-    if (!isset($_POST['nilai']) || !is_array($_POST['nilai'])) {
-        $error = "Data nilai tidak valid.";
-    } else {
-
-        $pdo->beginTransaction();
-
-        try {
-            foreach ($_POST['nilai'] as $peran => $item) {
-
-                $nilai    = floatval($item['nilai']);
-                $dosen_id = intval($item['dosen_id']);
-
-                if ($nilai < 0 || $nilai > 100) {
-                    throw new Exception("Nilai harus antara 0 – 100");
-                }
-
-                $stmt = $pdo->prepare("
-                    INSERT INTO nilai_sempro (pengajuan_id, dosen_id, peran, nilai)
-                    VALUES (?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE nilai = VALUES(nilai)
-                ");
-
-                $stmt->execute([
-                    $pengajuan_id,
-                    $dosen_id,
-                    $peran,
-                    $nilai
-                ]);
+            if ($nilai < 0 || $nilai > 100) {
+                throw new Exception("Nilai harus 0–100");
             }
 
-            $pdo->commit();
-            header("Location: index.php?success=1");
-            exit;
-
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            $error = $e->getMessage();
+            $stmt = $pdo->prepare("
+                INSERT INTO nilai_sempro (pengajuan_id, dosen_id, peran, nilai)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE nilai = VALUES(nilai)
+            ");
+            $stmt->execute([$sempro_id, $dosen_id, $peran, $nilai]);
         }
+
+        $pdo->commit();
+        header("Location: index.php?success=1");
+        exit;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $error = $e->getMessage();
     }
 }
 ?>
@@ -283,58 +273,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
-    
-    <div class="dashboard-header">
-        <h1>Input Nilai</h1>
-        <p>Tempat Penguji Menginput nilai Seminar Proposal</p>
-    </div>
+    <h2>Input Nilai SEMPRO</h2>
+    <p><?= htmlspecialchars($data['nama_mahasiswa']) ?> (<?= $data['nim'] ?>)</p>
 
     <div class="form-card">
-        
-        <div class="info-header">
-            Mahasiswa: <b><?= htmlspecialchars($data['nama_mahasiswa']) ?></b><br>
-            NIM: <b><?= htmlspecialchars($data['nim']) ?></b><br>   
-            Judul: <i><?= htmlspecialchars($data['judul_ta']) ?></i>
-        </div>
+
+<?php if ($akses_ditutup): ?>
+
+        <p style="color:red;text-align:center">⛔ Jadwal SEMPRO belum ditentukan</p>
+
+<?php else: ?>
 
         <?php if ($error): ?>
-            <div class="error-msg"><?= htmlspecialchars($error) ?></div>
+            <div style="color:red"><?= $error ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <?php foreach ($dosbing as $d): ?>
                 <div class="input-group">
-                    <label>
-                        <?= strtoupper(str_replace('_',' ', $d['peran'])) ?> 
-                        - <?= htmlspecialchars($d['nama']) ?>
-                    </label>
-
-                    <input type="hidden"
-                           name="nilai[<?= $d['peran'] ?>][dosen_id]"
-                           value="<?= $d['dosen_id'] ?>">
-
+                    <label><?= strtoupper(str_replace('_',' ',$d['peran'])) ?> - <?= $d['nama'] ?></label>
+                    <input type="hidden" name="nilai[<?= $d['peran'] ?>][dosen_id]" value="<?= $d['dosen_id'] ?>">
                     <input type="number"
-                        class="input-control"
-                        name="nilai[<?= $d['peran'] ?>][nilai]"
-                        min="0"
-                        max="100"
-                        step="0.01"
-                        placeholder="input nilai disini"
-                        required
-                        value="<?= $nilaiLama[$d['peran']] ?? '' ?>">
+                           name="nilai[<?= $d['peran'] ?>][nilai]"
+                           min="0" max="100"
+                           value="<?= $nilaiLama[$d['peran']] ?? '' ?>"
+                           class="input-control"
+                           required>
                 </div>
             <?php endforeach; ?>
 
-            <button type="submit" class="btn-submit">Simpan Nilai</button>
+            <button class="btn-submit">Simpan Nilai</button>
         </form>
+
+<?php endif; ?>
+
     </div>
 </div>
 
 <script>
-document.querySelectorAll('input[type="number"]').forEach(el=>{
-    el.addEventListener('input',()=>{
-        if(el.value > 100) el.value = 100;
-        if(el.value < 0) el.value = 0;
+document.querySelectorAll('input[type="number"]').forEach(i=>{
+    i.addEventListener('input',()=>{
+        if(i.value>100) i.value=100;
+        if(i.value<0) i.value=0;
     });
 });
 </script>

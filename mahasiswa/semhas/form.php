@@ -39,7 +39,9 @@ $stmt->execute([$_SESSION['user']['id']]);
 $ta = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$ta || $ta['status'] !== 'disetujui') {
+
     $pesan_error = "Tugas Akhir belum disetujui.";
+
 } else {
 
     /* ===============================
@@ -77,21 +79,60 @@ if (!$ta || $ta['status'] !== 'disetujui') {
 
         } else {
 
-            /* ===============================
-               CEK SUDAH AJUKAN SEMHAS
-            ================================ */
+            /* ==================================================
+               CEK JUMLAH DOSEN PEMBIMBING
+            =================================================== */
             $cek = $pdo->prepare("
-                SELECT id 
-                FROM pengajuan_semhas
-                WHERE mahasiswa_id = ?
-                LIMIT 1
+                SELECT COUNT(*) 
+                FROM dosbing_ta d
+                JOIN pengajuan_ta p ON d.pengajuan_id = p.id
+                WHERE p.mahasiswa_id = ?
             ");
             $cek->execute([$_SESSION['user']['id']]);
+            $total_dosbing = $cek->fetchColumn();
 
-            if ($cek->rowCount() > 0) {
-                $pesan_error = "Anda sudah mengajukan Seminar Hasil.";
+            if ($total_dosbing < 2) {
+
+                $pesan_error = "Jumlah dosen pembimbing belum memenuhi (minimal 2 dosen).";
+
             } else {
-                $boleh_upload = true;
+
+                /* ==================================================
+                   CEK PERSETUJUAN SEMHAS (WAJIB 2 DOSEN)
+                =================================================== */
+                $cek = $pdo->prepare("
+                    SELECT COUNT(*) 
+                    FROM dosbing_ta d
+                    JOIN pengajuan_ta p ON d.pengajuan_id = p.id
+                    WHERE p.mahasiswa_id = ?
+                      AND d.status_persetujuan_semhas = 'disetujui'
+                ");
+                $cek->execute([$_SESSION['user']['id']]);
+                $jumlah_setuju = $cek->fetchColumn();
+
+                if ($jumlah_setuju < 2) {
+
+                    $pesan_error = "Persetujuan Seminar Hasil belum diunggah.";
+
+                } else {
+
+                    /* ===============================
+                       CEK SUDAH AJUKAN SEMHAS
+                    ================================ */
+                    $cek = $pdo->prepare("
+                        SELECT id 
+                        FROM pengajuan_semhas
+                        WHERE mahasiswa_id = ?
+                        LIMIT 1
+                    ");
+                    $cek->execute([$_SESSION['user']['id']]);
+
+                    if ($cek->rowCount() > 0) {
+                        $pesan_error = "Anda sudah mengajukan Seminar Hasil.";
+                    } else {
+                        $boleh_upload = true;
+                    }
+                }
             }
         }
     }
@@ -102,19 +143,44 @@ if (!$ta || $ta['status'] !== 'disetujui') {
 <head>
 <meta charset="UTF-8">
 <title>Pengajuan Seminar Hasil</title>
+
 <style>
-.card{background:#fff;padding:26px;max-width:720px;border-radius:16px}
-.alert{background:#fff7ed;color:#9a3412;padding:14px;border-radius:12px}
-label{margin-top:14px;display:block;font-weight:600}
-input[type=file]{margin-top:6px}
-button{
-    margin-top:20px;width:100%;padding:12px;border:none;border-radius:14px;
-    background:linear-gradient(135deg,#FF74C7,#FF983D);
-    color:#fff;font-weight:600
+.card{
+    background:#fff;
+    padding:26px;
+    max-width:720px;
+    border-radius:16px
 }
-small{color:#6b7280}
+.alert{
+    background:#fff7ed;
+    color:#9a3412;
+    padding:14px;
+    border-radius:12px
+}
+label{
+    margin-top:14px;
+    display:block;
+    font-weight:600
+}
+input[type=file]{
+    margin-top:6px
+}
+button{
+    margin-top:20px;
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#FF74C7,#FF983D);
+    color:#fff;
+    font-weight:600
+}
+small{
+    color:#6b7280
+}
 </style>
 </head>
+
 <body>
 
 <?php include "../sidebar.php"; ?>
