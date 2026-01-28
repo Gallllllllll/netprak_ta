@@ -118,6 +118,7 @@ body {
     box-shadow:0 5px 15px rgba(0,0,0,.2);
     overflow-x: hidden;
     margin-bottom: 25px;
+    
 }
 
 .card h2{
@@ -275,7 +276,7 @@ body {
     align-items: center;
     padding: 10px 15px;
     background: #fff;
-    border: 1px solid #f1dcdc;
+    border: 1px solid #ff9f43;
     border-radius: 12px;
     margin-bottom: 10px;
 }

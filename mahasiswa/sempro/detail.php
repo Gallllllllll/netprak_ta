@@ -141,7 +141,7 @@ body {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 25px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #dc9532ff;
     padding-bottom: 15px;
 }
 
@@ -230,7 +230,7 @@ body {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
-    border: 1px solid #fce8e8;
+    border: 1px solid #eba337ff;
     border-radius: 20px;
     overflow: hidden;
     margin-bottom: 30px;
@@ -239,7 +239,7 @@ body {
 .schedule-box {
     padding: 25px 15px;
     text-align: center;
-    border-right: 1px solid #fce8e8;
+    border-right: 1px solid #eba337ff;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -274,10 +274,10 @@ body {
 
 .catatan-box {
     background: #f9f9fb;
-    border: 1px solid #eee;
+    border: 1px solid #eba337ff;
     border-radius: 15px;
     padding: 15px 20px;
-    min-height: 60px;
+    min-height: 30px;
     color: #777;
     font-size: 13px;
     margin-top: 8px;
@@ -297,7 +297,7 @@ body {
 
 .doc-card {
     background: #fff;
-    border: 1px solid #FFD9BB;
+    border: 1px solid #eba337ff;
     border-radius: 20px;
     padding: 20px;
     margin-bottom: 20px;
@@ -313,7 +313,7 @@ body {
     width: 45px;
     height: 45px;
     background: #fff5f0;
-    border: 1px solid #FFD9BB;
+    border: 1px solid #eba337ff;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -352,7 +352,7 @@ body {
 
 .doc-catatan-box {
     background: #fff;
-    border: 1px solid #eee;
+    border: 1px solid #eba337ff;
     border-radius: 15px;
     padding: 12px 20px;
     margin-top: 5px;
@@ -422,7 +422,7 @@ body {
 
     <!-- MAIN CARD -->
     <div class="premium-card">
-        <div class="card-title-main">Informasi lengkap pendaftaran seminar proposal</div>
+        <div class="card-title-main">Informasi Lengkap Pendaftaran Seminar Proposal</div>
 
         <?php 
             $st = strtolower($data['status']);
