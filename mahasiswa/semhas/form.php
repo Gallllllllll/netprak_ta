@@ -11,133 +11,98 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     exit;
 }
 
-/* ===============================
-   FUNGSI NILAI HURUF
-================================ */
-function nilaiHuruf($nilai) {
-    if ($nilai >= 85) return 'A';
-    if ($nilai >= 75) return 'B';
-    if ($nilai >= 65) return 'C';
-    if ($nilai >= 50) return 'D';
-    return 'E';
-}
+$mahasiswa_id = $_SESSION['user']['id'];
 
 $pesan_error  = '';
 $boleh_upload = false;
 
 /* ===============================
-   CEK TUGAS AKHIR
+   CEK SUDAH AJUKAN SEMHAS
 ================================ */
-$stmt = $pdo->prepare("
-    SELECT id, judul_ta, status 
-    FROM pengajuan_ta 
+$cek = $pdo->prepare("
+    SELECT id, status, created_at
+    FROM pengajuan_semhas
     WHERE mahasiswa_id = ?
     ORDER BY created_at DESC
     LIMIT 1
 ");
-$stmt->execute([$_SESSION['user']['id']]);
-$ta = $stmt->fetch(PDO::FETCH_ASSOC);
+$cek->execute([$mahasiswa_id]);
+$semhas = $cek->fetch(PDO::FETCH_ASSOC);
 
-if (!$ta || $ta['status'] !== 'disetujui') {
+if ($semhas) {
+    $pesan_error = "Anda sudah melakukan pengajuan Seminar Hasil.";
+}
 
-    $pesan_error = "Tugas Akhir belum disetujui.";
-
-} else {
+/* ===============================
+   LANJUT CEK SYARAT (JIKA BELUM AJUKAN)
+================================ */
+if (!$pesan_error) {
 
     /* ===============================
-       CEK SEMINAR PROPOSAL
+       CEK TUGAS AKHIR
     ================================ */
-    $cek = $pdo->prepare("
-        SELECT 
-            sp.status,
-            ns.nilai
-        FROM pengajuan_sempro sp
-        LEFT JOIN nilai_sempro ns 
-            ON sp.id = ns.pengajuan_id
-        WHERE sp.mahasiswa_id = ?
-        ORDER BY sp.created_at DESC
+    $stmt = $pdo->prepare("
+        SELECT id, status 
+        FROM pengajuan_ta
+        WHERE mahasiswa_id = ?
+        ORDER BY created_at DESC
         LIMIT 1
     ");
-    $cek->execute([$_SESSION['user']['id']]);
-    $sempro = $cek->fetch(PDO::FETCH_ASSOC);
+    $stmt->execute([$mahasiswa_id]);
+    $ta = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$sempro || $sempro['status'] !== 'disetujui') {
-
-        $pesan_error = "Seminar Proposal belum disetujui.";
-
-    } elseif ($sempro['nilai'] === null) {
-
-        $pesan_error = "Nilai Seminar Proposal belum tersedia.";
+    if (!$ta || $ta['status'] !== 'disetujui') {
+        $pesan_error = "Tugas Akhir belum disetujui.";
 
     } else {
 
-        $nilai_huruf = nilaiHuruf($sempro['nilai']);
+        /* ===============================
+           CEK SEMPRO
+        ================================ */
+        $cek = $pdo->prepare("
+            SELECT sp.status, ns.nilai
+            FROM pengajuan_sempro sp
+            LEFT JOIN nilai_sempro ns ON sp.id = ns.pengajuan_id
+            WHERE sp.mahasiswa_id = ?
+            ORDER BY sp.created_at DESC
+            LIMIT 1
+        ");
+        $cek->execute([$mahasiswa_id]);
+        $sempro = $cek->fetch(PDO::FETCH_ASSOC);
 
-        if (in_array($nilai_huruf, ['D', 'E'])) {
+        if (!$sempro || $sempro['status'] !== 'disetujui') {
+            $pesan_error = "Seminar Proposal belum disetujui.";
 
-            $pesan_error = "Anda tidak lulus Seminar Proposal, sehingga tidak dapat mengajukan Seminar Hasil.";
+        } elseif ($sempro['nilai'] === null) {
+            $pesan_error = "Nilai Seminar Proposal belum tersedia.";
+
+        } elseif ($sempro['nilai'] < 65) {
+            $pesan_error = "Anda tidak lulus Seminar Proposal.";
 
         } else {
 
-            /* ==================================================
-               CEK JUMLAH DOSEN PEMBIMBING
-            =================================================== */
+            /* ===============================
+               CEK DOSEN PEMBIMBING
+            ================================ */
             $cek = $pdo->prepare("
                 SELECT COUNT(*) 
-                FROM dosbing_ta d
-                JOIN pengajuan_ta p ON d.pengajuan_id = p.id
-                WHERE p.mahasiswa_id = ?
+                FROM dosbing_ta
+                WHERE pengajuan_id = ?
+                  AND status_persetujuan_semhas = 'disetujui'
             ");
-            $cek->execute([$_SESSION['user']['id']]);
-            $total_dosbing = $cek->fetchColumn();
+            $cek->execute([$ta['id']]);
+            $jumlah_setuju = $cek->fetchColumn();
 
-            if ($total_dosbing < 2) {
-
-                $pesan_error = "Jumlah dosen pembimbing belum memenuhi (minimal 2 dosen).";
-
+            if ($jumlah_setuju < 2) {
+                $pesan_error = "Persetujuan Seminar Hasil dari kedua dosen pembimbing belum lengkap.";
             } else {
-
-                /* ==================================================
-                   CEK PERSETUJUAN SEMHAS (WAJIB 2 DOSEN)
-                =================================================== */
-                $cek = $pdo->prepare("
-                    SELECT COUNT(*) 
-                    FROM dosbing_ta d
-                    JOIN pengajuan_ta p ON d.pengajuan_id = p.id
-                    WHERE p.mahasiswa_id = ?
-                      AND d.status_persetujuan_semhas = 'disetujui'
-                ");
-                $cek->execute([$_SESSION['user']['id']]);
-                $jumlah_setuju = $cek->fetchColumn();
-
-                if ($jumlah_setuju < 2) {
-
-                    $pesan_error = "Persetujuan Seminar Hasil belum diunggah.";
-
-                } else {
-
-                    /* ===============================
-                       CEK SUDAH AJUKAN SEMHAS
-                    ================================ */
-                    $cek = $pdo->prepare("
-                        SELECT id 
-                        FROM pengajuan_semhas
-                        WHERE mahasiswa_id = ?
-                        LIMIT 1
-                    ");
-                    $cek->execute([$_SESSION['user']['id']]);
-
-                    if ($cek->rowCount() > 0) {
-                        $pesan_error = "Anda sudah mengajukan Seminar Hasil.";
-                    } else {
-                        $boleh_upload = true;
-                    }
-                }
+                $boleh_upload = true;
             }
         }
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -201,19 +166,15 @@ small{
 
     <label>Lembar Berita Acara</label>
     <input type="file" name="file_berita_acara" accept=".pdf" required>
-    <small>Format: PDF</small>
 
     <label>Persetujuan Laporan TA</label>
     <input type="file" name="file_persetujuan_laporan" accept=".pdf" required>
-    <small>Format: PDF</small>
 
     <label>Form Pendaftaran Ujian TA</label>
     <input type="file" name="file_pendaftaran_ujian" accept=".pdf" required>
-    <small>Format: PDF</small>
 
     <label>Buku Konsultasi TA</label>
     <input type="file" name="file_buku_konsultasi" accept=".pdf" required>
-    <small>Format: PDF</small><br>
 
     <button type="submit">Ajukan Seminar Hasil</button>
 </form>
