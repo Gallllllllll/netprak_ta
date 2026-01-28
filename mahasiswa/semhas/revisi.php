@@ -9,6 +9,7 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
     exit;
 }
+$username = $_SESSION['user']['nama'] ?? 'Mahasiswa';
 
 $id = $_GET['id'] ?? 0;
 $upload_dir = "../../uploads/semhas/";
@@ -115,125 +116,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
         }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: #FFF1E5 !important;
-            margin: 0;
+        /* TOP */
+        .topbar{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:25px
+        }
+        .topbar h1{
+            color:#ff8c42;
+            font-size:28px
         }
 
-        .main-content {
-            margin-left: 280px;
-            padding: 32px;
-            min-height: 100vh;
-            background: #FFF1E5 !important;
+        /* PROFILE */
+        .mhs-info{
+            display:flex;
+            align-items:left;
+            gap:20px
         }
-        
-
-        /* TOPBAR */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
+        .mhs-text span{
+            font-size:13px;
+            color:#555
         }
-
-        .topbar h1 {
-            color: var(--orange);
-            font-size: 28px;
-            font-weight: 800;
-            margin: 0;
+        .mhs-text b{
+            color:#ff8c42;
+            font-size:14px
         }
 
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .avatar{
+            width:42px;
+            height:42px;
+            background:#ff8c42;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
         }
 
-        .user-text {
-            text-align: right;
-            font-size: 13px;
-            color: #555;
+        /* CARD */
+        .card {
+            background:#fff;
+            border-radius:18px;
+            padding:15px;
+            box-shadow:0 5px 15px rgba(0,0,0,.2);
+            overflow-x: hidden;
         }
 
-        .user-text b {
-            color: var(--orange);
-            display: block;
-        }
-
-        .avatar {
-            width: 45px;
-            height: 45px;
-            background: var(--orange);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        /* REVISI CARD */
-        .revisi-card {
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 10px 30px rgba(255, 152, 61, 0.1);
-            overflow: hidden;
-            margin-bottom: 30px;
-            border: 1px solid #fce8e8;
+        .form-card h2{
+            text-align: center;
+            color: #ff8c42;
         }
 
         .card-header {
-            padding: 20px 30px;
-            border-bottom: 1px solid #fce8e8;
+            padding: 0;
+            border-bottom: none;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .icon-upload-wrap {
-            width: 40px;
-            height: 40px;
-            background: #eef2ff;
-            border-radius: 12px;
+            width: 28px;
+            height: 28px;
+            background: #FFF7F1;
+            border: 1px solid #FF8C42;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6366f1;
+            color: #FF8C42;
+            flex-shrink: 0;
         }
 
         .card-header h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #4b5563;
+            font-size: 16px;
+            font-weight: 800;
+            color: #FF8C42;
             margin: 0;
         }
 
         .card-body {
-            padding: 40px 30px;
+            padding: 0;
+        }
+
+        .divider {
+            border: none;
+            height: 0.5px;
+            width: 100% !important;
+            background: #FF983D;
+            display: block;
+            margin: 12px 0;
         }
 
         /* FILE ITEM */
         .file-item-revisi {
-            background: #fcfcfc;
-            border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: #F9FAFB;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .file-item-content {
             display: flex;
             align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
+            flex: 1;
+            min-width: 250px;
         }
 
         .icon-revisi {
-            width: 45px;
-            height: 45px;
-            border: 1px solid #fee2e2;
-            background: #fff;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #FFE4E6;
+            color: #EF4444;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ef4444;
+            font-weight: 800;
+            margin-right: 12px;
+            flex-shrink: 0;
         }
 
         .file-info {
@@ -241,9 +248,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .file-label {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-            color: #6b7280;
+            color: #4b5563;
             margin-bottom: 4px;
         }
 
@@ -255,11 +262,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         /* CUSTOM FILE INPUT */
         .btn-pilih-file {
-            background: #60a5fa;
+            background: #3B82F6;
             color: white;
-            padding: 10px 25px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
@@ -268,7 +275,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-pilih-file:hover {
-            background: #3b82f6;
+            background: #2563EB;
         }
 
         /* HIDE DEFAULT INPUT */
@@ -280,44 +287,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-submit-wrap {
             display: flex;
             justify-content: center;
-            margin-bottom: 40px;
+            margin: 25px 0;
         }
 
         .btn-upload-revisi {
-            background: var(--gradient);
+            background: linear-gradient(135deg, #FF74C7, #FF983D);
             color: white;
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-size: 15px;
-            font-weight: 800;
+            padding: 14px 34px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
             border: none;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 116, 199, 0.3);
-            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 116, 199, 0.2);
+            transition: opacity 0.2s;
         }
 
         .btn-upload-revisi:hover {
-            transform: translateY(-3px);
-            opacity: 0.95;
+            opacity: 0.9;
         }
 
-        /* INFO BAR */
+        /* INFO BOX */
         .info-warning {
-    background:#FFE4E5;
-    border:1px solid rgba(255,58,61,.35);
-    border-radius:18px;
-    padding:16px 18px;
-    color:#FF3A3D;
-    font-size:13px;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:20px;
-}
-.material-symbols-rounded {
-    font-size: 20px;
-    vertical-align: middle;
-}
+            background: #EAF2FF;
+            border: 1px solid #93C5FD;
+            border-radius: 14px;
+            padding: 14px 16px;
+            color: #2563EB;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .material-symbols-rounded {
+            font-size: 20px;
+            vertical-align: middle;
+        }
 
         @media (max-width: 768px) {
             .main-content { margin-left: 0; padding: 20px; }
@@ -333,23 +340,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include "../sidebar.php"; ?>
 
     <div class="main-content">
-        <!-- TOPBAR -->
         <div class="topbar">
-            <h1>Form Revisi Pengajuan Seminar Hasil</h1>
-            <div class="user-profile">
-                <div class="user-text">
-                    Selamat Datang,<br>
-                    <b><?= htmlspecialchars($_SESSION['user']['nama']) ?></b>
+            <h1>Pengajuan Tugas Akhir</h1>
+
+            <div class="mhs-info">
+                <div class="mhs-text">
+                    <span>Selamat Datang,</span><br>
+                    <b><?= htmlspecialchars($username) ?></b>
                 </div>
                 <div class="avatar">
-                    <span class="material-symbols-rounded">person</span>
+                    <span class="material-symbols-rounded" style="color:#fff">person</span>
                 </div>
             </div>
         </div>
 
         <form method="POST" enctype="multipart/form-data">
             <!-- REVISI CARD -->
-            <div class="revisi-card">
+            <div class="card">
                 <div class="card-header">
                     <div class="icon-upload-wrap">
                         <span class="material-symbols-rounded">upload</span>
@@ -366,12 +373,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $ada_revisi = true;
                     ?>
                         <div class="file-item-revisi">
-                            <div class="icon-revisi">
-                                <span class="material-symbols-rounded">close</span>
-                            </div>
-                            <div class="file-info">
-                                <div class="file-label"><?= htmlspecialchars($f['label']) ?></div>
-                                <div class="file-current">File Saat Ini: <?= htmlspecialchars($data[$f['db']] ?: 'Belum ada file') ?></div>
+                            <div class="file-item-content">
+                                <div class="icon-revisi">
+                                    <span class="material-symbols-rounded">close</span>
+                                </div>
+                                <div class="file-info">
+                                    <div class="file-label"><?= htmlspecialchars($f['label']) ?></div>
+                                    <div class="file-current">File Saat Ini: <?= htmlspecialchars($data[$f['db']] ?: 'Belum ada file') ?></div>
+                                </div>
                             </div>
                             <!-- Custom Label as Button -->
                             <label for="input-<?= $input ?>" class="btn-pilih-file" id="label-<?= $input ?>">

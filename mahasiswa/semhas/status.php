@@ -125,8 +125,7 @@ body {
 
 /* ENHANCED CARD */
 .card-outer-container {
-    max-width: 950px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .card-title-main {
