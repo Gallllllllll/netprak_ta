@@ -64,6 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $ruangan_value = htmlspecialchars($data['ruangan_sempro'] ?? '');
 $tanggal_value = $data['tanggal_sempro'] ?? '';
 $jam_value     = $data['jam_sempro'] ?? '';
+$today = date('Y-m-d');
+$min_date = $tanggal_value && $tanggal_value > $today 
+    ? $today 
+    : $today;
+
 ?>
 
 <!DOCTYPE html>
@@ -272,7 +277,13 @@ input:focus {
         <form method="POST">
             <label>Tanggal Seminar Proposal</label>
             <div class="input-group">
-                <input type="date" name="tanggal_sempro" value="<?= $tanggal_value ?>" required>
+                <input 
+                    type="date" 
+                    name="tanggal_sempro"
+                    value="<?= $tanggal_value ?>"
+                    min="<?= $today ?>"
+                    required
+                >
             </div>
 
             <label>Jam Seminar</label>

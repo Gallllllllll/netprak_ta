@@ -98,6 +98,19 @@ foreach ($tim as $t) {
 }
 
 /* ===============================
+   CEK JADWAL SEMHAS
+================================ */
+$stmt = $pdo->prepare("
+    SELECT tanggal_sidang
+    FROM pengajuan_semhas
+    WHERE id = ?
+        AND tanggal_sidang IS NOT NULL
+");
+$stmt->execute([$semhas_id]);
+$jadwalAda = $stmt->fetchColumn();
+
+
+/* ===============================
    AMBIL NILAI LAMA (JIKA ADA)
 ================================ */
 $nilaiLama = [];
@@ -343,7 +356,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="error-msg"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST" <?= !$adaPenguji ? 'style="display:none"' : '' ?>>
+        <?php if (!$jadwalAda): ?>
+            <div class="error-msg">
+                Seminar Hasil belum dijadwalkan. Input nilai hanya dapat dilakukan setelah jadwal ditentukan.
+            </div>
+        <?php endif; ?>
+
+
+        <form method="POST" <?= (!$adaPenguji || !$jadwalAda) ? 'style="display:none"' : '' ?>>
             <?php foreach ($tim as $t): ?>
                 <div class="input-group">
                     <label>

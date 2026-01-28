@@ -532,9 +532,10 @@ $badgeClass = getPengajuanBadgeClass($data['status'] ?? 'proses');
                 <div style="font-size:12px; margin-bottom:8px;
                     color: <?= $docStatus === 'revisi' ? '#FF3A3D' : '#9ca3af' ?>;">Catatan:
                     
-                    <?= $docStatus === 'revisi' && !empty($doc['note'])
+                    <?= !empty($doc['note'])
                         ? htmlspecialchars($doc['note'])
                         : '-' ?>
+
                 </div>
 
 

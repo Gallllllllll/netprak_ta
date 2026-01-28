@@ -45,6 +45,7 @@ $stmt = $pdo->prepare("
         p.judul_ta,
         d.role,
         d.status_persetujuan,
+        d.status_persetujuan_semhas,
         s.tanggal_sidang,
         sempro.tanggal_sempro
     FROM dosbing_ta d
@@ -167,6 +168,36 @@ tbody tr{
 }
 tbody tr:hover{
     background:#fff7ed;
+}
+
+/* KOLOM AKSI */
+th.aksi,
+td.aksi {
+    width: 140px;
+    max-width: 140px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.aksi-wrap{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    align-items:center;
+}
+
+.btn-upload{
+    padding:6px 10px;
+    font-size:12px;
+    border-radius:8px;
+    width:100%;
+    text-align:center;
+}
+
+.btn-done{
+    font-size:12px;
+    color:#16a34a;
+    font-weight:600;
 }
 
 /* BADGE */
@@ -305,8 +336,9 @@ tbody tr:hover{
     <th data-sort="text">Peran</th>
     <th data-sort="text">Status Sempro</th>
     <th data-sort="date">Tanggal Sempro</th>
+    <th data-sort="text">Status Semhas</th>
     <th data-sort="date">Tanggal Sidang</th>
-    <th>Aksi</th>
+    <th class="aksi">Aksi</th>
 </tr>
 </thead>
 
@@ -326,22 +358,45 @@ tbody tr:hover{
         ? '<span class="badge badge-hijau">'.date('d M Y',strtotime($row['tanggal_sempro'])).'</span>'
         : '<span class="badge badge-belum">Belum</span>' ?></td>
     <td>
-    <?php
-    if (!$row['tanggal_sidang']) {
-        echo '<span class="badge badge-belum">Belum</span>';
-    } else {
-        echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sidang'])) . '</span>';
-    }
-    ?>
-</td>
-
-    <td>
-        <?php if($row['status_persetujuan']!=='disetujui'): ?>
-            <a class="btn-upload" href="upload_persetujuan_sempro.php?id=<?= $row['dosbing_id'] ?>">Upload</a>
-        <?php else: ?>
-            <small>✔ Sudah Upload</small>
-        <?php endif ?>
+        <?php
+        if ($row['status_persetujuan_semhas'] === 'disetujui') {
+            echo '<span class="badge badge-ok">Disetujui</span>';
+        } else {
+            echo '<span class="badge badge-wait">Menunggu</span>';
+        }
+        ?>
     </td>
+    <td>
+        <?php
+        if (!$row['tanggal_sidang']) {
+            echo '<span class="badge badge-belum">Belum</span>';
+        } else {
+            echo '<span class="badge badge-hijau">' . date('d M Y', strtotime($row['tanggal_sidang'])) . '</span>';
+        }
+        ?>
+    </td>
+
+    <td class="aksi">
+        <div class="aksi-wrap">
+            <?php
+            if ($row['status_persetujuan'] !== 'disetujui') {
+                echo '<a class="btn-upload" href="upload_persetujuan_sempro.php?id='
+                    . $row['dosbing_id'] . '">Sempro</a>';
+            }
+            elseif ($row['status_persetujuan'] === 'disetujui'
+                && $row['status_persetujuan_semhas'] !== 'disetujui') {
+
+                echo '<a class="btn-upload" href="upload_persetujuan_semhas.php?id='
+                    . $row['dosbing_id'] . '">Semhas</a>';
+            }
+            else {
+                echo '<span class="btn-done">✔ Lengkap</span>';
+            }
+            ?>
+        </div>
+    </td>
+
+
 </tr>
 <?php endforeach ?>
 </tbody>
