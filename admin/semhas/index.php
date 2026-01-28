@@ -294,9 +294,9 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-transform: capitalize;
         }
 
-        .status-diajukan { background-color: #FFF9C4; color: #F57F17; }
-        .status-revisi { background-color: #FFE0B2; color: #E65100; }
-        .status-ditolak { background-color: #FFCDD2; color: #C62828; }
+        .status-diajukan { background-color: #F57F17; color: #fcfcfcff; }
+        .status-revisi { background-color: #E65100; color: #fcfcfcff; }
+        .status-ditolak { background-color: #C62828; color: #fcfcfcff; }
         .status-disetujui { background-color: #3A7C3A; color: #fcfcfcff; }
 
         /* Action Buttons */
