@@ -533,7 +533,7 @@ function time_ago($timestamp) {
             <?php endforeach; ?>
         <?php endif; ?>
 
-        <a href="verifikasi.php" class="btn-more">Selengkapnya</a>
+        <a href="pengajuan/index.php" class="btn-more">Selengkapnya</a>
     </div>
 
 </div>
