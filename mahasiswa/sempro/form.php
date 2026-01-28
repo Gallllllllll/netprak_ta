@@ -15,6 +15,17 @@ $pesan_error  = '';
 $boleh_upload = false;
 $can_proceed = false;
 
+// ===============================
+// DEFAULT SEMPRO (BELUM AJUAN)
+// ===============================
+$pengajuan = [
+    'id_sempro'   => '-',
+    'created_at'  => null,
+    'status'      => '-'
+];
+
+$has_sempro = false;
+
 /* ===============================
    CEK PENGAJUAN TA TERAKHIR
 ================================ */
@@ -62,6 +73,12 @@ function badgeStatus($status) {
 if (!$ta) {
 
     $pesan_error = "Anda belum mengajukan Tugas Akhir.\nSilakan ajukan Tugas Akhir terlebih dahulu.";
+    // Set default values when no TA submission exists
+    $ta = [
+        'id' => '-',
+        'status' => '-',
+        'judul_ta' => '-'
+    ];
 
 } elseif ($ta['status'] !== 'disetujui') {
 
@@ -89,26 +106,31 @@ if (!$ta) {
         /* ===============================
            CEK SUDAH AJUKAN SEMPRO
         ================================ */
+
         $cek = $pdo->prepare("
-            SELECT id 
-            FROM pengajuan_sempro 
+            SELECT id, id_sempro, created_at
+            FROM pengajuan_sempro
             WHERE pengajuan_ta_id = ?
+            ORDER BY created_at DESC
             LIMIT 1
         ");
         $cek->execute([$ta['id']]);
 
         if ($cek->rowCount() > 0) {
 
+            $pengajuan = $cek->fetch(PDO::FETCH_ASSOC);
+            $has_sempro = true;
             $pesan_error = "Anda sudah pernah mengajukan Seminar Proposal.";
-
         } else {
-
-            // ⬅️ TIDAK ADA PEMBUATAN ID APA PUN DI SINI
             $boleh_upload = true;
         }
         $can_proceed = $boleh_upload;
-    }
+
+        }
 }
+
+// Enable button based on submission status
+$can_proceed = $boleh_upload;
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -484,6 +506,18 @@ if (!$ta) {
     font-weight: 700;
     color: #ff8c42;
 }
+
+.ta-textbox { 
+    background:#f5f5f5; 
+    color:#555;
+    font-size:14px;
+    font-weight:700; 
+    padding:8px; 
+    border-radius:6px;
+    margin-top:8px;
+    margin-bottom:15px; 
+    width: fit-content; }
+
 /* ===============================
    DOSEN VALIDATION
 ================================ */
@@ -641,8 +675,8 @@ button {
                     <span class="material-symbols-rounded">error_outline</span>
                 </div>
                 <div>
-                    <h3 class="ta-error-title">AKSES TERKUNCI!</h3>
-                    <p class="ta-error-desc"><?= nl2br(htmlspecialchars($pesan_error)) ?></p>
+                    <h3 class="ta-error-title">INFORMASI SISTEM</h3>
+                    <p class="ta-error-desc"><?= nl2br(htmlspecialchars($pesan_error)) ?></p>    
                 </div>
             </div>
         </div>
@@ -670,75 +704,74 @@ button {
                     </div>
                     <hr class="divider">
                 </div>
-                            <div class="dosen-section">
+                <div class="dosen-section">
                 <div class="ta-info-header">
                     <span class="material-symbols-rounded">assignment_turned_in</span>
                     VALIDASI DOSEN PEMBIMBING
                 </div>
 
-                <?php if ($dosen): ?>
-                <!-- DOSEN 1 -->
-                <div class="dosen-item">
-                    <div class="dosen-left">
-                        <div class="dosen-avatar">
-                            <span class="material-symbols-rounded">person</span>
+                    <?php if ($dosen): ?>
+                    <!-- DOSEN 1 -->
+                    <div class="dosen-item">
+                        <div class="dosen-left">
+                            <div class="dosen-avatar">
+                                <span class="material-symbols-rounded">person</span>
+                            </div>
+                            <div>
+                                <div class="dosen-role">DOSEN PEMBIMBING 1</div>
+                                <?= htmlspecialchars($dosen['dosen1_nama'] ?? '-') ?>
+                            </div>
                         </div>
-                        <div>
-                            <div class="dosen-role">DOSEN PEMBIMBING 1</div>
-                            <?= htmlspecialchars($dosen['dosen1_nama'] ?? '-') ?>
-                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                        <?= badgeStatus($dosen['dosen1_status'] ?? 'menunggu') ?>
                     </div>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                    <?= badgeStatus($dosen['dosen1_status'] ?? 'menunggu') ?>
+                    </div>
 
-                    <?php if (!empty($dosen['dosen1_file'])): ?>
-                        <a href="<?= base_url('uploads/persetujuan_sempro/' . $dosen['dosen1_file']) ?>"
-                        class="ta-btn"
-                        target="_blank">
-                            <span class="material-symbols-rounded">download</span>
-                            Unduh
-                        </a>
+                    <!-- DOSEN 2 -->
+                    <div class="dosen-item">
+                        <div class="dosen-left">
+                            <div class="dosen-avatar">
+                                <span class="material-symbols-rounded">person</span>
+                            </div>
+                            <div>
+                                <div class="dosen-role">DOSEN PEMBIMBING 2</div>
+                                <?= htmlspecialchars($dosen['dosen2_nama'] ?? '-') ?>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                        <?= badgeStatus($dosen['dosen2_status'] ?? 'menunggu') ?>
+                    </div>
+                    </div>
+                    <hr class="divider">
+                    <!--tampilkan id sempro dan tanggal pengajuan -->
+                        <p class="ta-error-label">ID Seminar Proposal</p>
+                        <div class="ta-textbox">
+                            <?= htmlspecialchars($pengajuan['id_sempro']) ?>
+                        </div>
+                        <p class="ta-error-label">Tanggal Pengajuan</p>
+                        <div class="ta-textbox">
+                            <?= $pengajuan['created_at']
+                                ? date('d F Y, H:i:s', strtotime($pengajuan['created_at']))
+                                : '-' ?>
+                        </div>
+
+                        <div class="ta-actions">
+                        <?php if ($has_sempro): ?>
+                            <a href="<?= base_url('mahasiswa/sempro/status.php') ?>" 
+                            class="ta-btn ta-btn-primary">
+                                <span class="material-symbols-rounded">history</span>
+                                Lihat Riwayat Ajuan
+                            </a>
+                        <?php else: ?>
+                            <button class="ta-btn" disabled style="opacity:.5;cursor:not-allowed;">
+                                <span class="material-symbols-rounded">history</span>
+                                Lihat Riwayat Ajuan
+                            </button>
+                        <?php endif; ?>
+                        </div>
+
                     <?php endif; ?>
                 </div>
-                </div>
-
-                <!-- DOSEN 2 -->
-                <div class="dosen-item">
-                    <div class="dosen-left">
-                        <div class="dosen-avatar">
-                            <span class="material-symbols-rounded">person</span>
-                        </div>
-                        <div>
-                            <div class="dosen-role">DOSEN PEMBIMBING 2</div>
-                            <?= htmlspecialchars($dosen['dosen2_nama'] ?? '-') ?>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:8px;align-items:center;">
-                    <?= badgeStatus($dosen['dosen2_status'] ?? 'menunggu') ?>
-
-                    <?php if (!empty($dosen['dosen2_file'])): ?>
-                        <a href="<?= base_url('uploads/persetujuan_sempro/' . $dosen['dosen2_file']) ?>"
-                        class="ta-btn"
-                        target="_blank">
-                            <span class="material-symbols-rounded">download</span>
-                            Unduh
-                        </a>
-                    <?php endif; ?>
-                </div>
-                </div>
-                <div class="ta-actions">
-                    <button
-                        id="btnLanjut"
-                        class="ta-btn ta-btn-primary"
-                        <?= $can_proceed ? '' : 'disabled' ?>
-                        style="<?= $can_proceed ? '' : 'opacity:.5;cursor:not-allowed;' ?>"
-                    >
-                        <span class="material-symbols-rounded">arrow_forward</span>
-                        Lanjut Ajukan Seminar Proposal
-                    </button>
-                </div>
-
-                <?php endif; ?>
 
             <div class="info-footer">
                 <span class="material-symbols-rounded">info</span>
@@ -748,14 +781,11 @@ button {
             </div>
 
             </div>
-
-
-
         <?php endif; ?>
 
 
         <?php if ($boleh_upload): ?>
-            <div id="formSempro" style="display:none;">
+            <div>
                 <div class="ta-info-header">
                     <span class="material-symbols-rounded">description</span>
                     <span>INFORMASI TUGAS AKHIR</span>
