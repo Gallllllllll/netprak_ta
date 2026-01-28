@@ -56,144 +56,477 @@ $status_class_map = [
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Detail Pengajuan Seminar Proposal</title>
-<link rel="stylesheet" href="../../style.css">
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <style>
-body { margin:0; font-family:Arial,sans-serif; background:#f4f6f8; }
-.container { display:flex; min-height:100vh; }
-.main-content { flex:1; padding:20px; }
-.card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }
-table { width:100%; border-collapse:collapse; }
-th, td { padding:10px; border:1px solid #ccc; vertical-align:top; }
-th { background:#eee; width:180px; }
-.status { display:inline-block; padding:5px 12px; border-radius:20px; font-weight:bold; color:#fff; font-size:13px; }
-.status-proses { background:#ffc107; color:#000; }
-.status-disetujui { background:#28a745; }
-.status-ditolak { background:#dc3545; }
-.status-revisi { background:#17a2b8; }
-.file-link { color:#007bff; text-decoration:none; }
-.file-link:hover { text-decoration:underline; }
-.id-badge {
-    display:inline-block;
-    padding:6px 14px;
-    border-radius:20px;
-    background:#1f2937;
-    color:#fff;
-    font-weight:bold;
-    font-size:13px;
+:root {
+    --pink: #FF74C7;
+    --orange: #FF983D;
+    --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
+    --bg: #FFF1E5;
 }
 
-/* ====== BUTTON REVISI ====== */
-.btn-revisi {
-    display:inline-block;
-    padding:10px 16px;
-    background:#dc3545;
-    color:#fff;
-    text-decoration:none;
-    border-radius:4px;
-    font-weight:bold;
-    margin-top: 14px;
+body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg) !important;
+    margin: 0;
 }
-.btn-revisi:hover {
-    background:#c82333;
+
+.main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 30px 40px;
+    min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.topbar h1 {
+    color: var(--orange);
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.mhs-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.mhs-text {
+    text-align: right;
+    font-size: 13px;
+    color: #555;
+}
+
+.mhs-text b {
+    color: var(--orange);
+    display: block;
+    font-size: 14px;
+}
+
+.avatar {
+    width: 45px;
+    height: 45px;
+    background: var(--orange);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+/* MAIN CARD */
+.premium-card {
+    background: #fff;
+    border-radius: 25px;
+    padding: 35px;
+    box-shadow: 0 10px 30px rgba(255, 152, 61, 0.1);
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 152, 61, 0.1);
+}
+
+.card-title-main {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+/* HEADER ROW (SNIPPET STYLE) */
+.info-grid-header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.label-orange-bold {
+    color: var(--orange);
+    font-size: 15px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.capsule-value {
+    background: #f3f4f6;
+    color: #555;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.dashed-divider {
+    border: none;
+    border-top: 1px dashed rgba(255, 152, 61, 0.3);
+    margin: 25px 0;
+}
+
+.capsule-status {
+    padding: 10px 25px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    border: 1px solid;
+    display: inline-block;
+}
+
+.st-disetujui { background: rgba(22, 163, 74, 0.1); color: #16A34A; border-color: rgba(22, 163, 74, 0.3); }
+.st-proses { background: rgba(37, 99, 235, 0.1); color: #2563EB; border-color: rgba(37, 99, 235, 0.3); }
+.st-revisi { background: rgba(255, 152, 61, 0.1); color: #FF983D; border-color: rgba(255, 152, 61, 0.3); }
+.st-ditolak { background: rgba(220, 38, 38, 0.1); color: #DC2626; border-color: rgba(220, 38, 38, 0.3); }
+
+.capsule-id {
+    background: #f1f3f5;
+    color: #999;
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.date-top {
+    margin-left: auto;
+    color: #aaa;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* STUDENT INFO */
+.label-small {
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.student-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #444;
+    margin-bottom: 25px;
+}
+
+/* SCHEDULE BOXES */
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid #fce8e8;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.schedule-box {
+    padding: 25px 15px;
+    text-align: center;
+    border-right: 1px solid #fce8e8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.schedule-box:last-child { border-right: none; }
+
+.schedule-box .icon {
+    color: var(--orange);
+    margin-bottom: 5px;
+}
+
+.schedule-box .label {
+    font-size: 11px;
+    color: #a43636ff;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.schedule-box .value {
+    font-size: 16px;
+    font-weight: 800;
+    color: #080808ff;
+    letter-spacing: 0.5px;
+}
+
+/* CATATAN AREA */
+.catatan-section {
+    margin-top: 10px;
+}
+
+.catatan-box {
+    background: #f9f9fb;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 15px 20px;
+    min-height: 60px;
+    color: #777;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+/* DOCUMENT LIST */
+.doc-section {
+    margin-top: 40px;
+}
+
+.doc-section-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.doc-card {
+    background: #fff;
+    border: 1px solid #FFD9BB;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.doc-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.doc-icon {
+    width: 45px;
+    height: 45px;
+    background: #fff5f0;
+    border: 1px solid #FFD9BB;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--orange);
+}
+
+.doc-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 700;
+    color: #555;
+}
+
+.btn-lihat {
+    background: var(--gradient);
+    color: white;
+    text-decoration: none;
+    padding: 10px 40px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(255, 116, 199, 0.2);
+    transition: all 0.3s;
+}
+
+.btn-lihat:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 116, 199, 0.3); }
+
+.doc-catatan-label {
+    margin-top: 15px;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--orange);
+    display: block;
+}
+
+.doc-catatan-box {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 12px 20px;
+    margin-top: 5px;
+    font-size: 12px;
+    color: #999;
+}
+
+/* FOOTER BAR */
+.footer-info {
+    background: #FFE8E8;
+    border: 1px solid #FFCACA;
+    border-radius: 20px;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.footer-info .icon-wrap {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FF3A3D;
+}
+
+.footer-info .text {
+    font-size: 12px;
+    color: #FF3B3E;
+    line-height: 1.6;
+    font-weight: 500;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .main-content { margin-left: 0; padding: 20px; }
+    .schedule-grid { grid-template-columns: 1fr; }
+    .header-row { flex-wrap: wrap; }
+    .date-top { margin-left: 0; width: 100%; margin-top: 5px; }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
+<div class="container" style="display: flex; width: 100%;">
 
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <h1>Detail Status Seminar Proposal</h1>
+        <div class="mhs-info">
+            <div class="mhs-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($_SESSION['user']['nama']) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded">person</span>
+            </div>
+        </div>
+    </div>
 
-<h1>Detail Pengajuan Seminar Proposal</h1>
+    <!-- MAIN CARD -->
+    <div class="premium-card">
+        <div class="card-title-main">Informasi lengkap pendaftaran seminar proposal</div>
 
-<!-- =============================== -->
-<!-- INFORMASI PENGAJUAN -->
-<!-- =============================== -->
-<div class="card">
-    <p>
-        <b>ID Seminar Proposal:</b><br>
-        <span class="id-badge"><?= htmlspecialchars($data['id_sempro']) ?></span>
-    </p>
-
-    <p><b>Nama Mahasiswa:</b> <?= htmlspecialchars($data['mahasiswa_nama']) ?></p>
-    <p><b>Tanggal Pengajuan:</b> <?= htmlspecialchars($data['created_at']) ?></p>
-
-    <p><b>Tanggal Seminar:</b> <?= htmlspecialchars($data['tanggal_sempro'] ?? '-') ?></p>
-    <p><b>Jam Seminar:</b> <?= htmlspecialchars($data['jam_sempro'] ?? '-') ?></p>
-    <p><b>Ruangan:</b> <?= htmlspecialchars($data['ruangan_sempro'] ?? '-') ?></p>
-
-    <p>
-        <b>Status Pengajuan:</b><br>
-        <span class="status <?= $status_class_map[$data['status']] ?>">
-            <?= strtoupper($data['status']) ?>
-        </span>
-    </p>
-
-    <p><b>Catatan Admin:</b><br>
-        <?= $data['catatan'] ? htmlspecialchars($data['catatan']) : '-' ?>
-    </p>
-
-    <!-- ====== BUTTON UPLOAD REVISI ====== -->
-    <?php if (strtolower($data['status']) === 'revisi' && $_SESSION['user']['role'] === 'mahasiswa'): ?>
-        <a class="btn-revisi" href="<?= base_url('mahasiswa/sempro/revisi.php?id=' . $data['id']) ?>">
-            Upload Revisi
-        </a>
-    <?php endif; ?>
-</div>
-
-<!-- =============================== -->
-<!-- DOKUMEN -->
-<!-- =============================== -->
-<div class="card">
-<h3>Dokumen Persyaratan</h3>
-
-<table>
-<tr>
-    <th>Dokumen</th>
-    <th>File</th>
-    <th>Status</th>
-    <th>Catatan</th>
-</tr>
-
-<?php foreach ($files as $field => $label): ?>
-<tr>
-    <td><?= $label ?></td>
-
-    <td>
-        <?php if (!empty($data[$field])): ?>
-            <a href="../../uploads/sempro/<?= htmlspecialchars($data[$field]) ?>"
-               target="_blank" class="file-link">
-               Lihat File
-            </a>
-        <?php else: ?>
-            -
-        <?php endif; ?>
-    </td>
-
-    <td>
-        <?php
-        $status_file = $data['status_'.$field] ?? 'proses';
+        <?php 
+            $st = strtolower($data['status']);
+            $st_class = "st-".$st;
+            $st_lbl = ($st === 'revisi') ? 'PERLU REVISI' : strtoupper($data['status']);
         ?>
-        <span class="status <?= $status_class_map[$status_file] ?>">
-            <?= strtoupper($status_file) ?>
-        </span>
-    </td>
+        
+        <div class="info-grid-header">
+            <div class="info-item">
+                <span class="label-orange-bold">ID Sempro</span>
+                <div class="capsule-value"><?= htmlspecialchars($data['id_sempro']) ?></div>
+            </div>
+            <div class="info-item">
+                <span class="label-orange-bold">Status Pengajuan</span>
+                <div class="capsule-status <?= $st_class ?>"><?= $st_lbl ?></div>
+            </div>
+            <div class="info-item">
+                <span class="label-orange-bold">Tanggal Pengajuan</span>
+                <div class="capsule-value"><?= date('d F Y, H:i', strtotime($data['created_at'])) ?></div>
+            </div>
+        </div>
 
-    <td>
-        <?= !empty($data['catatan_'.$field])
-            ? htmlspecialchars($data['catatan_'.$field])
-            : '-' ?>
-    </td>
-</tr>
-<?php endforeach; ?>
+        <hr class="dashed-divider">
 
-</table>
-</div>
+        <span class="label-small">Nama Mahasiswa</span>
+        <div class="student-name"><?= strtoupper(htmlspecialchars($data['mahasiswa_nama'])) ?></div>
+
+        <div class="schedule-grid">
+            <div class="schedule-box">
+                <div class="icon"><span class="material-symbols-rounded">calendar_today</span></div>
+                <div class="label">Tanggal Seminar</div>
+                <div class="value"><?= $data['tanggal_sempro'] ? date('Y-m-d', strtotime($data['tanggal_sempro'])) : '-' ?></div>
+            </div>
+            <div class="schedule-box">
+                <div class="icon"><span class="material-symbols-rounded">schedule</span></div>
+                <div class="label">Waktu Seminar</div>
+                <div class="value"><?= $data['jam_sempro'] ?? '-' ?></div>
+            </div>
+            <div class="schedule-box">
+                <div class="icon"><span class="material-symbols-rounded">location_on</span></div>
+                <div class="label">Ruangan Seminar</div>
+                <div class="value"><?= $data['ruangan_sempro'] ?? '-' ?></div>
+            </div>
+        </div>
+
+        <div class="catatan-section">
+            <span class="label-small">Catatan Admin:</span>
+            <div class="catatan-box">
+                <?= $data['catatan'] ? nl2br(htmlspecialchars($data['catatan'])) : '-' ?>
+            </div>
+        </div>
+        
+        <!-- DOCUMENTS -->
+        <div class="doc-section">
+            <div class="doc-section-title">DAFTAR LAMPIRAN BERKAS</div>
+            
+            <?php foreach ($files as $field => $label): ?>
+                <?php 
+                    $st_file = strtolower($data['status_'.$field] ?? 'proses');
+                    $st_f_class = "st-".$st_file;
+                    $st_f_lbl = ($st_file === 'revisi') ? 'PERLU REVISI' : strtoupper($st_file);
+                ?>
+                <div class="doc-card">
+                    <div class="doc-main">
+                        <div class="doc-icon">
+                            <span class="material-symbols-rounded">description</span>
+                        </div>
+                        <div class="doc-name"><?= $label ?> Tugas Akhir</div>
+                        
+                        <div class="capsule-status <?= $st_f_class ?>" style="padding: 5px 15px; margin-right: 15px;"><?= $st_f_lbl ?></div>
+
+                        <?php if (!empty($data[$field])): ?>
+                            <a href="../../uploads/sempro/<?= htmlspecialchars($data[$field]) ?>" target="_blank" class="btn-lihat">Lihat</a>
+                        <?php else: ?>
+                            <span style="font-size: 12px; color: #ccc;">Belum upload</span>
+                        <?php endif; ?>
+                    </div>
+                    <span class="doc-catatan-label">Catatan:</span>
+                    <div class="doc-catatan-box">
+                        <?= !empty($data['catatan_'.$field]) ? htmlspecialchars($data['catatan_'.$field]) : '-' ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <!-- FOOTER INFO BAR -->
+    <div class="footer-info">
+        <div class="icon-wrap">
+            <span class="material-symbols-rounded">info</span>
+        </div>
+        <div class="text">
+            Jadwal seminar akan muncul secara otomatis setelah pengajuan divalidasi dan dikonfirmasi oleh Admin Program Studi. Pastikan Anda rutin memantau halaman ini.
+        </div>
+    </div>
+
+    <!-- ACTION (UPLOAD REVISI) -->
+    <?php if (strtolower($data['status']) === 'revisi' && $_SESSION['user']['role'] === 'mahasiswa'): ?>
+        <div style="display: flex; justify-content: center; margin-top: 30px; margin-bottom: 50px;">
+            <a class="btn-lihat" style="padding: 15px 50px; border-radius: 18px; font-size: 16px;" href="<?= base_url('mahasiswa/sempro/revisi.php?id=' . $data['id']) ?>">
+                Upload Revisi Sekarang
+            </a>
+        </div>
+    <?php endif; ?>
 
 </div>
 </div>
