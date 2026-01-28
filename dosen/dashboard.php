@@ -156,69 +156,59 @@ body {
     background: #FFF1E5 !important;
 }
 
-/* HEADER */
-.dashboard-header {
-    background: white;
-    border-radius: 20px;
-    padding: 24px;
-    margin-bottom: 28px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+/* HEADER - SAMA SEPERTI ADMIN */
+.topbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 30px;
 }
 
-.dashboard-header h1 {
-    margin: 0;
+.greeting h1 {
     font-size: 28px;
+    margin: 0;
+    color: #FF8E3C;
     font-weight: 700;
-    color: #1F2937;
 }
 
-.subtitle {
+.greeting p {
+    margin: 5px 0 0;
     color: #6B7280;
-    font-size: 14px;
-    margin: 6px 0 0;
+    font-size: 15px;
 }
 
-.user-greeting {
+.admin-profile {
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: var(--gradient);
-    padding: 12px 20px;
-    border-radius: 50px;
+    gap: 15px;
 }
 
-.user-greeting-avatar {
-    width: 40px;
-    height: 40px;
-    background: white;
+.admin-profile .text {
+    text-align: right;
+    line-height: 1.3;
+}
+
+.admin-profile small { 
+    color: #6B7280; 
+    font-size: 12px;
+    display: block;
+}
+
+.admin-profile b { 
+    color: #FF8E3C; 
+    font-size: 14px; 
+    display: block; 
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    background: #FF8E3C;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.user-greeting-avatar .material-symbols-rounded {
-    color: var(--primary);
-    font-size: 24px;
-}
-
-.user-greeting-text {
-    color: white;
-}
-
-.user-greeting-text p {
-    margin: 0;
-    font-size: 12px;
-    opacity: 0.9;
-}
-
-.user-greeting-text h3 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(255, 142, 60, 0.3);
 }
 
 /* STAT CARDS */
@@ -476,10 +466,15 @@ body {
         padding: 20px;
     }
     
-    .dashboard-header {
+    .topbar {
         flex-direction: column;
         gap: 16px;
         align-items: flex-start;
+    }
+    
+    .admin-profile {
+        width: 100%;
+        justify-content: flex-end;
     }
 }
 </style>
@@ -492,19 +487,19 @@ body {
 
 <div class="main-content">
 
-<!-- HEADER -->
-<div class="dashboard-header">
-    <div>
+<!-- HEADER - SAMA SEPERTI ADMIN -->
+<div class="topbar">
+    <div class="greeting">
         <h1>Dashboard</h1>
-        <p class="subtitle">Monitoring progres Tugas Akhir, Seminar Proposal, dan Seminar Hasil</p>
+        <p>Monitoring progres Tugas Akhir, Seminar Proposal, dan Seminar Hasil</p>
     </div>
-    <div class="user-greeting">
-        <div class="user-greeting-avatar">
-            <span class="material-symbols-rounded">person</span>
+    <div class="admin-profile">
+        <div class="text">
+            <small>Selamat Datang,</small>
+            <b><?= htmlspecialchars($nama_dosen) ?></b>
         </div>
-        <div class="user-greeting-text">
-            <p>Selamat Datang,</p>
-            <h3><?= htmlspecialchars($nama_dosen) ?></h3>
+        <div class="avatar">
+            <span class="material-symbols-rounded" style="color:white">person</span>
         </div>
     </div>
 </div>

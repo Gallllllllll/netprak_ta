@@ -58,7 +58,7 @@ $queueQuery = "
      FROM pengajuan_semhas sh 
      JOIN mahasiswa m ON sh.mahasiswa_id = m.id)
     ORDER BY created_at DESC 
-    LIMIT 5
+    LIMIT 3
 ";
 $antrian = $pdo->query($queueQuery)->fetchAll(PDO::FETCH_ASSOC);
 
@@ -100,24 +100,27 @@ function time_ago($timestamp) {
             --text-dark: #2D3436;
             --text-muted: #636E72;
             --white: #FFFFFF;
-            --shadow: 0 10px 30px rgba(255, 140, 80, 0.12);
+            --shadow-orange: 0 10px 30px rgba(255, 140, 80, 0.12);
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            color: var(--text-dark);
-        }
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
 
-        .main-content {
-            margin-left: 250px;
-            padding: 40px;
-            min-height: 100vh;
-            transition: margin-left 0.3s ease;
-        }
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
 
         .topbar {
             display: flex;
@@ -150,8 +153,17 @@ function time_ago($timestamp) {
             line-height: 1.3;
         }
 
-        .admin-profile small { color: var(--text-muted); font-size: 12px; }
-        .admin-profile b { color: var(--accent-orange); font-size: 14px; display: block; }
+        .admin-profile small { 
+            color: var(--text-muted); 
+            font-size: 12px;
+            display: block;
+        }
+        
+        .admin-profile b { 
+            color: var(--accent-orange); 
+            font-size: 14px; 
+            display: block; 
+        }
 
         .avatar {
             width: 48px;
@@ -164,10 +176,10 @@ function time_ago($timestamp) {
             box-shadow: 0 4px 12px rgba(255, 140, 97, 0.3);
         }
 
-        /* STAT CARDS */
+        /* STAT CARDS - UKURAN SAMA SEPERTI DOSEN */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr); /* Force 1 row on desktop */
+            grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 40px;
         }
@@ -179,11 +191,13 @@ function time_ago($timestamp) {
             display: flex;
             align-items: center;
             gap: 15px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-orange);
             transition: transform 0.3s ease;
         }
 
-        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card:hover { 
+            transform: translateY(-5px); 
+        }
 
         .icon-box {
             width: 60px;
@@ -200,8 +214,18 @@ function time_ago($timestamp) {
         .bg-pink { background: #FF74C7; color: white; }
         .bg-purple { background: #9B6CFF; color: white; }
 
-        .stat-info span { font-size: 14px; color: var(--text-muted); font-weight: 500; }
-        .stat-info h2 { margin: 4px 0 0; font-size: 32px; font-weight: 700; color: #2d3436; }
+        .stat-info span { 
+            font-size: 14px; 
+            color: var(--text-muted); 
+            font-weight: 500; 
+        }
+        
+        .stat-info h2 { 
+            margin: 4px 0 0; 
+            font-size: 32px; 
+            font-weight: 700; 
+            color: var(--text-dark); 
+        }
 
         /* CHARTS SECTION */
         .charts-grid {
@@ -215,11 +239,15 @@ function time_ago($timestamp) {
             background: var(--white);
             border-radius: 24px;
             padding: 24px;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-orange);
             text-align: center;
         }
 
-        .chart-card h4 { margin: 0 0 20px; color: var(--text-dark); font-weight: 600; }
+        .chart-card h4 { 
+            margin: 0 0 20px; 
+            color: var(--text-dark); 
+            font-weight: 600; 
+        }
 
         .chart-container {
             width: 180px;
@@ -227,14 +255,12 @@ function time_ago($timestamp) {
             margin: 0 auto;
         }
 
-        /* QUEUE LIST REDESIGN */
+        /* QUEUE LIST */
         .queue-card {
             background: var(--white);
             border-radius: 24px;
             padding: 30px;
-            box-shadow: var(--shadow);
-            max-width: 900px;
-            margin: 0 auto;
+            box-shadow: var(--shadow-orange);
         }
 
         .queue-card h4 {
@@ -242,7 +268,7 @@ function time_ago($timestamp) {
             text-align: center;
             font-size: 20px;
             font-weight: 700;
-            color: #2d3436;
+            color: var(--text-dark);
         }
 
         .queue-item {
@@ -275,16 +301,33 @@ function time_ago($timestamp) {
             box-shadow: 0 4px 10px rgba(255, 116, 199, 0.2);
         }
 
-        .m-info { flex: 1; margin-left: 20px; }
-        .m-info b { font-size: 16px; color: #2d3436; display: block; margin-bottom: 2px; }
-        .m-info p { margin: 0; font-size: 14px; color: var(--text-muted); font-weight: 400; }
+        .m-info { 
+            flex: 1; 
+            margin-left: 20px; 
+        }
+        
+        .m-info b { 
+            font-size: 16px; 
+            color: var(--text-dark); 
+            display: block; 
+            margin-bottom: 2px; 
+        }
+        
+        .m-info p { 
+            margin: 0; 
+            font-size: 14px; 
+            color: var(--text-muted); 
+            font-weight: 400; 
+        }
 
-        .m-status { text-align: right; }
+        .m-status { 
+            text-align: right; 
+        }
 
         .status-text {
             font-size: 14px;
             font-weight: 700;
-            color: #2D3436;
+            color: var(--text-dark);
         }
 
         .status-badge {
@@ -337,14 +380,31 @@ function time_ago($timestamp) {
         }
 
         @media screen and (max-width: 1024px) {
-            .main-content { margin-left: 0; padding: 100px 20px 40px; }
-            .topbar { flex-direction: column; align-items: flex-start; gap: 20px; }
-            .admin-profile { width: 100%; justify-content: flex-end; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .main-content { 
+                margin-left: 0; 
+                padding: 100px 20px 40px; 
+            }
+            
+            .topbar { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 20px; 
+            }
+            
+            .admin-profile { 
+                width: 100%; 
+                justify-content: flex-end; 
+            }
+            
+            .stats-grid { 
+                grid-template-columns: repeat(2, 1fr); 
+            }
         }
 
         @media screen and (max-width: 600px) {
-            .stats-grid { grid-template-columns: 1fr; }
+            .stats-grid { 
+                grid-template-columns: 1fr; 
+            }
         }
     </style>
 </head>
@@ -362,7 +422,7 @@ function time_ago($timestamp) {
         </div>
         <div class="admin-profile">
             <div class="text">
-                <span>Selamat Datang,</span>
+                <small>Selamat Datang,</small>
                 <b><?= htmlspecialchars($username) ?></b>
             </div>
             <div class="avatar">
@@ -482,8 +542,21 @@ function time_ago($timestamp) {
 const commonOptions = {
     cutout: '75%',
     plugins: {
-        legend: { position: 'bottom', labels: { usePointStyle: true, font: { family: 'Outfit', size: 11 } } },
-        tooltip: { callbacks: { label: (context) => ` ${context.label}: ${context.raw}` } }
+        legend: { 
+            position: 'bottom', 
+            labels: { 
+                usePointStyle: true, 
+                font: { 
+                    family: 'Outfit', 
+                    size: 11 
+                } 
+            } 
+        },
+        tooltip: { 
+            callbacks: { 
+                label: (context) => ` ${context.label}: ${context.raw}` 
+            } 
+        }
     },
     responsive: true,
     maintainAspectRatio: false
