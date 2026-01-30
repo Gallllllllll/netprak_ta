@@ -2,9 +2,9 @@
 session_start();
 require "../config/connection.php";
 
-// ===============================
-// CEK LOGIN DOSEN
-// ===============================
+/* ===============================
+   CEK LOGIN DOSEN
+================================ */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dosen') {
     header("Location: ../login.php");
     exit;
@@ -12,15 +12,16 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dosen') {
 
 $dosen_id = $_SESSION['user']['id'];
 
-// Ambil nama dosen dari database
+/* ===============================
+   DATA DOSEN
+================================ */
 $stmt = $pdo->prepare("SELECT nama FROM dosen WHERE id = ?");
 $stmt->execute([$dosen_id]);
-$dosen = $stmt->fetch(PDO::FETCH_ASSOC);
-$nama_dosen = $dosen['nama'] ?? 'Dosen';
+$nama_dosen = $stmt->fetchColumn() ?? 'Dosen';
 
-/* =====================================================
+/* ===============================
    STATISTIK DASHBOARD
-===================================================== */
+================================ */
 
 // TOTAL MAHASISWA BIMBINGAN
 $stmt = $pdo->prepare("
@@ -31,46 +32,40 @@ $stmt = $pdo->prepare("
 $stmt->execute([$dosen_id]);
 $totalMahasiswa = (int)$stmt->fetchColumn();
 
-// TOTAL TA (semua pengajuan TA yang dibimbing)
+// TOTAL TA
 $stmt = $pdo->prepare("
-    SELECT COUNT(DISTINCT p.id)
-    FROM pengajuan_ta p
-    JOIN dosbing_ta d ON d.pengajuan_id = p.id
-    WHERE d.dosen_id = ?
+    SELECT COUNT(*)
+    FROM dosbing_ta
+    WHERE dosen_id = ?
 ");
 $stmt->execute([$dosen_id]);
 $totalTA = (int)$stmt->fetchColumn();
 
-// TOTAL SEMPRO
+// TOTAL SEMPRO (yang sudah upload persetujuan)
 $stmt = $pdo->prepare("
-    SELECT COUNT(DISTINCT s.id)
-    FROM pengajuan_sempro s
-    JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
-    JOIN dosbing_ta d ON d.pengajuan_id = p.id
-    WHERE d.dosen_id = ?
+    SELECT COUNT(*)
+    FROM dosbing_ta
+    WHERE dosen_id = ?
+      AND persetujuan_sempro IS NOT NULL
 ");
 $stmt->execute([$dosen_id]);
 $totalSempro = (int)$stmt->fetchColumn();
 
-// TOTAL SEMHAS
+// TOTAL SEMHAS (yang sudah disetujui)
 $stmt = $pdo->prepare("
-    SELECT COUNT(DISTINCT sh.id)
-    FROM pengajuan_semhas sh
-    JOIN pengajuan_ta p ON sh.pengajuan_ta_id = p.id
-    JOIN dosbing_ta d ON d.pengajuan_id = p.id
-    WHERE d.dosen_id = ?
+    SELECT COUNT(*)
+    FROM dosbing_ta
+    WHERE dosen_id = ?
+      AND status_persetujuan_semhas = 'disetujui'
 ");
 $stmt->execute([$dosen_id]);
 $totalSemhas = (int)$stmt->fetchColumn();
 
-/* =====================================================
-   ANTRIAN VALIDASI TERKINI (LIMIT 3)
-===================================================== */
+/* ===============================
+   ANTRIAN VALIDASI (3 TERBARU)
+================================ */
 $stmt = $pdo->prepare("
-    SELECT 
-        m.nama,
-        d.status_persetujuan,
-        d.created_at
+    SELECT m.nama, d.status_persetujuan, d.created_at
     FROM dosbing_ta d
     JOIN pengajuan_ta p ON d.pengajuan_id = p.id
     JOIN mahasiswa m ON p.mahasiswa_id = m.id
@@ -81,11 +76,11 @@ $stmt = $pdo->prepare("
 $stmt->execute([$dosen_id]);
 $antrian = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-/* =====================================================
+/* ===============================
    DATA PIE CHART
-===================================================== */
+================================ */
 
-// STATUS TUGAS AKHIR (dari dosbing_ta)
+// STATUS TA
 $stmt = $pdo->prepare("
     SELECT status_persetujuan, COUNT(*) total
     FROM dosbing_ta
@@ -95,30 +90,30 @@ $stmt = $pdo->prepare("
 $stmt->execute([$dosen_id]);
 $statusTA = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// STATUS SEMPRO
+// STATUS SEMPRO (NULL / NOT NULL)
 $stmt = $pdo->prepare("
-    SELECT s.status, COUNT(*) total
-    FROM pengajuan_sempro s
-    JOIN pengajuan_ta p ON s.pengajuan_ta_id = p.id
-    JOIN dosbing_ta d ON d.pengajuan_id = p.id
-    WHERE d.dosen_id = ?
-    GROUP BY s.status
+    SELECT 
+        CASE 
+            WHEN persetujuan_sempro IS NULL THEN 'Belum Sempro'
+            ELSE 'Sudah Sempro'
+        END AS status,
+        COUNT(*) total
+    FROM dosbing_ta
+    WHERE dosen_id = ?
+    GROUP BY status
 ");
 $stmt->execute([$dosen_id]);
 $statusSempro = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
 // STATUS SEMHAS
 $stmt = $pdo->prepare("
-    SELECT sh.status, COUNT(*) total
-    FROM pengajuan_semhas sh
-    JOIN pengajuan_ta p ON sh.pengajuan_ta_id = p.id
-    JOIN dosbing_ta d ON d.pengajuan_id = p.id
-    WHERE d.dosen_id = ?
-    GROUP BY sh.status
+    SELECT status_persetujuan_semhas, COUNT(*) total
+    FROM dosbing_ta
+    WHERE dosen_id = ?
+    GROUP BY status_persetujuan_semhas
 ");
 $stmt->execute([$dosen_id]);
 $statusSemhas = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-
 ?>
 
 <!DOCTYPE html>
