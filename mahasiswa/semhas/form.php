@@ -101,6 +101,20 @@ if (!$pesan_error) {
         }
     }
 }
+
+// Ambil semua template yang terlihat untuk fitur 'Contoh Template'
+$stmt_tpl = $pdo->prepare("SELECT * FROM template WHERE is_visible = 1");
+$stmt_tpl->execute();
+$templates_all = $stmt_tpl->fetchAll(PDO::FETCH_ASSOC);
+
+function find_template_by_keywords($templates, $keywords){
+    foreach ($templates as $t){
+        foreach ($keywords as $kw){
+            if (stripos($t['nama'], $kw) !== false) return $t;
+        }
+    }
+    return null;
+}
 ?>
 
 <!DOCTYPE html>
@@ -501,6 +515,11 @@ body{
     opacity: .9;
 }
 
+/* small variant used for inline sample template links */
+.template-sample{font-size:12px;padding:4px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#e5e7eb;color:#374151}
+.template-sample .material-symbols-rounded{font-size:16px;line-height:1}
+@media (max-width:768px){.template-sample{font-size:12px;padding:4px 6px;display:inline-flex;white-space:nowrap}}
+
 /* UPLOAD GRID */
 .ta-upload-grid {
     display: flex;
@@ -644,12 +663,15 @@ small{
 }
 
 .ta-label {
-    display: block;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-weight: 700;
     font-size: 14px;
     color: #374151;
     margin-bottom: 8px;
-}
+    gap: 12px;
+} 
 
 .message-box {
     background: #EFF6FF;
@@ -749,7 +771,16 @@ small{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Lembar Berita Acara Seminar Proposal</label>
+                        <?php $tpl = find_template_by_keywords($templates_all, ['Berita Acara Seminar Proposal']); ?>
+                        <label class="ta-label">Lembar Berita Acara Seminar Proposal
+                        <?php if ($tpl && $tpl['file']): ?>
+                            <a class="template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                        <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -768,7 +799,16 @@ small{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Persetujuan Laporan TA</label>
+                        <?php $tpl = find_template_by_keywords($templates_all, ['persetujuan','laporan','surat persetujuan']); ?>
+                        <label class="ta-label">Persetujuan Laporan TA
+                        <?php if ($tpl && $tpl['file']): ?>
+                            <a class="template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                        <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -787,7 +827,16 @@ small{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Form Pendaftaran Ujian TA</label>
+                        <?php $tpl = find_template_by_keywords($templates_all, ['ujian','Form Pendaftaran Ujian TA']); ?>
+                        <label class="ta-label">Form Pendaftaran Ujian TA
+                        <?php if ($tpl && $tpl['file']): ?>
+                            <a class="template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                        <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -806,7 +855,16 @@ small{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Buku Konsultasi TA</label>
+                        <?php $tpl = find_template_by_keywords($templates_all, ['konsultasi','buku konsultasi','logbook']); ?>
+                        <label class="ta-label">Buku Konsultasi TA
+                        <?php if ($tpl && $tpl['file']): ?>
+                            <a class="template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                        <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">

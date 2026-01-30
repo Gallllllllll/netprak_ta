@@ -20,11 +20,26 @@ $cek = $pdo->prepare("SELECT id, judul_ta, id_pengajuan, created_at FROM pengaju
 $cek->execute([$mahasiswa_id]);
 $pengajuan = $cek->fetch(PDO::FETCH_ASSOC);
 
+// Ambil semua template yang terlihat (digunakan sebagai contoh dokumen yang bisa diunduh mahasiswa)
+$stmt_tpl = $pdo->prepare("SELECT * FROM template WHERE is_visible = 1");
+$stmt_tpl->execute();
+$templates_all = $stmt_tpl->fetchAll(PDO::FETCH_ASSOC);
+
+// Helper: cari template berdasarkan kata kunci (mis. 'formulir','transkrip')
+function find_template_by_keywords($templates, $keywords){
+    foreach ($templates as $t){
+        foreach ($keywords as $kw){
+            if (stripos($t['nama'], $kw) !== false) return $t;
+        }
+    }
+    return null;
+}
+
 if ($pengajuan) {
     $pesan_error = "<b>" . htmlspecialchars($pengajuan['judul_ta']) . "</b>";
 } else {
     $boleh_upload = true;
-}
+} 
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -257,12 +272,17 @@ form{
     margin: 15px 0;
 }
 
+/* make label act as a horizontal container so inline actions align right */
 .ta-label {
     font-size: 14px;
     font-weight: 800;
     color: #000000;
     letter-spacing: .3px;
-}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+} 
 
 .ta-input {
     width: auto;
@@ -509,6 +529,10 @@ form{
     opacity:.9;
 }
 
+/* small variant used for inline sample template links */
+.template-sample{font-size:12px;padding:3px 5px;border-radius:5px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+@media (max-width:768px){.template-sample{display:inline-flex;flex-wrap:wrap;margin-top:8px}}
+.template-sample span{font-size:16px;}
 
 /* MOBILE */
 @media (max-width: 768px) {
@@ -531,7 +555,7 @@ form{
 <body>
 
 <div class="container">
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
+    <?php include '../../mahasiswa/sidebar.php'; ?>
 
     <div class="main-content">
         <div class="topbar">
@@ -634,7 +658,16 @@ form{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Formulir Pendaftaran & Persetujuan Tema</label>
+                    <?php $tpl = find_template_by_keywords($templates_all, ['formulir','pendaftaran','persetujuan']); ?>
+                        <label class="ta-label">Formulir Pendaftaran & Persetujuan Tema
+                            <?php if ($tpl && $tpl['file']): ?>
+                                <a class="ta-btn ta-btn-secondary template-sample"
+                                href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                    <span class="material-symbols-rounded">download</span>
+                                    Contoh Template
+                                </a>
+                            <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -653,7 +686,16 @@ form{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Bukti Pembayaran</label>
+                    <?php $tpl = find_template_by_keywords($templates_all, ['pembayaran','bukti pembayaran','transfer']); ?>
+                        <label class="ta-label">Bukti Pembayaran
+                            <?php if ($tpl && $tpl['file']): ?>
+                            <a class="ta-btn ta-btn-secondary template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                            <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -672,7 +714,16 @@ form{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Transkrip Nilai</label>
+                    <?php $tpl = find_template_by_keywords($templates_all, ['transkrip']); ?>
+                        <label class="ta-label">Transkrip Nilai
+                            <?php if ($tpl && $tpl['file']): ?>
+                            <a class="ta-btn ta-btn-secondary template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                            <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">
@@ -691,7 +742,16 @@ form{
 
                 <div class="ta-upload-item">
                     <div class="ta-field">
-                        <label class="ta-label">Bukti Kelulusan Mata Kuliah Magang / PI</label>
+                    <?php $tpl = find_template_by_keywords($templates_all, ['magang','pi','praktik','kelulusan']); ?>
+                        <label class="ta-label">Bukti Kelulusan Mata Kuliah Magang / PI
+                            <?php if ($tpl && $tpl['file']): ?>
+                            <a class="ta-btn ta-btn-secondary template-sample"
+                            href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                <span class="material-symbols-rounded">download</span>
+                                Contoh Template
+                            </a>
+                            <?php endif; ?>
+                        </label>
                         <label class="ta-upload-box">
                             <div class="ta-upload-inner">
                                 <div class="ta-upload-icon">

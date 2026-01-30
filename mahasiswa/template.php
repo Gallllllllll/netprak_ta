@@ -186,7 +186,6 @@ body {
                             </div>
                             <div>
                                 <div class="template-name"><?= htmlspecialchars($t['nama']) ?></div>
-                                <div class="template-file"><?= htmlspecialchars($t['file'] ?: '-') ?></div>
                             </div>
                         </div>
                     </td>

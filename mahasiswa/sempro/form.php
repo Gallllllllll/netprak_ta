@@ -131,6 +131,20 @@ if (!$ta) {
 
 // Enable button based on submission status
 $can_proceed = $boleh_upload;
+
+// Ambil template contoh (dipakai sebagai 'Contoh Template' untuk mahasiswa)
+$stmt_tpl = $pdo->prepare("SELECT * FROM template WHERE is_visible = 1");
+$stmt_tpl->execute();
+$templates_all = $stmt_tpl->fetchAll(PDO::FETCH_ASSOC);
+
+function find_template_by_keywords($templates, $keywords){
+    foreach ($templates as $t){
+        foreach ($keywords as $kw){
+            if (stripos($t['nama'], $kw) !== false) return $t;
+        }
+    }
+    return null;
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -427,6 +441,11 @@ body{
 .ta-btn-primary:hover {
     opacity: .9;
 }
+
+/* small variant used for inline sample template links */
+.template-sample{font-size:12px;padding:4px 6px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;background:#e5e7eb;color:#374151}
+.template-sample .material-symbols-rounded{font-size:16px;line-height:1}
+@media (max-width:768px){.template-sample{font-size:12px;padding:4px 6px;display:inline-flex;white-space:nowrap}}
 /* message BOX */
 .message-box {
     background: #FFDFE0;
@@ -832,8 +851,18 @@ button {
                             <div class="upload-icon">
                                 <span class="material-symbols-rounded">description</span>
                             </div>
-                            <div>
-                                <strong>Form Pendaftaran Seminar Proposal</strong><br>
+                            <?php $tpl = find_template_by_keywords($templates_all, ['pendaftaran seminar proposal']); ?>
+                            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <strong style="flex:0 0 auto">Form Pendaftaran Seminar Proposal</strong>
+                                    <?php if ($tpl && $tpl['file']): ?>
+                                        <a class="template-sample"
+                                        href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                            <span class="material-symbols-rounded">download</span>
+                                            Contoh Template
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                                 <small class="upload-status">Belum ada file</small>
                             </div>
                         </div>
@@ -850,8 +879,18 @@ button {
                             <div class="upload-icon">
                                 <span class="material-symbols-rounded">description</span>
                             </div>
-                            <div>
-                                <strong>Lembar Persetujuan Proposal TA</strong><br>
+                            <?php $tpl = find_template_by_keywords($templates_all, ['persetujuan proposal tugas akhir']); ?>
+                            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <strong style="flex:0 0 auto">Lembar Persetujuan Proposal TA</strong>
+                                    <?php if ($tpl && $tpl['file']): ?>
+                                        <a class="template-sample"
+                                        href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                            <span class="material-symbols-rounded">download</span>
+                                            Contoh Template
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                                 <small class="upload-status">Belum ada file</small>
                             </div>
                         </div>
@@ -868,8 +907,18 @@ button {
                             <div class="upload-icon">
                                 <span class="material-symbols-rounded">description</span>
                             </div>
-                            <div>
-                                <strong>Buku Konsultasi Tugas Akhir</strong><br>
+                            <?php $tpl = find_template_by_keywords($templates_all, ['konsultasi','buku konsultasi','bimbingan','logbook']); ?>
+                            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <strong style="flex:0 0 auto">Buku Konsultasi Tugas Akhir</strong>
+                                    <?php if ($tpl && $tpl['file']): ?>
+                                        <a class="template-sample"
+                                        href="<?= base_url('mahasiswa/pengajuan/download_template.php?file=' . urlencode($tpl['file'])) ?>">
+                                            <span class="material-symbols-rounded">download</span>
+                                            Contoh Template
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
                                 <small class="upload-status">Belum ada file</small>
                             </div>
                         </div>

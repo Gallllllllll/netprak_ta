@@ -43,12 +43,9 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
             --text-grey: #6B7280;
         }
 
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-soft);
-            margin: 0;
-            color: var(--text-dark);
-        }
+body{
+    background: #FFF1E5 !important;
+}
 
         .container {
             /* Sidebar layout handled manually or by sidebar.php styles */
@@ -591,7 +588,7 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
             <div class="alert-footer">
                 <span class="material-symbols-rounded alert-icon">info</span>
                 <span class="alert-text">
-                    Pastikan Status Pengajuan sudah "Disetujui" sebelum lanjut ke tahap berikutnya.Jangan lupa untuk memeriksa Hasil Nilai secara berkala setelah seminar dilaksanakan.
+                    Pastikan Status Pengajuan sudah "Disetujui" sebelum lanjut ke tahap berikutnya. Jangan lupa untuk memeriksa Hasil Nilai secara berkala setelah seminar dilaksanakan.
                 </span>
             </div>
 
