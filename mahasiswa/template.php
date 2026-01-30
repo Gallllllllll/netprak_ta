@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../config/connection.php";
+require_once '../config/base_url.php';
 
 // ===============================
 // CEK ROLE MAHASISWA
@@ -28,8 +29,8 @@ $templates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Template untuk Mahasiswa</title>
-<link rel="stylesheet" href="../../style.css">
 <style>
 body { font-family: Arial, sans-serif; background:#f4f6f8; padding:20px; }
 .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }

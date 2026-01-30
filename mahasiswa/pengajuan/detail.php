@@ -97,6 +97,9 @@ $badgeClass = getPengajuanBadgeClass($data['status'] ?? 'proses');
 <link rel="stylesheet" href="<?= base_url('style.css') ?>">
 
 <style>
+body{
+    background: #FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;

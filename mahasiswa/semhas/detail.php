@@ -106,6 +106,9 @@ function badgeFileStatus($status) {
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <style>
+body{
+    background:#FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;

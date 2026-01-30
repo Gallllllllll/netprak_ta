@@ -146,6 +146,9 @@ $can_proceed = $boleh_upload;
     --orange: #FF983D;
     --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
 }
+body{
+    background:#FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;

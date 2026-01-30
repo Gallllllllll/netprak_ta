@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once '../../config/base_url.php';
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
     header("Location: ../../login.php");
@@ -60,11 +61,13 @@ $data = $tab === 'semhas'
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Hasil Penilaian Seminar</title>
 
-<link rel="stylesheet" href="../../style.css">
-
 <style>
+body{
+    background:#FFF1E5 !important;
+}
 .main-content{
     padding:32px;
     background:#fff3e9;
