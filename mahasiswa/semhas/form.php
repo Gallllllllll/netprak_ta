@@ -118,6 +118,9 @@ if (!$pesan_error) {
     --gradient: linear-gradient(135deg, #FF74C7, #FF983D);
 }
 /* TOP */
+body{
+    background:#FFF1E5 !important;
+}
 .topbar{
     display:flex;
     justify-content:space-between;

@@ -124,6 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Revisi Pengajuan TA</title>
 <style>
+body{
+    background:#FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;
@@ -256,6 +259,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 .btn-gradient:hover {
     opacity:0.9;
+}
+
+/* === BUTTON DISABLED STATE === */
+.btn-gradient:disabled {
+    background: #E5E7EB !important;
+    color: #9CA3AF !important;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.9;
 }
 
 .info-box {
@@ -406,10 +418,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if ($has_revisi): ?>
         <div class="center-action">
-            <button type="submit" class="btn-gradient">
+            <button type="submit" class="btn-gradient" disabled>
                 Upload Revisi
             </button>
         </div>
+        
     <?php endif; ?>
 
     </form>
@@ -452,7 +465,30 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
     });
 });
 </script>
+<script>
+const submitBtn = document.querySelector('.btn-gradient');
+const fileInputs = document.querySelectorAll('input[type="file"]');
 
+function checkFileSelected() {
+    let hasFile = false;
+
+    fileInputs.forEach(input => {
+        if (input.files.length > 0) {
+            hasFile = true;
+        }
+    });
+
+    submitBtn.disabled = !hasFile;
+}
+
+// cek awal (pastikan disabled)
+checkFileSelected();
+
+// event change tiap input file
+fileInputs.forEach(input => {
+    input.addEventListener('change', checkFileSelected);
+});
+</script>
 </body>
 
 </html>

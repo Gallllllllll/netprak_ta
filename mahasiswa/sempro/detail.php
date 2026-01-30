@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once '../../config/base_url.php';
 
 // ===============================
 // CEK LOGIN
@@ -60,6 +60,7 @@ $status_class_map = [
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <style>
 :root {
     --pink: #FF74C7;
@@ -68,10 +69,8 @@ $status_class_map = [
     --bg: #FFF1E5;
 }
 
-body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--bg) !important;
-    margin: 0;
+body{
+    background:#FFF1E5 !important;
 }
 
 .main-content {
