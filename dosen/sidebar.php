@@ -44,6 +44,8 @@ function isAnyActive(array $paths)
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 70px;
 }
 
 body {
@@ -53,10 +55,75 @@ body {
 }
 
 /* ==============================
+   OVERLAY EFFECT
+============================== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==============================
+   TOGGLE ARROW BUTTON
+============================== */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1100;
+    width: 28px;
+    height: 56px;
+    background: var(--gradient);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle:hover {
+    width: 32px;
+    box-shadow: 3px 0 12px rgba(255, 107, 157, 0.4);
+}
+
+.sidebar-toggle span {
+    color: white;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+/* Position based on sidebar state */
+.sidebar-toggle.collapsed {
+    left: var(--sidebar-collapsed-width);
+}
+
+.sidebar-toggle.expanded {
+    left: var(--sidebar-width);
+}
+
+/* ==============================
    SIDEBAR
 ============================== */
 .sidebar {
-    width: 280px;
+    width: var(--sidebar-width);
     height: 100vh;
     background: var(--sidebar-bg);
     position: fixed;
@@ -67,6 +134,7 @@ body {
     box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
 }
 
 /* ==============================
@@ -77,6 +145,7 @@ body {
     padding: 28px 24px;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 .sidebar-header::before {
@@ -106,14 +175,27 @@ body {
     position: relative;
     z-index: 1;
     text-align: center;
+    transition: all 0.3s ease;
 }
 
-.logo img {
+.logo-desktop {
     width: 200px;
+    display: block;
+    margin: 0 auto;
     filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.4)) 
             drop-shadow(0 4px 16px rgba(255, 255, 255, 0.3))
             drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.logo-mobile {
+    width: 40px;
+    display: none;
+    margin: 0 auto;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.4)) 
+            drop-shadow(0 4px 16px rgba(255, 255, 255, 0.3))
+            drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+    transition: all 0.3s ease;
 }
 
 .logo img:hover {
@@ -131,6 +213,7 @@ body {
     padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
+    transition: all 0.3s ease;
 }
 
 .user-avatar {
@@ -204,6 +287,9 @@ body {
     color: var(--text-muted);
     padding: 0 12px 8px;
     margin: 0 0 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* ==============================
@@ -232,6 +318,7 @@ body {
     transition: all 0.2s ease;
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
 }
 
 /* ICON */
@@ -245,6 +332,11 @@ body {
         'wght' 400,
         'GRAD' 0,
         'opsz' 24;
+}
+
+.menu-text {
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 /* ==============================
@@ -329,10 +421,11 @@ body {
    MAIN CONTENT
 ============================== */
 .main-content {
-    margin-left: 280px;
+    margin-left: var(--sidebar-width);
     padding: 32px;
     min-height: 100vh;
     margin-bottom: 50px;
+    transition: all 0.3s ease;
 }
 
 /* HEADER DASHBOARD */
@@ -363,30 +456,221 @@ body {
 }
 
 /* ==============================
-   RESPONSIVE
+   RESPONSIVE - TABLET & MOBILE
 ============================== */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
+@media (max-width: 1024px) {
+    /* Show overlay */
+    .sidebar-overlay {
+        display: block;
     }
-    
-    .sidebar.active {
+
+    /* Show toggle button */
+    .sidebar-toggle {
+        display: flex;
+    }
+
+    /* Sidebar collapsed by default */
+    .sidebar {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    /* EXPANDED STATE - Sidebar floats on top */
+    .sidebar.expanded {
+        width: var(--sidebar-width);
+        z-index: 1001; /* Above overlay */
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Switch logo */
+    .sidebar:not(.expanded) .logo-desktop {
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .logo-mobile {
+        display: block;
+    }
+
+    .sidebar.expanded .logo-desktop {
+        display: block;
+    }
+
+    .sidebar.expanded .logo-mobile {
+        display: none;
+    }
+
+    /* Hide text in collapsed mode */
+    .sidebar:not(.expanded) .menu-text {
+        opacity: 0;
+        width: 0;
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .menu-section-title {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .sidebar:not(.expanded) .sidebar-header {
+        padding: 20px 15px;
+    }
+
+    .sidebar:not(.expanded) .user-info {
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a {
+        justify-content: center;
+        padding: 11px 0;
+        gap: 0;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a:hover {
         transform: translateX(0);
     }
-    
+
+    .sidebar:not(.expanded) .sidebar-footer {
+        padding: 16px 8px;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu-container {
+        padding: 20px 8px;
+    }
+
+    /* Show text in expanded mode */
+    .sidebar.expanded .menu-text {
+        opacity: 1;
+        width: auto;
+        display: block;
+    }
+
+    .sidebar.expanded .menu-section-title {
+        opacity: 1;
+        height: auto;
+    }
+
+    /* Adjust main content - ALWAYS fixed margin */
     .main-content {
-        margin-left: 0;
+        margin-left: var(--sidebar-collapsed-width);
+        padding: 24px 20px;
+    }
+
+    /* Main content stays in place when sidebar expands */
+    .sidebar.expanded ~ .main-content {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Tooltip for collapsed state */
+    .sidebar:not(.expanded) .sidebar-menu a {
+        position: relative;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--text-primary);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        white-space: nowrap;
+        margin-left: 10px;
+        z-index: 1001;
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a::before {
+        content: '';
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 4px;
+        border: 5px solid transparent;
+        border-right-color: var(--text-primary);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a:hover::after,
+    .sidebar:not(.expanded) .sidebar-menu a:hover::before {
+        opacity: 1;
+    }
+
+    .dashboard-header h1 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    .dashboard-header {
         padding: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar:not(.expanded) {
+        width: 60px;
+    }
+
+    .sidebar-toggle.collapsed {
+        left: 60px;
+    }
+
+    .main-content {
+        margin-left: 60px;
+        padding: 16px 12px;
+    }
+
+    .sidebar:not(.expanded) ~ .main-content {
+        margin-left: 60px;
+    }
+
+    .sidebar.expanded ~ .main-content {
+        margin-left: 60px;
+    }
+
+    .dashboard-header {
+        padding: 16px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 20px;
     }
 }
 </style>
 
-<div class="sidebar">
+<!-- Overlay dengan blur effect -->
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Toggle Arrow Button -->
+<button class="sidebar-toggle collapsed" id="toggleBtn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+    <span class="material-symbols-rounded" id="toggleIcon">chevron_right</span>
+</button>
+
+<div class="sidebar" id="sidebar">
     <!-- Header dengan Gradient -->
     <div class="sidebar-header">
         <div class="logo">
-            <img src="<?= base_url('assets/img/logo2.png') ?>" alt="Logo Politeknik">
+            <img src="<?= base_url('assets/img/logo2.png') ?>" alt="Logo Politeknik" class="logo-desktop">
+            <img src="<?= base_url('assets/img/Logo.webp') ?>" alt="Logo Politeknik" class="logo-mobile">
         </div>
         
         <!-- Optional: Dosen Info Section -->
@@ -408,9 +692,10 @@ body {
                 <!-- DASHBOARD -->
                 <li>
                     <a href="<?= base_url('dosen/dashboard.php') ?>"
-                       class="<?= isActive('/dosen/dashboard.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/dosen/dashboard.php') ? 'active' : '' ?>"
+                       data-tooltip="Dashboard">
                         <span class="material-symbols-rounded">dashboard</span>
-                        <span>Dashboard</span>
+                        <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
             </ul>
@@ -423,9 +708,10 @@ body {
                 <!-- MAHASISWA BIMBINGAN -->
                 <li>
                     <a href="<?= base_url('dosen/mahasiswa_bimbingan.php') ?>"
-                       class="<?= isActive('/dosen/mahasiswa_bimbingan.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/dosen/mahasiswa_bimbingan.php') ? 'active' : '' ?>"
+                       data-tooltip="Mahasiswa Bimbingan">
                         <span class="material-symbols-rounded">groups</span>
-                        <span>Mahasiswa Bimbingan</span>
+                        <span class="menu-text">Mahasiswa Bimbingan</span>
                     </a>
                 </li>
             </ul>
@@ -436,14 +722,64 @@ body {
     <div class="sidebar-footer">
         <ul class="sidebar-menu">
             <li>
-                <a href="<?= base_url('logout.php') ?>" class="logout">
+                <a href="<?= base_url('logout.php') ?>" class="logout" data-tooltip="Log Out">
                     <span class="material-symbols-rounded">logout</span>
-                    <span>Log Out</span>
+                    <span class="menu-text">Log Out</span>
                 </a>
             </li>
         </ul>
     </div>
 </div>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    sidebar.classList.toggle('expanded');
+    overlay.classList.toggle('active');
+    toggleBtn.classList.toggle('collapsed');
+    toggleBtn.classList.toggle('expanded');
+    
+    // Update arrow direction
+    if (sidebar.classList.contains('expanded')) {
+        toggleIcon.textContent = 'chevron_left';
+    } else {
+        toggleIcon.textContent = 'chevron_right';
+    }
+}
+
+// Handle resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (window.innerWidth > 1024) {
+            // Desktop mode - remove toggle button and expanded class
+            sidebar.classList.remove('expanded');
+            overlay.classList.remove('active');
+            toggleBtn.classList.remove('expanded');
+            toggleBtn.classList.add('collapsed');
+            toggleIcon.textContent = 'chevron_right';
+        }
+    }, 250);
+});
+
+// Initialize toggle button position on load
+window.addEventListener('load', () => {
+    const toggleBtn = document.getElementById('toggleBtn');
+    if (window.innerWidth <= 1024) {
+        toggleBtn.classList.add('collapsed');
+    }
+});
+</script>
 
 <div>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/dosen/footer.php'; ?>

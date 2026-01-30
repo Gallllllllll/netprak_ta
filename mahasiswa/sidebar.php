@@ -52,6 +52,8 @@ function isAnyActive(array $paths)
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 70px;
 }
 
 body {
@@ -61,10 +63,75 @@ body {
 }
 
 /* ==============================
+   OVERLAY EFFECT
+============================== */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==============================
+   TOGGLE ARROW BUTTON
+============================== */
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1100;
+    width: 28px;
+    height: 56px;
+    background: var(--gradient);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle:hover {
+    width: 32px;
+    box-shadow: 3px 0 12px rgba(255, 107, 157, 0.4);
+}
+
+.sidebar-toggle span {
+    color: white;
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+/* Position based on sidebar state */
+.sidebar-toggle.collapsed {
+    left: var(--sidebar-collapsed-width);
+}
+
+.sidebar-toggle.expanded {
+    left: var(--sidebar-width);
+}
+
+/* ==============================
    SIDEBAR
 ============================== */
 .sidebar {
-    width: 280px;
+    width: var(--sidebar-width);
     height: 100vh;
     background: var(--sidebar-bg);
     position: fixed;
@@ -75,6 +142,7 @@ body {
     box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
 }
 
 /* ==============================
@@ -85,6 +153,7 @@ body {
     padding: 28px 24px;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
 }
 
 .sidebar-header::before {
@@ -114,14 +183,27 @@ body {
     position: relative;
     z-index: 1;
     text-align: center;
+    transition: all 0.3s ease;
 }
 
-.logo img {
+.logo-desktop {
     width: 200px;
+    display: block;
+    margin: 0 auto;
     filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.4)) 
             drop-shadow(0 4px 16px rgba(255, 255, 255, 0.3))
             drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
-    transition: transform 0.3s ease, filter 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.logo-mobile {
+    width: 40px;
+    display: none;
+    margin: 0 auto;
+    filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.4)) 
+            drop-shadow(0 4px 16px rgba(255, 255, 255, 0.3))
+            drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+    transition: all 0.3s ease;
 }
 
 .logo img:hover {
@@ -131,7 +213,7 @@ body {
             drop-shadow(0 0 30px rgba(255, 255, 255, 0.3));
 }
 
-/* USER INFO (Optional - bisa ditambahkan) */
+/* USER INFO (Optional) */
 .user-info {
     position: relative;
     z-index: 1;
@@ -139,6 +221,7 @@ body {
     padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.2);
     text-align: center;
+    transition: all 0.3s ease;
 }
 
 .user-avatar {
@@ -212,6 +295,9 @@ body {
     color: var(--text-muted);
     padding: 0 12px 8px;
     margin: 0 0 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 /* ==============================
@@ -240,6 +326,7 @@ body {
     transition: all 0.2s ease;
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
 }
 
 /* ICON */
@@ -253,6 +340,11 @@ body {
         'wght' 400,
         'GRAD' 0,
         'opsz' 24;
+}
+
+.menu-text {
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 /* ==============================
@@ -431,28 +523,14 @@ body {
 }
 
 /* ==============================
-   BADGE (Optional - untuk notifikasi)
-============================== */
-.menu-badge {
-    margin-left: auto;
-    background: var(--gradient);
-    color: white;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-}
-
-/* ==============================
    MAIN CONTENT
 ============================== */
 .main-content {
-    margin-left: 280px;
+    margin-left: var(--sidebar-width);
     padding: 32px;
     min-height: 100vh;
     margin-bottom: 50px;
+    transition: all 0.3s ease;
 }
 
 /* HEADER DASHBOARD */
@@ -483,30 +561,230 @@ body {
 }
 
 /* ==============================
-   RESPONSIVE
+   RESPONSIVE - TABLET & MOBILE
 ============================== */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
+@media (max-width: 1024px) {
+    /* Show overlay */
+    .sidebar-overlay {
+        display: block;
     }
-    
-    .sidebar.active {
+
+    /* Show toggle button */
+    .sidebar-toggle {
+        display: flex;
+    }
+
+    /* Sidebar collapsed by default */
+    .sidebar {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    /* EXPANDED STATE - Sidebar floats on top */
+    .sidebar.expanded {
+        width: var(--sidebar-width);
+        z-index: 1001;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Switch logo */
+    .sidebar:not(.expanded) .logo-desktop {
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .logo-mobile {
+        display: block;
+    }
+
+    .sidebar.expanded .logo-desktop {
+        display: block;
+    }
+
+    .sidebar.expanded .logo-mobile {
+        display: none;
+    }
+
+    /* Hide text in collapsed mode */
+    .sidebar:not(.expanded) .menu-text {
+        opacity: 0;
+        width: 0;
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .menu-section-title {
+        opacity: 0;
+        height: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .sidebar:not(.expanded) .sidebar-header {
+        padding: 20px 15px;
+    }
+
+    .sidebar:not(.expanded) .user-info {
+        display: none;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a {
+        justify-content: center;
+        padding: 11px 0;
+        gap: 0;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu a:hover {
         transform: translateX(0);
     }
-    
+
+    .sidebar:not(.expanded) .sidebar-footer {
+        padding: 16px 8px;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu-container {
+        padding: 20px 8px;
+    }
+
+    /* Hide submenu arrow in collapsed mode */
+    .sidebar:not(.expanded) .submenu-arrow {
+        display: none;
+    }
+
+    /* Hide submenu in collapsed mode */
+    .sidebar:not(.expanded) .has-submenu > .submenu {
+        display: none !important;
+    }
+
+    /* Show text in expanded mode */
+    .sidebar.expanded .menu-text {
+        opacity: 1;
+        width: auto;
+        display: block;
+    }
+
+    .sidebar.expanded .menu-section-title {
+        opacity: 1;
+        height: auto;
+    }
+
+    /* Adjust main content */
     .main-content {
-        margin-left: 0;
+        margin-left: var(--sidebar-collapsed-width);
+        padding: 24px 20px;
+    }
+
+    .sidebar.expanded ~ .main-content {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Tooltip for collapsed state */
+    .sidebar:not(.expanded) .sidebar-menu a:not(.submenu-toggle) {
+        position: relative;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu > li > a::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: var(--text-primary);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 13px;
+        white-space: nowrap;
+        margin-left: 10px;
+        z-index: 1001;
+        box-shadow: var(--shadow-md);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu > li > a::before {
+        content: '';
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: 4px;
+        border: 5px solid transparent;
+        border-right-color: var(--text-primary);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar:not(.expanded) .sidebar-menu > li > a:hover::after,
+    .sidebar:not(.expanded) .sidebar-menu > li > a:hover::before {
+        opacity: 1;
+    }
+
+    .dashboard-header h1 {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px 16px;
+    }
+
+    .dashboard-header {
         padding: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 22px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar:not(.expanded) {
+        width: 60px;
+    }
+
+    .sidebar-toggle.collapsed {
+        left: 60px;
+    }
+
+    .main-content {
+        margin-left: 60px;
+        padding: 16px 12px;
+    }
+
+    .sidebar:not(.expanded) ~ .main-content {
+        margin-left: 60px;
+    }
+
+    .sidebar.expanded ~ .main-content {
+        margin-left: 60px;
+    }
+
+    .dashboard-header {
+        padding: 16px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 20px;
     }
 }
 </style>
 
-<div class="sidebar">
+<!-- Overlay dengan blur effect -->
+<div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<!-- Toggle Arrow Button -->
+<button class="sidebar-toggle collapsed" id="toggleBtn" onclick="toggleSidebar()" aria-label="Toggle Sidebar">
+    <span class="material-symbols-rounded" id="toggleIcon">chevron_right</span>
+</button>
+
+<div class="sidebar" id="sidebar">
     <!-- Header dengan Gradient -->
     <div class="sidebar-header">
         <div class="logo">
-            <img src="<?= base_url('assets/img/logo2.png') ?>" alt="Logo Politeknik">
+            <img src="<?= base_url('assets/img/logo2.png') ?>" alt="Logo Politeknik" class="logo-desktop">
+            <img src="<?= base_url('assets/img/Logo.webp') ?>" alt="Logo Politeknik" class="logo-mobile">
         </div>
         
         <!-- Optional: User Info Section -->
@@ -528,18 +806,20 @@ body {
                 <!-- DASHBOARD -->
                 <li>
                     <a href="<?= base_url('mahasiswa/dashboard.php') ?>"
-                       class="<?= isActive('/mahasiswa/dashboard.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/mahasiswa/dashboard.php') ? 'active' : '' ?>"
+                       data-tooltip="Dashboard">
                         <span class="material-symbols-rounded">dashboard</span>
-                        <span>Dashboard</span>
+                        <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
 
                 <!-- ALUR PANDUAN -->
                 <li>
                     <a href="<?= base_url('mahasiswa/alurpanduan.php') ?>"
-                       class="<?= isActive('/mahasiswa/alurpanduan.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/mahasiswa/alurpanduan.php') ? 'active' : '' ?>"
+                       data-tooltip="Alur & Panduan">
                         <span class="material-symbols-rounded">book_5</span>
-                        <span>Alur & Panduan</span>
+                        <span class="menu-text">Alur & Panduan</span>
                     </a>
                 </li>
             </ul>
@@ -551,9 +831,9 @@ body {
             <ul class="sidebar-menu">
                 <!-- PENGAJUAN TUGAS AKHIR -->
                 <li class="has-submenu <?= isAnyActive(['/mahasiswa/pengajuan/']) ? 'open' : '' ?>">
-                    <a class="submenu-toggle">
+                    <a class="submenu-toggle" data-tooltip="Pengajuan TA">
                         <span class="material-symbols-rounded">assignment</span>
-                        <span>Pengajuan TA</span>
+                        <span class="menu-text">Pengajuan TA</span>
                         <span class="submenu-arrow material-symbols-rounded">expand_more</span>
                     </a>
                     <ul class="submenu">
@@ -561,14 +841,14 @@ body {
                             <a href="<?= base_url('mahasiswa/pengajuan/form.php') ?>"
                                class="<?= isActive('/mahasiswa/pengajuan/form.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">contract_edit</span>
-                                <span>Form Pengajuan</span>
+                                <span class="menu-text">Form Pengajuan</span>
                             </a>
                         </li>
                         <li>
                             <a href="<?= base_url('mahasiswa/pengajuan/status.php') ?>"
                                class="<?= isActive('/mahasiswa/pengajuan/status.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">assignment_turned_in</span>
-                                <span>Status & Feedback</span>
+                                <span class="menu-text">Status & Feedback</span>
                             </a>
                         </li>
                     </ul>
@@ -576,9 +856,9 @@ body {
 
                 <!-- SEMINAR PROPOSAL -->
                 <li class="has-submenu <?= isAnyActive(['/mahasiswa/sempro/']) ? 'open' : '' ?>">
-                    <a class="submenu-toggle">
+                    <a class="submenu-toggle" data-tooltip="Seminar Proposal">
                         <span class="material-symbols-rounded">co_present</span>
-                        <span>Seminar Proposal</span>
+                        <span class="menu-text">Seminar Proposal</span>
                         <span class="submenu-arrow material-symbols-rounded">expand_more</span>
                     </a>
                     <ul class="submenu">
@@ -586,14 +866,14 @@ body {
                             <a href="<?= base_url('mahasiswa/sempro/form.php') ?>"
                                class="<?= isActive('/mahasiswa/sempro/form.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">contract_edit</span>
-                                <span>Form Pengajuan</span>
+                                <span class="menu-text">Form Pengajuan</span>
                             </a>
                         </li>
                         <li>
                             <a href="<?= base_url('mahasiswa/sempro/status.php') ?>"
                                class="<?= isActive('/mahasiswa/sempro/status.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">assignment_turned_in</span>
-                                <span>Status & Feedback</span>
+                                <span class="menu-text">Status & Feedback</span>
                             </a>
                         </li>
                     </ul>
@@ -601,9 +881,9 @@ body {
 
                 <!-- SEMINAR HASIL -->
                 <li class="has-submenu <?= isAnyActive(['/mahasiswa/semhas/']) ? 'open' : '' ?>">
-                    <a class="submenu-toggle">
+                    <a class="submenu-toggle" data-tooltip="Seminar Hasil">
                         <span class="material-symbols-rounded">task</span>
-                        <span>Seminar Hasil</span>
+                        <span class="menu-text">Seminar Hasil</span>
                         <span class="submenu-arrow material-symbols-rounded">expand_more</span>
                     </a>
                     <ul class="submenu">
@@ -611,14 +891,14 @@ body {
                             <a href="<?= base_url('mahasiswa/semhas/form.php') ?>"
                                class="<?= isActive('/mahasiswa/semhas/form.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">contract_edit</span>
-                                <span>Form Pengajuan</span>
+                                <span class="menu-text">Form Pengajuan</span>
                             </a>
                         </li>
                         <li>
                             <a href="<?= base_url('mahasiswa/semhas/status.php') ?>"
                                class="<?= isActive('/mahasiswa/semhas/status.php') ? 'active' : '' ?>">
                                 <span class="material-symbols-rounded">assignment_turned_in</span>
-                                <span>Status & Feedback</span>
+                                <span class="menu-text">Status & Feedback</span>
                             </a>
                         </li>
                     </ul>
@@ -633,18 +913,20 @@ body {
                 <!-- CEK NILAI -->
                 <li>
                     <a href="<?= base_url('mahasiswa/semhas/cek_nilai.php') ?>"
-                       class="<?= isActive('/mahasiswa/semhas/cek_nilai.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/mahasiswa/semhas/cek_nilai.php') ? 'active' : '' ?>"
+                       data-tooltip="Cek Nilai">
                         <span class="material-symbols-rounded">fact_check</span>
-                        <span>Cek Nilai</span>
+                        <span class="menu-text">Cek Nilai</span>
                     </a>
                 </li>
 
                 <!-- TEMPLATE DOKUMEN -->
                 <li>
                     <a href="<?= base_url('mahasiswa/template.php') ?>"
-                       class="<?= isActive('/mahasiswa/template.php') ? 'active' : '' ?>">
+                       class="<?= isActive('/mahasiswa/template.php') ? 'active' : '' ?>"
+                       data-tooltip="Dokumen">
                         <span class="material-symbols-rounded">description</span>
-                        <span>Dokumen</span>
+                        <span class="menu-text">Dokumen</span>
                     </a>
                 </li>
             </ul>
@@ -655,22 +937,40 @@ body {
     <div class="sidebar-footer">
         <ul class="sidebar-menu">
             <li>
-                <a href="<?= base_url('logout.php') ?>" class="logout">
+                <a href="<?= base_url('logout.php') ?>" class="logout" data-tooltip="Log Out">
                     <span class="material-symbols-rounded">logout</span>
-                    <span>Log Out</span>
+                    <span class="menu-text">Log Out</span>
                 </a>
             </li>
         </ul>
     </div>
 </div>
 
-<div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/footer.php'; ?>
-</div>
-
 <script>
+// Toggle sidebar function
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    sidebar.classList.toggle('expanded');
+    overlay.classList.toggle('active');
+    toggleBtn.classList.toggle('collapsed');
+    toggleBtn.classList.toggle('expanded');
+    
+    // Update arrow direction
+    if (sidebar.classList.contains('expanded')) {
+        toggleIcon.textContent = 'chevron_left';
+    } else {
+        toggleIcon.textContent = 'chevron_right';
+    }
+}
+
+// Submenu toggle
 document.querySelectorAll('.submenu-toggle').forEach(toggle => {
-    toggle.addEventListener('click', function () {
+    toggle.addEventListener('click', function (e) {
+        e.preventDefault();
         const parent = this.closest('.has-submenu');
         
         // Optional: Accordion style (tutup yang lain)
@@ -681,4 +981,37 @@ document.querySelectorAll('.submenu-toggle').forEach(toggle => {
         parent.classList.toggle('open');
     });
 });
+
+// Handle resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const toggleIcon = document.getElementById('toggleIcon');
+        
+        if (window.innerWidth > 1024) {
+            // Desktop mode - remove toggle button and expanded class
+            sidebar.classList.remove('expanded');
+            overlay.classList.remove('active');
+            toggleBtn.classList.remove('expanded');
+            toggleBtn.classList.add('collapsed');
+            toggleIcon.textContent = 'chevron_right';
+        }
+    }, 250);
+});
+
+// Initialize toggle button position on load
+window.addEventListener('load', () => {
+    const toggleBtn = document.getElementById('toggleBtn');
+    if (window.innerWidth <= 1024) {
+        toggleBtn.classList.add('collapsed');
+    }
+});
 </script>
+
+<div>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/footer.php'; ?>
+</div>
