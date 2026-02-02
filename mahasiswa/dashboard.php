@@ -43,9 +43,12 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
             --text-grey: #6B7280;
         }
 
-body{
-    background: #FFF1E5 !important;
-}
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-soft);
+            margin: 0;
+            color: var(--text-dark);
+        }
 
         .container {
             /* Sidebar layout handled manually or by sidebar.php styles */
@@ -60,10 +63,10 @@ body{
         .dash-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 30px;
-            flex-wrap: wrap; /* Allow wrapping on small screens */
-            gap: 15px; /* Add gap for wrapped items */
+            gap: 20px;
+            width: 100%;
         }
         
         .dash-title h1 {
@@ -76,15 +79,18 @@ body{
         /* User welcome responsive adjustment */
         .user-welcome {
             text-align: right;
+            max-width: 90px; /* Force wrapping like mockup */
+            line-height: 1.2;
         }
         
         .user-welcome span { font-size: 12px; color: #888; display: block; }
-        .user-welcome b { color: var(--orange); font-size: 14px; }
+        .user-welcome b { color: var(--orange); font-size: 14px; display: block; }
         
         .header-profile {
             display: flex;
             align-items: center;
             gap: 12px;
+            margin-top: 5px; /* Visual alignment with H1 top */
         }
         .header-avatar {
             width: 40px; height: 40px;
@@ -358,18 +364,39 @@ body{
         @media screen and (max-width: 768px) {
             /* Header */
             .dash-header {
-                flex-direction: column-reverse;
-                align-items: flex-end;
-                gap: 20px;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                gap: 10px;
             }
             .dash-title {
-                width: 100%;
-                text-align: left;
+                flex: 1;
+                min-width: 0;
             }
-            .dash-title h1 { font-size: 24px; }
+            .dash-title h1 { 
+                font-size: 20px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .user-welcome {
+                display: block !important; /* Ensure container is visible */
+            }
+            .user-welcome span {
+                display: block; /* Restore 'Selamat Datang' text visibility */
+                font-size: 11px;
+                line-height: 1.2;
+            }
+            .user-welcome b {
+                font-size: 13px;
+                display: block;
+            }
             .header-profile { 
-                width: 100%;
-                justify-content: flex-end;
+                gap: 8px;
+            }
+            .header-avatar {
+                width: 35px;
+                height: 35px;
             }
 
             /* HERO CARD STACKING */
@@ -588,7 +615,7 @@ body{
             <div class="alert-footer">
                 <span class="material-symbols-rounded alert-icon">info</span>
                 <span class="alert-text">
-                    Pastikan Status Pengajuan sudah "Disetujui" sebelum lanjut ke tahap berikutnya. Jangan lupa untuk memeriksa Hasil Nilai secara berkala setelah seminar dilaksanakan.
+                    Pastikan Status Pengajuan sudah "Disetujui" sebelum lanjut ke tahap berikutnya.Jangan lupa untuk memeriksa Hasil Nilai secara berkala setelah seminar dilaksanakan.
                 </span>
             </div>
 
