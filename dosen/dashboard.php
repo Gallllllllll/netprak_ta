@@ -95,7 +95,7 @@ $stmt = $pdo->prepare("
     SELECT 
         CASE 
             WHEN persetujuan_sempro IS NULL THEN 'Belum Sempro'
-            ELSE 'Sudah Sempro'
+            ELSE 'disetujui'
         END AS status,
         COUNT(*) total
     FROM dosbing_ta

@@ -32,6 +32,7 @@ function isAnyActive(array $paths)
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="assets\img\Logo.webp">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 
 <style>
@@ -769,6 +770,82 @@ body {
         font-size: 20px;
     }
 }
+    /* Custom SweetAlert2 Styles - Theme Matched */
+.swal2-popup {
+    font-family: 'Inter', sans-serif !important;
+    border-radius: 16px !important;
+    padding: 32px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.swal2-title {
+    font-weight: 700 !important;
+    font-size: 24px !important;
+    color: #1F2937 !important;
+    margin-bottom: 12px !important;
+}
+
+.swal2-html-container {
+    font-size: 16px !important;
+    color: #6B7280 !important;
+    font-weight: 500 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #FF6B9D !important;
+    color: #FF6B9D !important;
+}
+
+.swal2-icon.swal2-warning .swal2-icon-content {
+    color: #FF6B9D !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FF8E3C 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 12px 32px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3) !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-confirm:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(255, 107, 157, 0.4) !important;
+}
+
+.swal2-cancel {
+    background: #F3F4F6 !important;
+    color: #6B7280 !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 10px !important;
+    padding: 12px 32px !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    transition: all 0.3s ease !important;
+}
+
+.swal2-cancel:hover {
+    background: #E5E7EB !important;
+    color: #1F2937 !important;
+    transform: translateY(-2px) !important;
+}
+
+.swal2-actions {
+    gap: 12px !important;
+    margin-top: 24px !important;
+}
+
+/* Loading state */
+.swal2-loading .swal2-confirm {
+    background: linear-gradient(135deg, #FF6B9D 0%, #FF8E3C 100%) !important;
+}
+
+.swal2-loader {
+    border-color: #FF6B9D transparent #FF6B9D transparent !important;
+}
 </style>
 
 <!-- Overlay dengan blur effect -->
@@ -937,10 +1014,10 @@ body {
     <div class="sidebar-footer">
         <ul class="sidebar-menu">
             <li>
-                <a href="<?= base_url('logout.php') ?>" class="logout" data-tooltip="Log Out">
-                    <span class="material-symbols-rounded">logout</span>
-                    <span class="menu-text">Log Out</span>
-                </a>
+                <a href="#" class="logout" data-tooltip="Log Out" onclick="confirmLogout(event)">
+    <span class="material-symbols-rounded">logout</span>
+    <span class="menu-text">Log Out</span>
+</a>
             </li>
         </ul>
     </div>
@@ -1010,6 +1087,47 @@ window.addEventListener('load', () => {
         toggleBtn.classList.add('collapsed');
     }
 });
+</script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Logout confirmation with SweetAlert2
+function confirmLogout(event) {
+    event.preventDefault();
+    
+    Swal.fire({
+        title: 'Konfirmasi Logout',
+        html: '<p style="margin: 0;">Apakah Anda yakin ingin keluar dari sistem?</p>',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: '<span style="display: flex; align-items: center; gap: 8px;"><i class="material-symbols-rounded" style="font-size: 20px;">logout</i> Ya, Logout</span>',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        focusCancel: true,
+        allowEnterKey: false
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Logging out...',
+                html: '<p style="margin: 0; color: #6B7280;">Mohon tunggu sebentar</p>',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                willOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Redirect to logout page
+            setTimeout(() => {
+                window.location.href = '<?= base_url('logout.php') ?>';
+            }, 500);
+        }
+    });
+}
 </script>
 
 <div>
