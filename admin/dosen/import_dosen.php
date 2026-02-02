@@ -40,10 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
                 for ($i = 1; $i < count($rows); $i++) {
 
                     $nip      = trim($rows[$i][0] ?? '');
-                    $nama     = trim($rows[$i][1] ?? '');
-                    $username = trim($rows[$i][2] ?? '');
-                    $email    = trim($rows[$i][3] ?? '') ?: null;
-                    $rawPass  = trim($rows[$i][4] ?? '') ?: '123456';
+                    $username = trim($rows[$i][1] ?? '');
+                    $rawPass  = trim($rows[$i][2] ?? '') ?: '123456';
+                    $nama     = trim($rows[$i][3] ?? '');
+                    $email    = trim($rows[$i][4] ?? '') ?: null;
+
                     $password = password_hash($rawPass, PASSWORD_DEFAULT);
 
                     if (!$nip || !$nama || !$username) {
