@@ -425,6 +425,7 @@ form{
     color: #ffffff;
     border:1px solid #FF983D;
     cursor: pointer;
+    width: fit-content !important;
 }
 .ta-btn-primary:hover {
     opacity: .9;
@@ -531,24 +532,110 @@ form{
 
 /* small variant used for inline sample template links */
 .template-sample{font-size:12px;padding:3px 5px;border-radius:5px;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
-@media (max-width:768px){.template-sample{display:inline-flex;flex-wrap:wrap;margin-top:8px}}
+@media (max-width:768px){.template-sample{display:inline-flex;flex-wrap:nowrap;margin-top:8px;white-space:nowrap;}}
 .template-sample span{font-size:16px;}
 
-/* MOBILE */
-@media (max-width: 768px) {
+/* TABLET */
+@media (max-width: 1024px) {
+    /* Adjust content area to sidebar collapsed width from sidebar styles */
+    .main-content {
+        margin-left: 70px;
+        padding: 24px 20px;
+    }
+
+    .topbar h1{
+        font-size:22px;
+    }
+
+    .ta-form-head{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
     .ta-upload-item {
         flex: 1 1 100%;
         min-width: 100%;
     }
 
-    .ta-actions {
-        flex-direction: column;
+    .ta-upload-box { padding: 12px; }
+    .ta-upload-icon { width: 38px; height: 38px; }
+    .ta-upload-icon span { font-size: 20px; }
+    .ta-upload-text strong { font-size: 14px; }
+    .ta-actions { justify-content: flex-end; gap: 8px; }
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 60px;
+        padding: 20px 16px;
     }
 
-    .ta-btn {
-        width: 100%;
-        justify-content: center;
+    .topbar{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
+
+    .topbar h1{
+        font-size:24px;
+    }
+
+    /* HIDE welcome text and person icon on small screens */
+    .mhs-text{ display:none; }
+    .mhs-info{ align-items:center; gap:12px }
+    .mhs-info .avatar{ display:none; }
+
+    .ta-form-head{
+        align-items:flex-start;
+        gap:8px;
+    }
+
+    .ta-upload-item {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    /* Center icon + text inside upload box on mobile */
+    .ta-upload-inner{
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 8px;
+    }
+
+    .ta-upload-box { padding: 12px; }
+    .ta-upload-icon { width: 40px; height: 40px; }
+    .ta-upload-icon span { font-size: 22px; }
+    .ta-upload-text small { display:block; }
+
+    /* Keep template sample small */
+    .template-sample{ margin-top:8px; flex-wrap:nowrap; white-space:nowrap; align-self:center; }
+
+    .ta-actions{
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .ta-btn{ width:100%; justify-content:center; padding:12px; font-size:15px }
+
+    .ta-form-title{ font-size:16px }
+    .info-box{ font-size:13px }
+    .pretty-ol li{ font-size:13px }
+}
+
+/* EXTRA SMALL */
+@media (max-width: 480px) {
+    .topbar h1{ font-size:18px }
+    .mhs-text span{ font-size:12px }
+    .mhs-text b{ font-size:13px }
+    .ta-upload-icon { width:36px; height:36px }
+    .ta-upload-icon span{ font-size:18px }
+    .ta-input{ padding:10px; font-size:13px }
+    .ta-upload-box{ padding:10px }
+    .ta-error-icon{ width:42px; height:42px }
+    .ta-btn{ font-size:14px; padding:10px }
 }
 </style>
 </head>
