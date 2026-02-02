@@ -147,15 +147,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             margin-left: 280px;
             padding: 32px;
             min-height: 100vh;
+            transition: all 0.3s ease;
+            width: calc(100vw - 280px);
+            max-width: calc(100vw - 280px);
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         /* HEADER */
         .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             background: var(--primary-gradient) !important;
             border-radius: 20px;
             padding: 24px 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 20px rgba(255, 95, 158, 0.15);
+            gap: 20px;
+        }
+
+        .header-text {
+            flex: 1;
         }
 
         .dashboard-header h1 {
@@ -174,6 +187,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             color: #fff !important;
             opacity: 0.9;
             font-weight: 400;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .admin-profile .text {
+            text-align: right;
+            max-width: 90px;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .admin-profile small { 
+            font-size: 11px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .admin-profile b { 
+            font-size: 13px; 
+            display: block; 
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* CARD */
@@ -216,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             font-size: 14px;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            color: #666;
+            color: #2D3436;
         }
 
         .input-control:focus {
@@ -242,6 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             transition: all 0.3s ease;
             margin-top: 10px;
             box-shadow: 0 4px 15px rgba(255, 95, 158, 0.2);
+            width: 100%;
         }
 
         .btn-submit:hover {
@@ -261,8 +312,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             font-size: 14px;
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 70px !important;
+                padding: 20px !important;
+                width: calc(100vw - 70px) !important;
+                max-width: calc(100vw - 70px) !important;
+            }
+        }
+
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; padding: 20px; }
+            .main-content {
+                margin-left: 60px !important;
+                padding: 15px !important;
+                width: calc(100vw - 60px) !important;
+                max-width: calc(100vw - 60px) !important;
+            }
+
+            .dashboard-header {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 18px;
+            }
+
+            .admin-profile {
+                gap: 10px;
+            }
+
+            .admin-profile .text {
+                max-width: 80px;
+            }
+
+            .avatar {
+                width: 36px;
+                height: 36px;
+            }
+
             .form-card { padding: 25px; }
         }
     </style>
@@ -273,39 +361,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
 <?php include "../sidebar.php"; ?>
 
 <div class="main-content">
-    <h2>Input Nilai SEMPRO</h2>
-    <p><?= htmlspecialchars($data['nama_mahasiswa']) ?> (<?= $data['nim'] ?>)</p>
+    <div class="dashboard-header">
+        <div class="header-text">
+            <h1>Input Nilai Seminar Proposal</h1>
+            <p><?= htmlspecialchars($data['nama_mahasiswa']) ?> (<?= $data['nim'] ?>)</p>
+        </div>
+        <div class="admin-profile">
+            <div class="text">
+                <small>Selamat Datang,</small>
+                <b><?= htmlspecialchars($_SESSION['user']['nama'] ?? 'Admin') ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
+    </div>
 
     <div class="form-card">
+        
+        <div class="info-header">
+            Mahasiswa: <b><?= htmlspecialchars($data['nama_mahasiswa']) ?></b><br>
+            NIM: <b><?= htmlspecialchars($data['nim']) ?></b><br>   
+            Judul: <i><?= htmlspecialchars($data['judul_ta']) ?></i>
+        </div>
 
-<?php if ($akses_ditutup): ?>
-
-        <p style="color:red;text-align:center">⛔ Jadwal SEMPRO belum ditentukan</p>
-
-<?php else: ?>
-
-        <?php if ($error): ?>
-            <div style="color:red"><?= $error ?></div>
+        <?php if ($akses_ditutup): ?>
+            <div class="error-msg">
+                ⛔ Jadwal SEMPRO belum ditentukan. Input nilai hanya dapat dilakukan setelah jadwal ditentukan.
+            </div>
         <?php endif; ?>
 
-        <form method="POST">
+        <?php if ($error): ?>
+            <div class="error-msg"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+
+        <form method="POST" <?= ($akses_ditutup) ? 'style="display:none"' : '' ?>>
             <?php foreach ($dosbing as $d): ?>
                 <div class="input-group">
-                    <label><?= strtoupper(str_replace('_',' ',$d['peran'])) ?> - <?= $d['nama'] ?></label>
+                    <label><?= strtoupper(str_replace('_',' ',$d['peran'])) ?> - <?= htmlspecialchars($d['nama']) ?></label>
                     <input type="hidden" name="nilai[<?= $d['peran'] ?>][dosen_id]" value="<?= $d['dosen_id'] ?>">
                     <input type="number"
                            name="nilai[<?= $d['peran'] ?>][nilai]"
                            min="0" max="100"
+                           step="0.01"
                            value="<?= $nilaiLama[$d['peran']] ?? '' ?>"
                            class="input-control"
+                           placeholder="input nilai disini"
                            required>
                 </div>
             <?php endforeach; ?>
 
             <button class="btn-submit">Simpan Nilai</button>
         </form>
-
-<?php endif; ?>
 
     </div>
 </div>

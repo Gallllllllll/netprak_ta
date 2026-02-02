@@ -206,15 +206,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-left: 280px;
             padding: 32px;
             min-height: 100vh;
+            transition: all 0.3s ease;
+            width: calc(100vw - 280px);
+            max-width: calc(100vw - 280px);
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         /* HEADER */
         .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             background: var(--primary-gradient) !important;
             border-radius: 20px;
             padding: 24px 30px;
             margin-bottom: 30px;
             box-shadow: 0 10px 20px rgba(255, 95, 158, 0.15);
+            gap: 20px;
+        }
+
+        .header-text {
+            flex: 1;
         }
 
         .dashboard-header h1 {
@@ -233,6 +246,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #fff !important;
             opacity: 0.9;
             font-weight: 400;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
+        .admin-profile .text {
+            text-align: right;
+            max-width: 90px;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        .admin-profile small { 
+            font-size: 11px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        .admin-profile b { 
+            font-size: 13px; 
+            display: block; 
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* CARD */
@@ -320,8 +370,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 14px;
         }
 
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 70px !important;
+                padding: 20px !important;
+                width: calc(100vw - 70px) !important;
+                max-width: calc(100vw - 70px) !important;
+            }
+        }
+
         @media (max-width: 768px) {
-            .main-content { margin-left: 0; padding: 20px; }
+            .main-content {
+                margin-left: 60px !important;
+                padding: 15px !important;
+                width: calc(100vw - 60px) !important;
+                max-width: calc(100vw - 60px) !important;
+            }
+
+            .dashboard-header {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .dashboard-header h1 {
+                font-size: 18px;
+            }
+
+            .admin-profile {
+                gap: 10px;
+            }
+
+            .admin-profile .text {
+                max-width: 80px;
+            }
+
+            .avatar {
+                width: 36px;
+                height: 36px;
+            }
+
             .form-card { padding: 25px; }
         }
     </style>
@@ -334,8 +421,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="main-content">
     
     <div class="dashboard-header">
-        <h1>Input Nilai</h1>
-        <p>Tempat Penguji Menginput nilai</p>
+        <div class="header-text">
+            <h1>Input Nilai Seminar Hasil</h1>
+            <p><?= htmlspecialchars($data['nama_mahasiswa']) ?> (<?= $data['nim'] ?>)</p>
+        </div>
+        <div class="admin-profile">
+            <div class="text">
+                <small>Selamat Datang,</small>
+                <b><?= htmlspecialchars($_SESSION['user']['nama'] ?? 'Admin') ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
     </div>
 
     <div class="form-card">

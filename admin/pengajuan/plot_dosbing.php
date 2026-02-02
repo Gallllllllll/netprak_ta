@@ -77,15 +77,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Plot Dosen Pembimbing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
 body{
     background:#f3a4a4;
-    font-family:Arial, sans-serif;
+    font-family:'Outfit', sans-serif;
+    margin: 0;
 }
 
-.main-content{
-    padding:40px;
+.main-content {
+    margin-left: 280px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    width: calc(100vw - 280px);
+    max-width: calc(100vw - 280px);
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* card utama */
@@ -99,12 +110,19 @@ body{
 
 /* header */
 .dashboard-header{
-    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     padding:18px 22px;
     border-radius:14px;
     margin-bottom:22px;
+    background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    gap: 20px;
 }
 
+.header-text {
+    flex: 1;
+}
 
 .dashboard-header h1 {
     margin:0;
@@ -113,6 +131,7 @@ body{
     background: none !important;
     -webkit-background-clip: initial !important;
     font-size: 20px;
+    font-weight: 700;
 }
 
 .dashboard-header p{
@@ -120,9 +139,43 @@ body{
     margin:4px 0 0;
     opacity:.9;
     color:#fff !important;
-    -webkit-text-fill-color: initial !important;
-    background: none !important;
-    -webkit-background-clip: initial !important;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.admin-profile .text {
+    text-align: right;
+    max-width: 90px;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.admin-profile small { 
+    font-size: 11px;
+    display: block;
+    opacity: 0.8;
+}
+
+.admin-profile b { 
+    font-size: 13px; 
+    display: block; 
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* form */
@@ -170,6 +223,47 @@ button{
 button:hover{
     opacity:.9;
 }
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:1024px){
+    .main-content {
+        margin-left: 70px !important;
+        padding: 20px !important;
+        width: calc(100vw - 70px) !important;
+        max-width: calc(100vw - 70px) !important;
+    }
+}
+
+@media (max-width:768px){
+    .main-content {
+        margin-left: 60px !important;
+        padding: 15px !important;
+        width: calc(100vw - 60px) !important;
+        max-width: calc(100vw - 60px) !important;
+    }
+
+    .dashboard-header {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 18px;
+    }
+
+    .admin-profile {
+        gap: 10px;
+    }
+
+    .admin-profile .text {
+        max-width: 80px;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+    }
+}
 </style>
 
 </head>
@@ -184,8 +278,19 @@ button:hover{
     <div class="card">
 
         <div class="dashboard-header">
-            <h1>Plot Dosen Pembimbing</h1>
-            <p>Tentukan dosen pembimbing 1 dan 2</p>
+            <div class="header-text">
+                <h1>Plot Dosen Pembimbing</h1>
+                <p>Tentukan dosen pembimbing 1 dan 2</p>
+            </div>
+            <div class="admin-profile">
+                <div class="text">
+                    <small>Selamat Datang,</small>
+                    <b><?= htmlspecialchars($_SESSION['user']['nama'] ?? 'Admin') ?></b>
+                </div>
+                <div class="avatar">
+                    <span class="material-symbols-rounded" style="color:#fff">person</span>
+                </div>
+            </div>
         </div>
 
         <form method="POST" id="plotForm">

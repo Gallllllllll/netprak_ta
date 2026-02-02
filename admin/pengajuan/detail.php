@@ -42,6 +42,10 @@ $files = [
 <head>
 <meta charset="UTF-8">
 <title>Detail Pengajuan TA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 
 <style>
 :root{
@@ -54,16 +58,32 @@ $files = [
 body{
     margin:0;
     background:var(--bg);
-    font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+    font-family:'Outfit', sans-serif;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 30px;
+    transition: all 0.3s ease;
+    width: calc(100vw - 280px);
+    max-width: calc(100vw - 280px);
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* ================= HEADER ================= */
 .dashboard-header{
-    background:linear-gradient(135deg,var(--primary),var(--secondary));
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     padding:20px 24px;
     border-radius:14px;
     margin-bottom:20px;
     background:linear-gradient(90deg, #ff5f9e, #ff9f43) !important;
+    gap: 20px;
+}
+.header-text {
+    flex: 1;
 }
 .dashboard-header h1{
     margin:0;
@@ -71,12 +91,51 @@ body{
     -webkit-text-fill-color: initial !important;
     background: none !important;
     -webkit-background-clip: initial !important;
-    font-size: 20px;
+    font-size: 24px;
+    font-weight: 700;
 }
 .dashboard-header p{
     margin:6px 0 0;
     color:#fff !important;
     font-size:14px;
+    opacity: 0.9;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    margin-top: 5px;
+}
+
+.admin-profile .text {
+    text-align: right;
+    max-width: 90px;
+    line-height: 1.2;
+}
+
+.admin-profile small { 
+    color: rgba(255,255,255,0.8); 
+    font-size: 11px;
+    display: block;
+}
+
+.admin-profile b { 
+    color: #fff;
+    font-size: 13px; 
+    display: block; 
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ================= CARD ================= */
@@ -186,7 +245,45 @@ button{
 
 
 /* ================= RESPONSIVE ================= */
+@media (max-width:1024px){
+    .main-content {
+        margin-left: 70px !important;
+        padding: 20px !important;
+        width: calc(100vw - 70px) !important;
+        max-width: calc(100vw - 70px) !important;
+    }
+}
+
 @media (max-width:768px){
+    .main-content {
+        margin-left: 60px !important;
+        padding: 15px !important;
+        width: calc(100vw - 60px) !important;
+        max-width: calc(100vw - 60px) !important;
+    }
+
+    .dashboard-header {
+        padding: 15px;
+        gap: 10px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 18px;
+    }
+
+    .admin-profile {
+        gap: 10px;
+    }
+
+    .admin-profile .text {
+        max-width: 80px;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+    }
+
     table, thead, tbody, tr, td, th{
         display:block;
         width:100%;
@@ -196,7 +293,18 @@ button{
         margin-bottom:10px;
     }
     tr{
-        margin-bottom:18px;
+        margin-bottom:15px;
+    }
+    .file-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+    }
+    .file-link {
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+        margin-top: 10px;
     }
 }
 </style>
@@ -211,8 +319,19 @@ button{
 <div class="main-content">
 
     <div class="dashboard-header">
-        <h1>Detail Pengajuan TA</h1>
-        <p>Verifikasi dokumen dan plot dosen pembimbing</p>
+        <div class="header-text">
+            <h1>Detail Pengajuan TA</h1>
+            <p>Verifikasi dokumen dan plot dosen pembimbing</p>
+        </div>
+        <div class="admin-profile">
+            <div class="text">
+                <small>Selamat Datang,</small>
+                <b><?= htmlspecialchars($_SESSION['user']['nama'] ?? 'Admin') ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
+        </div>
     </div>
 
     <!-- INFO MAHASISWA -->
