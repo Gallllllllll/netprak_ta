@@ -13,11 +13,35 @@ $stmt = $pdo->prepare("SELECT * FROM mahasiswa WHERE username = ? LIMIT 1");
 $stmt->execute([$_SESSION['user']['username']]);
 $mhs = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// ===============================
+// CEK STATUS PENGAJUAN (SEMHas ONLY)
+// ===============================
+
+$status_pengajuan = "Sedang Berjalan";
+
+$stmt = $pdo->prepare("
+    SELECT 1
+    FROM nilai_semhas ns
+    JOIN pengajuan_semhas ps 
+        ON ns.pengajuan_id = ps.id
+    WHERE ps.mahasiswa_id = ?
+      AND ns.nilai IS NOT NULL
+    LIMIT 1
+");
+
+$stmt->execute([$mhs['id']]);
+
+if ($stmt->fetchColumn()) {
+    $status_pengajuan = "Selesai";
+}
+
+
+
+
 $nama = $mhs['nama'] ?? $_SESSION['user']['nama'];
 $nim = $mhs['nim'] ?? '-';
 $prodi = $mhs['prodi'] ?? '-';
 $kelas = $mhs['kelas'] ?? '-';
-$status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic database
 
 ?>
 <!DOCTYPE html>
@@ -150,6 +174,13 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
             font-size: 12px;
             backdrop-filter: blur(5px);
             white-space: nowrap;
+        }
+
+
+        .status-badge.done {
+            background: rgba(255, 255, 255, 0.3);
+            color: #ECFDF5;
+            font-weight: 700;
         }
 
         .hero-actions {
@@ -509,7 +540,10 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
                         <tr><td>Kelas</td> <td>: <?= htmlspecialchars($kelas) ?></td></tr>
                         <tr>
                             <td>Status Pengajuan</td>
-                            <td>: <span class="status-badge"><?= $status_pengajuan ?></span></td>
+                            <td>: <span class="status-badge <?= $status_pengajuan == 'Selesai' ? 'done' : '' ?>">
+                                    <?= $status_pengajuan ?>
+                                </span>
+                            </td>
                         </tr>
                     </table>
 
