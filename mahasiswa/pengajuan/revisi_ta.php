@@ -419,8 +419,9 @@ body{
     <?php if ($has_revisi): ?>
         <div class="center-action">
             <button type="submit" class="btn-gradient" disabled>
-                Upload Revisi
-            </button>
+    Upload Revisi
+</button>
+
         </div>
         
     <?php endif; ?>
@@ -489,6 +490,36 @@ fileInputs.forEach(input => {
     input.addEventListener('change', checkFileSelected);
 });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const form = document.querySelector('form.revisi-wrapper');
+const submitBtn = document.querySelector('.btn-gradient');
+
+form.addEventListener('submit', function (e) {
+    e.preventDefault(); // tahan submit dulu
+
+    Swal.fire({
+        title: 'Apakah Anda sudah yakin?',
+        text: 'Dokumen yang diunggah akan dikirim untuk diverifikasi ulang.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Upload Sekarang',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        confirmButtonColor: '#FF8C42',
+        cancelButtonColor: '#9CA3AF',
+        background: '#FFF7F1',
+        color: '#7C2D12'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // lanjut submit TANPA mengubah logika backend
+            form.submit();
+        }
+    });
+});
+</script>
+
 </body>
 
 </html>

@@ -44,15 +44,21 @@ $status_pengajuan = 'Sedang berjalan'; // Placeholder, bisa diambil dari logic d
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-soft);
-            margin: 0;
-            color: var(--text-dark);
-        }
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
 
-        .container {
-            /* Sidebar layout handled manually or by sidebar.php styles */
-        }
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
         
         .dashboard-container {
             max-width: 1200px;

@@ -863,7 +863,7 @@ form{
                 </strong>
             </div>
             <div class="ta-actions">
-                <button type="submit" class="ta-btn ta-btn-primary">
+                <button type="submit" id="btn-submit-ta" class="ta-btn ta-btn-primary">
                     <span class="material-symbols-rounded">send</span>
                     Kirim Pengajuan Tugas Akhir
                 </button>
@@ -903,6 +903,72 @@ setFileStatus("file-formulir", "status-formulir");
 setFileStatus("file-bayar", "status-bayar");
 setFileStatus("file-transkrip", "status-transkrip");
 setFileStatus("file-magang", "status-magang");
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.getElementById('btn-submit-ta').addEventListener('click', function (e) {
+    e.preventDefault(); // tahan submit dulu
+
+    const requiredFiles = [
+        { id: 'file-formulir', label: 'Formulir Pendaftaran & Persetujuan Tema' },
+        { id: 'file-bayar', label: 'Bukti Pembayaran' },
+        { id: 'file-transkrip', label: 'Transkrip Nilai' },
+        { id: 'file-magang', label: 'Bukti Kelulusan Magang / PI' }
+    ];
+
+    let missing = [];
+
+    requiredFiles.forEach(f => {
+        const input = document.getElementById(f.id);
+        if (!input || input.files.length === 0) {
+            missing.push(f.label);
+        }
+    });
+
+    if (missing.length > 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Dokumen Belum Lengkap',
+            html: `
+                <p style="margin-bottom:8px;">Silakan lengkapi dokumen berikut:</p>
+                <ul style="text-align:left;">
+                    ${missing.map(m => `<li>${m}</li>`).join('')}
+                </ul>
+            `,
+            confirmButtonText: 'Baik, Saya Lengkapi',
+            confirmButtonColor: '#FF983D',
+            background: '#FFF1E5'
+        });
+        return;
+    }
+
+    // Konfirmasi final
+    Swal.fire({
+        icon: 'question',
+        title: 'Konfirmasi Pengajuan Tugas Akhir',
+        html: `
+            <p style="margin-bottom:10px;">
+                Apakah Anda <b>yakin</b> seluruh data dan dokumen yang diunggah sudah benar?
+            </p>
+            <small style="color:#6b7280;">
+                Kesalahan dokumen dapat menyebabkan pengajuan ditolak dan tidak dapat diubah.
+            </small>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Kirim Pengajuan',
+        cancelButtonText: 'Periksa Kembali',
+        confirmButtonColor: '#FF74C7',
+        cancelButtonColor: '#e5e7eb',
+        background: '#FFF1E5',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // submit form manual
+            e.target.closest('form').submit();
+        }
+    });
+});
 </script>
 
 </body>

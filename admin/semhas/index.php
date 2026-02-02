@@ -98,21 +98,9 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     margin: 0;
 }
 
-<<<<<<< HEAD
 .container {
     background: #FFF1E5 !important;
 }
-=======
-        .main-content {
-            margin-left: 280px;
-            padding: 30px;
-            transition: all 0.3s ease;
-            width: calc(100vw - 280px);
-            max-width: calc(100vw - 280px);
-            box-sizing: border-box;
-            overflow-x: hidden;
-        }
->>>>>>> 6407f587c9a68984bdd34846d77971c7977f86a5
 
 .main-content {
     margin-left: 280px;
@@ -123,10 +111,8 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .topbar {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 30px;
-            gap: 20px;
-            width: 100%;
         }
 
         .topbar h1 {
@@ -143,20 +129,18 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* PROFILE */
-.admin-text {
-    text-align: right;
+.admin-info{
+    display:flex;
+    align-items:left;
+    gap:20px
 }
 .admin-text span{
-    font-size:12px;
-    color:#777;
-    display: block;
-    line-height: 1.2;
+    font-size:13px;
+    color:#555
 }
 .admin-text b{
     color:#ff8c42;
-    font-size:14px;
-    display: block;
-    line-height: 1.2;
+    font-size:14px
 }
 
 .avatar{
@@ -167,7 +151,6 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     display:flex;
     align-items:center;
     justify-content:center;
-    flex-shrink: 0;
 }
 
         /* ================= SEARCH & ENTRIES ================= */
@@ -227,17 +210,15 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            border-radius: 20px;
-        }
-
         table {
             width: 100%;
-            min-width: 1000px;
             border-collapse: collapse;
+            display: block;
+        }
+
+        thead, tbody {
+            display: block;
+            width: 100%;
         }
 
         thead tr {
@@ -405,69 +386,6 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: none !important;
             box-shadow: 0 4px 10px rgba(255,140,97,0.3);
         }
-
-        /* ================= RESPONSIVE ================= */
-        @media screen and (max-width: 1024px) {
-            .main-content {
-                margin-left: 70px !important;
-                padding: 20px !important;
-                width: calc(100vw - 70px) !important;
-                max-width: calc(100vw - 70px) !important;
-            }
-        }
-
-        @media screen and (max-width: 768px) {
-            .main-content {
-                margin-left: 60px !important;
-                padding: 15px !important;
-                width: calc(100vw - 60px) !important;
-                max-width: calc(100vw - 60px) !important;
-            }
-
-            .topbar {
-                gap: 15px;
-            }
-
-            .topbar h1 {
-                font-size: 20px;
-            }
-
-            .admin-text {
-                max-width: 85px;
-            }
-
-            .admin-text span {
-                font-size: 11px;
-            }
-
-            .admin-text b {
-                font-size: 13px;
-            }
-
-            .avatar {
-                width: 38px;
-                height: 38px;
-            }
-
-            .controls-row {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .search-box {
-                max-width: 100%;
-                margin-bottom: 0;
-            }
-
-            .entries-control {
-                justify-content: flex-start;
-            }
-
-            .pagination-container {
-                align-items: center;
-            }
-        }
     </style>
 </head>
 <body>
@@ -506,7 +424,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <div class="card table-responsive">
+    <div class="card">
         <table>
             <thead>
                 <tr>
