@@ -56,6 +56,8 @@ $status_class_map = [
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -69,6 +71,17 @@ $status_class_map = [
     --bg: #FFF1E5;
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 body{
     background:#FFF1E5 !important;
 }
@@ -78,6 +91,10 @@ body{
     margin-left: 280px;
     padding: 30px 40px;
     min-height: 100vh;
+    width: calc(100vw - 280px);
+    max-width: calc(100vw - 280px);
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* TOPBAR */
@@ -132,6 +149,9 @@ body{
     box-shadow: 0 10px 30px rgba(255, 152, 61, 0.1);
     margin-bottom: 25px;
     border: 1px solid rgba(255, 152, 61, 0.1);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 .card-title-main {
@@ -377,11 +397,186 @@ body{
     vertical-align: middle;
 }
 
+/* TABLET */
+@media (max-width: 1024px) {
+    .main-content {
+        margin-left: 70px;
+        padding: 25px 30px;
+        width: calc(100vw - 70px);
+        max-width: calc(100vw - 70px);
+    }
+    
+    .premium-card {
+        padding: 30px;
+    }
+    
+    .schedule-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .schedule-box {
+        border-right: none;
+        border-bottom: 1px solid #eba337ff;
+    }
+    
+    .schedule-box:last-child {
+        border-bottom: none;
+    }
+    
+    .doc-main {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+}
+
+/* MOBILE */
 @media (max-width: 768px) {
-    .main-content { margin-left: 0; padding: 20px; }
-    .schedule-grid { grid-template-columns: 1fr; }
-    .header-row { flex-wrap: wrap; }
-    .date-top { margin-left: 0; width: 100%; margin-top: 5px; }
+    .container {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+    
+    .main-content { 
+        margin-left: 60px !important;
+        padding: 15px !important;
+        width: calc(100vw - 60px) !important;
+        max-width: calc(100vw - 60px) !important;
+    }
+
+    
+    .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .topbar h1 {
+        font-size: 22px;
+    }
+    
+    .mhs-info {
+        align-self: flex-end;
+    }
+    
+    .premium-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+    
+    .card-title-main {
+        font-size: 14px;
+    }
+    
+    .info-grid-header {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .label-orange-bold {
+        font-size: 13px;
+    }
+    
+    .capsule-value {
+        font-size: 12px;
+        padding: 8px 14px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .capsule-status {
+        padding: 8px 20px;
+        font-size: 11px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .student-name {
+        font-size: 18px;
+    }
+    
+    .schedule-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .schedule-box {
+        padding: 20px 15px;
+        border-right: none;
+        border-bottom: 1px solid #eba337ff;
+    }
+    
+    .schedule-box:last-child {
+        border-bottom: none;
+    }
+    
+    .schedule-box .value {
+        font-size: 14px;
+    }
+    
+    .catatan-box {
+        font-size: 12px;
+        padding: 12px 15px;
+    }
+    
+    .doc-section {
+        margin-top: 30px;
+    }
+    
+    .doc-section-title {
+        font-size: 13px;
+    }
+    
+    .doc-card {
+        padding: 15px;
+    }
+    
+    .doc-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .doc-name {
+        font-size: 14px;
+    }
+    
+    .btn-lihat {
+        width: 100%;
+        text-align: center;
+        padding: 12px 20px;
+    }
+    
+    .info-warning {
+        font-size: 12px;
+        padding: 12px 15px;
+    }
+}
+
+/* SMALL MOBILE */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 10px;
+    }
+    
+    .topbar h1 {
+        font-size: 18px;
+    }
+    
+    .premium-card {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    .schedule-box .value {
+        font-size: 13px;
+    }
+    
+    .doc-icon {
+        width: 40px;
+        height: 40px;
+    }
 }
 </style>
 </head>
