@@ -103,54 +103,78 @@ function time_ago($timestamp) {
             --shadow-orange: 0 10px 30px rgba(255, 140, 80, 0.12);
         }
 
-        * { box-sizing: border-box; }
+        * { 
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
 
         body {
-    font-family: 'Inter', sans-serif;
-    background: #FFF1E5 !important;
-    margin: 0;
-}
+            font-family: 'Inter', sans-serif;
+            background: #FFF1E5 !important;
+            margin: 0;
+        }
 
-.container {
-    background: #FFF1E5 !important;
-}
+        .container {
+            background: #FFF1E5 !important;
+        }
 
-.main-content {
-    margin-left: 280px;
-    padding: 32px;
-    min-height: 100vh;
-    background: #FFF1E5 !important;
-}
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+            background: #FFF1E5 !important;
+            width: calc(100vw - 280px);
+            max-width: calc(100vw - 280px);
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
 
         .topbar {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 30px;
+            gap: 20px;
+            width: 100%;
         }
 
-        .greeting h1 {
+        .greeting-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .greeting-text h1 {
             font-size: 28px;
             margin: 0;
             color: var(--accent-orange);
             font-weight: 700;
         }
 
-        .greeting p {
+        .greeting-text p {
             margin: 5px 0 0;
             color: var(--text-muted);
             font-size: 15px;
+            white-space: normal;
         }
 
         .admin-profile {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-shrink: 0;
+            margin-top: 5px; /* Align roughly with h1 */
         }
 
         .admin-profile .text {
             text-align: right;
-            line-height: 1.3;
+            max-width: 90px; /* Force wrapping like mockup */
+            line-height: 1.2;
         }
 
         .admin-profile small { 
@@ -182,6 +206,8 @@ function time_ago($timestamp) {
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             margin-bottom: 40px;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .stat-card {
@@ -193,6 +219,9 @@ function time_ago($timestamp) {
             gap: 15px;
             box-shadow: var(--shadow-orange);
             transition: transform 0.3s ease;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .stat-card:hover { 
@@ -230,9 +259,11 @@ function time_ago($timestamp) {
         /* CHARTS SECTION */
         .charts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 24px;
             margin-bottom: 40px;
+            max-width: 100%;
+            overflow: hidden;
         }
 
         .chart-card {
@@ -241,6 +272,9 @@ function time_ago($timestamp) {
             padding: 24px;
             box-shadow: var(--shadow-orange);
             text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .chart-card h4 { 
@@ -261,6 +295,9 @@ function time_ago($timestamp) {
             border-radius: 24px;
             padding: 30px;
             box-shadow: var(--shadow-orange);
+            max-width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .queue-card h4 {
@@ -379,31 +416,188 @@ function time_ago($timestamp) {
             box-shadow: 0 6px 20px rgba(255, 116, 199, 0.3);
         }
 
+        /* TABLET */
         @media screen and (max-width: 1024px) {
             .main-content { 
-                margin-left: 0; 
-                padding: 100px 20px 40px; 
+                margin-left: 70px !important;
+                padding: 25px 20px !important;
+                width: calc(100vw - 70px) !important;
+                max-width: calc(100vw - 70px) !important;
             }
             
             .topbar { 
-                flex-direction: column; 
-                align-items: flex-start; 
-                gap: 20px; 
+                flex-direction: row !important; 
+                justify-content: space-between !important;
+                align-items: flex-start !important; 
+                gap: 15px; 
             }
             
             .admin-profile { 
-                width: 100%; 
-                justify-content: flex-end; 
+                align-self: flex-start !important;
             }
             
             .stats-grid { 
-                grid-template-columns: repeat(2, 1fr); 
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
             }
         }
 
-        @media screen and (max-width: 600px) {
+        /* MOBILE */
+        @media screen and (max-width: 768px) {
+            .main-content { 
+                margin-left: 60px !important;
+                padding: 15px !important;
+                width: calc(100vw - 60px) !important;
+                max-width: calc(100vw - 60px) !important;
+            }
+
+            .topbar {
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+
+            .greeting-text h1 {
+                font-size: 20px;
+            }
+
+            .greeting-text p {
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .admin-profile {
+                margin-top: 2px;
+            }
+
+            .admin-profile .text {
+                display: block !important;
+                text-align: right;
+                max-width: 85px;
+                line-height: 1.2;
+            }
+
+            .admin-profile .text small {
+                display: block;
+                font-size: 11px;
+            }
+
+            .admin-profile .text b {
+                display: block;
+                font-size: 13px;
+            }
+
+            .avatar {
+                width: 38px;
+                height: 38px;
+            }
+
             .stats-grid { 
-                grid-template-columns: 1fr; 
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 16px;
+            }
+
+            .icon-box {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .stat-info h2 {
+                font-size: 26px;
+            }
+
+            .stat-info span {
+                font-size: 13px;
+            }
+
+            .chart-card {
+                padding: 20px;
+            }
+
+            .queue-card {
+                padding: 20px;
+            }
+
+            .queue-item {
+                padding: 15px;
+                flex-wrap: wrap;
+            }
+
+            .m-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+
+            .m-info b {
+                font-size: 14px;
+            }
+
+            .m-info p {
+                font-size: 12px;
+            }
+        }
+
+        /* SMALL MOBILE */
+        @media screen and (max-width: 480px) {
+            .main-content {
+                margin-left: 60px !important;
+                padding: 10px !important;
+                width: calc(100vw - 60px) !important;
+                max-width: calc(100vw - 60px) !important;
+            }
+
+            .topbar {
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+
+            .greeting-text h1 {
+                font-size: 18px;
+            }
+
+            .greeting-text p {
+                font-size: 10px;
+                line-height: 1.3;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+            }
+
+            .stat-card {
+                padding: 14px;
+            }
+
+            .icon-box {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+            }
+
+            .stat-info h2 {
+                font-size: 22px;
+            }
+
+            .chart-card h4 {
+                font-size: 16px;
+            }
+
+            .queue-card h4 {
+                font-size: 18px;
             }
         }
     </style>
@@ -416,7 +610,7 @@ function time_ago($timestamp) {
     
     <!-- TOPBAR -->
     <div class="topbar">
-        <div class="greeting">
+        <div class="greeting-text">
             <h1>Dashboard</h1>
             <p>Monitoring progres Tugas Akhir, Seminar Proposal, dan Seminar Hasil.</p>
         </div>
