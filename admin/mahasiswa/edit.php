@@ -87,7 +87,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Edit Mahasiswa</title>
 
 <style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
 
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;

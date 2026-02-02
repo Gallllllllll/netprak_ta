@@ -79,18 +79,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <title>Plot Dosen Pembimbing</title>
 
 <style>
-body{
-    background:#f3a4a4;
-    font-family:Arial, sans-serif;
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
 }
 
-.main-content{
-    padding:40px;
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
 }
 
 /* card utama */
 .card{
-    background:#fff3e8;
+    background:#FFF3E8;
     padding:28px;
     border-radius:18px;
     max-width:650px;

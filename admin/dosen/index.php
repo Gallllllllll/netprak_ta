@@ -37,6 +37,22 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
+
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
 
 /* TOP */
 .topbar{

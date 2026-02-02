@@ -137,17 +137,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-beige);
-            margin: 0;
-            color: var(--text-dark);
-        }
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
 
-        .main-content {
-            margin-left: 280px;
-            padding: 32px;
-            min-height: 100vh;
-        }
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
 
         /* HEADER */
         .dashboard-header {

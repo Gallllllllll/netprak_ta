@@ -88,15 +88,20 @@ $min_date = $tanggal_value && $tanggal_value > $today
 }
 
 body {
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
     margin: 0;
-    padding: 0;
-    background: var(--bg-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    background: #FFF1E5 !important;
 }
 
 .main-content {
-    padding: 25px;
-    margin-left: 310px; /* Diperlebar agar lebih mepet ke kanan */
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
 }
 
 /* ================= HEADER ================= */

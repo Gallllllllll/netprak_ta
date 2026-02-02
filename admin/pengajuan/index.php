@@ -80,17 +80,21 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            color: var(--text-dark);
-        }
+    font-family: 'Inter', sans-serif;
+    background: #FFF1E5 !important;
+    margin: 0;
+}
 
-        .main-content {
-            margin-left: 310px;
-            padding: 40px;
-        }
+.container {
+    background: #FFF1E5 !important;
+}
+
+.main-content {
+    margin-left: 280px;
+    padding: 32px;
+    min-height: 100vh;
+    background: #FFF1E5 !important;
+}
 
         .topbar {
             display: flex;
