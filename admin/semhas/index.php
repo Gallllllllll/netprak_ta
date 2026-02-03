@@ -93,26 +93,32 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         body {
-    font-family: 'Inter', sans-serif;
-    background: #FFF1E5 !important;
-    margin: 0;
-}
+            font-family: 'Outfit', sans-serif;
+            background: #FFF1E5 !important;
+            margin: 0;
+            padding: 0;
+        }
 
-.container {
-    background: #FFF1E5 !important;
-}
+        .container {
+            background: #FFF1E5 !important;
+        }
 
-.main-content {
-    margin-left: 280px;
-    padding: 32px;
-    min-height: 100vh;
-    background: #FFF1E5 !important;
-}
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+            background: #FFF1E5 !important;
+            transition: margin-left 0.3s ease, padding 0.3s ease;
+        }
+
+        /* ================= TOPBAR ================= */
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .topbar h1 {
@@ -122,46 +128,46 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 700;
         }
 
+        /* PROFILE */
         .admin-info {
             display: flex;
-            align-items: center;
-            gap: 15px;
+            align-items: left;
+            gap: 20px;
         }
 
-        /* PROFILE */
-.admin-info{
-    display:flex;
-    align-items:left;
-    gap:20px
-}
-.admin-text span{
-    font-size:13px;
-    color:#555
-}
-.admin-text b{
-    color:#ff8c42;
-    font-size:14px
-}
+        .admin-text span {
+            font-size: 13px;
+            color: #555;
+        }
 
-.avatar{
-    width:42px;
-    height:42px;
-    background:#ff8c42;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
+        .admin-text b {
+            color: #ff8c42;
+            font-size: 14px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background: #ff8c42;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
         /* ================= SEARCH & ENTRIES ================= */
         .controls-row {
             margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .search-box {
             position: relative;
             max-width: 350px;
-            margin-bottom: 20px;
+            flex: 1;
+            min-width: 250px;
         }
 
         .search-box input {
@@ -174,6 +180,11 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 14px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             outline: none;
+            background: white;
+        }
+
+        .search-box input:focus {
+            border-color: #ff8c42;
         }
 
         .search-box span {
@@ -191,6 +202,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .entries-control select {
@@ -200,6 +212,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             outline: none;
+            cursor: pointer;
         }
 
         /* ================= TABLE ================= */
@@ -244,7 +257,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-right: none;
         }
 
-        /* Column Widths (Synchronized precisely) */
+        /* Column Widths */
         th:nth-child(1), td:nth-child(1) { flex: 0 0 50px; width: 50px; }
         th:nth-child(2), td:nth-child(2) { flex: 0 0 100px; width: 100px; }
         th:nth-child(3), td:nth-child(3) { flex: 1.5 1 0%; min-width: 0; }
@@ -288,7 +301,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* Status Badge */
         .status-badge {
             display: inline-block;
-            width: 80px; /* Fixed width for uniformity */
+            width: 80px;
             text-align: center;
             padding: 6px 0;
             border-radius: 20px;
@@ -305,7 +318,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* Action Buttons */
         .btn-action {
             display: inline-block;
-            width: 85px; /* Standardized width for alignment */
+            width: 85px;
             text-align: center;
             padding: 6px 0;
             border-radius: 12px;
@@ -318,7 +331,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .btn-grid {
             display: grid;
-            grid-template-columns: repeat(2, 85px); /* Ensure both columns are 85px */
+            grid-template-columns: repeat(2, 85px);
             gap: 8px;
             justify-content: center;
         }
@@ -351,6 +364,8 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .pagination {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .pagination a, .pagination span {
@@ -380,11 +395,180 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             pointer-events: none;
         }
 
-        .btn-prev-fancy {
-            background: linear-gradient(90deg, #ff9a9e, #ff8c61) !important;
-            color: white !important;
-            border: none !important;
-            box-shadow: 0 4px 10px rgba(255,140,97,0.3);
+        /* ================= RESPONSIVE - TABLET ================= */
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 24px;
+            }
+
+            .topbar h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* ================= RESPONSIVE - MOBILE ================= */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .topbar h1 {
+                font-size: 22px;
+            }
+
+            .admin-info {
+                align-self: flex-end;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box {
+                max-width: 100%;
+                min-width: 100%;
+            }
+
+            .entries-control {
+                justify-content: flex-start;
+            }
+
+            /* Table - Card Layout on Mobile */
+            .card {
+                border-radius: 16px;
+                overflow: visible;
+            }
+
+            table, thead, tbody, tr {
+                display: block;
+                width: 100%;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                display: block;
+                margin-bottom: 16px;
+                border: 2px solid #FFE5D9;
+                border-radius: 12px;
+                padding: 16px;
+                background: white;
+            }
+
+            td {
+                display: block;
+                width: 100%;
+                border: none !important;
+                padding: 8px 0;
+                justify-content: flex-start !important;
+                text-align: left !important;
+            }
+
+            td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #ff8c42;
+                display: block;
+                margin-bottom: 4px;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+
+            td:nth-child(1)::before { content: "No"; }
+            td:nth-child(2)::before { content: "ID Semhas"; }
+            td:nth-child(3)::before { content: "Nama"; }
+            td:nth-child(4)::before { content: "NIM"; }
+            td:nth-child(5)::before { content: "Judul TA"; }
+            td:nth-child(6)::before { content: "Status"; }
+            td:nth-child(7)::before { content: "Tanggal Sidang"; }
+            td:nth-child(8)::before { content: "Aksi"; }
+
+            td:nth-child(8) {
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid #FFE5D9 !important;
+            }
+
+            td:nth-child(8)::before {
+                display: none;
+            }
+
+            /* Button Grid on Mobile */
+            .btn-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .btn-action {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .status-badge {
+                width: auto;
+                padding: 6px 16px;
+                display: inline-block;
+            }
+
+            .pagination-container {
+                align-items: center;
+            }
+
+            .pagination {
+                justify-content: center;
+                gap: 4px;
+            }
+
+            .pagination a, .pagination span {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* ================= RESPONSIVE - SMALL MOBILE ================= */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 16px 12px;
+            }
+
+            .topbar h1 {
+                font-size: 20px;
+            }
+
+            .admin-text {
+                font-size: 12px;
+            }
+
+            .avatar {
+                width: 38px;
+                height: 38px;
+            }
+
+            tbody tr {
+                padding: 14px;
+            }
+
+            td {
+                font-size: 13px;
+            }
+
+            .btn-action {
+                font-size: 11px;
+                padding: 10px 8px;
+            }
         }
     </style>
 </head>
@@ -396,14 +580,14 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="topbar">
         <h1>Daftar Pengajuan Seminar Hasil</h1>
         <div class="admin-info">
-        <div class="admin-text">
-            <span>Selamat Datang,</span><br>
-            <b><?= htmlspecialchars($username) ?></b>
+            <div class="admin-text">
+                <span>Selamat Datang,</span><br>
+                <b><?= htmlspecialchars($username) ?></b>
+            </div>
+            <div class="avatar">
+                <span class="material-symbols-rounded" style="color:#fff">person</span>
+            </div>
         </div>
-        <div class="avatar">
-            <span class="material-symbols-rounded" style="color:#fff">person</span>
-        </div>
-    </div>
     </div>
 
     <div class="controls-row">
@@ -415,7 +599,6 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="entries-control">
             <span>Show</span>
             <select id="entriesSelect">
-                
                 <option value="25" <?= $limit == 25 ? 'selected' : '' ?>>25</option>
                 <option value="50" <?= $limit == 50 ? 'selected' : '' ?>>50</option>
                 <option value="100" <?= $limit == 100 ? 'selected' : '' ?>>100</option>
@@ -440,7 +623,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </thead>
             <tbody>
                 <?php if (empty($pengajuan_list)): ?>
-                    <tr><td colspan="8" style="width: 100%; border: none;">Data tidak ditemukan</td></tr>
+                    <tr><td colspan="8" style="width: 100%; border: none; text-align: center;">Data tidak ditemukan</td></tr>
                 <?php else: 
                     $no = $offset + 1;
                     foreach ($pengajuan_list as $p):

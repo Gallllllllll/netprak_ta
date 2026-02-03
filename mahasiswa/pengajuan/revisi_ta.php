@@ -494,7 +494,6 @@ fileInputs.forEach(input => {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 const form = document.querySelector('form.revisi-wrapper');
-const submitBtn = document.querySelector('.btn-gradient');
 
 form.addEventListener('submit', function (e) {
     e.preventDefault(); // tahan submit dulu
@@ -513,8 +512,7 @@ form.addEventListener('submit', function (e) {
         color: '#7C2D12'
     }).then((result) => {
         if (result.isConfirmed) {
-            // lanjut submit TANPA mengubah logika backend
-            form.submit();
+            form.submit(); // submit asli → PHP tetap jalan
         }
     });
 });

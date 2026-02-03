@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
                     $rawPass  = trim($rows[$i][2] ?? '') ?: '123456';
                     $nama     = trim($rows[$i][3] ?? '');
                     $email    = trim($rows[$i][4] ?? '') ?: null;
-
+                    
                     $password = password_hash($rawPass, PASSWORD_DEFAULT);
 
                     if (!$nip || !$nama || !$username) {
@@ -93,22 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
 <title>Import Dosen</title>
 
 <style>
-body {
-    font-family: 'Inter', sans-serif;
-    background: #FFF1E5 !important;
-    margin: 0;
-}
-
-.container {
-    background: #FFF1E5 !important;
-}
-
-.main-content {
-    margin-left: 280px;
-    padding: 32px;
-    min-height: 100vh;
-    background: #FFF1E5 !important;
-}
 /* TOP */
 .topbar{
     display:flex;
