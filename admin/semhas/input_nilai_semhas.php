@@ -201,7 +201,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     margin: 0;
 }
 
-<<<<<<< HEAD
 .container {
     background: #FFF1E5 !important;
 }
@@ -212,18 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     min-height: 100vh;
     background: #FFF1E5 !important;
 }
-=======
-        .main-content {
-            margin-left: 280px;
-            padding: 32px;
-            min-height: 100vh;
-            transition: all 0.3s ease;
-            width: calc(100vw - 280px);
-            max-width: calc(100vw - 280px);
-            box-sizing: border-box;
-            overflow-x: hidden;
-        }
->>>>>>> 6407f587c9a68984bdd34846d77971c7977f86a5
 
         /* HEADER */
         .dashboard-header {

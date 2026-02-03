@@ -93,27 +93,31 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         body {
-    font-family: 'Inter', sans-serif;
-    background: #FFF1E5 !important;
-    margin: 0;
-}
+            font-family: 'Outfit', sans-serif;
+            background: #FFF1E5 !important;
+            margin: 0;
+            padding: 0;
+        }
 
-.container {
-    background: #FFF1E5 !important;
-}
+        .container {
+            background: #FFF1E5 !important;
+        }
 
-.main-content {
-    margin-left: 280px;
-    padding: 32px;
-    min-height: 100vh;
-    background: #FFF1E5 !important;
-}
+        .main-content {
+            margin-left: 280px;
+            padding: 32px;
+            min-height: 100vh;
+            background: #FFF1E5 !important;
+            transition: margin-left 0.3s ease, padding 0.3s ease;
+        }
 
         .topbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .topbar h1 {
@@ -123,47 +127,46 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: 700;
         }
 
+        /* PROFILE */
         .admin-info {
             display: flex;
-            align-items: center;
-            gap: 15px;
+            align-items: left;
+            gap: 20px;
         }
 
-     /* PROFILE */
-.admin-info{
-    display:flex;
-    align-items:left;
-    gap:20px
-}
-.admin-text span{
-    font-size:13px;
-    color:#555
-}
-.admin-text b{
-    color:#ff8c42;
-    font-size:14px
-}
+        .admin-text span {
+            font-size: 13px;
+            color: #555;
+        }
 
-.avatar{
-    width:42px;
-    height:42px;
-    background:#ff8c42;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
+        .admin-text b {
+            color: #ff8c42;
+            font-size: 14px;
+        }
 
-       
+        .avatar {
+            width: 42px;
+            height: 42px;
+            background: #ff8c42;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         /* ================= SEARCH & ENTRIES ================= */
         .controls-row {
             margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .search-box {
             position: relative;
             max-width: 350px;
-            margin-bottom: 20px;
+            flex: 1;
+            min-width: 250px;
         }
 
         .search-box input {
@@ -176,6 +179,11 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 14px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             outline: none;
+            background: white;
+        }
+
+        .search-box input:focus {
+            border-color: #ff8c42;
         }
 
         .search-box span {
@@ -193,6 +201,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .entries-control select {
@@ -202,6 +211,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             outline: none;
+            cursor: pointer;
         }
 
         /* ================= TABLE ================= */
@@ -290,7 +300,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* Status Badge */
         .status-badge {
             display: inline-block;
-            width: 80px; /* Fixed width for uniformity */
+            width: 80px;
             text-align: center;
             padding: 6px 0;
             border-radius: 20px;
@@ -299,7 +309,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-transform: capitalize;
         }
 
-         .status-diajukan { background-color: #F57F17; color: #fcfcfcff; }
+        .status-diajukan { background-color: #F57F17; color: #fcfcfcff; }
         .status-revisi { background-color: #E65100; color: #fcfcfcff; }
         .status-ditolak { background-color: #C62828; color: #fcfcfcff; }
         .status-disetujui { background-color: #3A7C3A; color: #fcfcfcff; }
@@ -307,7 +317,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* Action Buttons */
         .btn-action {
             display: inline-block;
-            width: 85px; /* Standardized width for alignment */
+            width: 85px;
             text-align: center;
             padding: 6px 0;
             border-radius: 12px;
@@ -320,7 +330,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         .btn-grid {
             display: grid;
-            grid-template-columns: repeat(2, 85px); /* Ensure both columns are 85px */
+            grid-template-columns: repeat(2, 85px);
             gap: 8px;
             justify-content: center;
         }
@@ -352,6 +362,8 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .pagination {
             display: flex;
             gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .pagination a, .pagination span {
@@ -379,6 +391,116 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             opacity: 0.5;
             cursor: not-allowed;
             pointer-events: none;
+        }
+
+        /* ================= RESPONSIVE - TABLET ================= */
+        @media (max-width: 1024px) {
+            .main-content {
+                margin-left: 70px;
+                padding: 24px;
+            }
+
+            .topbar h1 {
+                font-size: 24px;
+            }
+        }
+
+        /* ================= RESPONSIVE - MOBILE ================= */
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px 16px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .topbar h1 {
+                font-size: 22px;
+            }
+
+            .admin-info {
+                align-self: flex-end;
+            }
+
+            .controls-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box {
+                max-width: 100%;
+                min-width: 100%;
+            }
+
+            .entries-control {
+                justify-content: flex-start;
+            }
+
+            /* Table - Horizontal Scroll on Mobile */
+            .card {
+                border-radius: 16px;
+                overflow-x: auto;
+                overflow-y: visible;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Keep table structure, just make it scrollable */
+            table {
+                min-width: 900px; /* Minimum width to trigger scroll */
+            }
+
+            /* Pagination responsive */
+            .pagination-container {
+                align-items: center;
+            }
+
+            .pagination {
+                justify-content: center;
+                gap: 4px;
+            }
+
+            .pagination a, .pagination span {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* ================= RESPONSIVE - SMALL MOBILE ================= */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 16px 12px;
+            }
+
+            .topbar h1 {
+                font-size: 20px;
+            }
+
+            .admin-text {
+                font-size: 12px;
+            }
+
+            .avatar {
+                width: 38px;
+                height: 38px;
+            }
+
+            td {
+                font-size: 12px;
+            }
+
+            .btn-action {
+                font-size: 10px;
+                padding: 5px 0;
+            }
+
+            .status-badge {
+                font-size: 10px;
+                padding: 5px 0;
+            }
         }
     </style>
 </head>
@@ -433,7 +555,7 @@ $pengajuan_list = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </thead>
             <tbody>
                 <?php if (empty($pengajuan_list)): ?>
-                    <tr><td colspan="8" style="width: 100%; border: none;">Data tidak ditemukan</td></tr>
+                    <tr><td colspan="8" style="width: 100%; border: none; text-align: center;">Data tidak ditemukan</td></tr>
                 <?php else: 
                     $no = $offset + 1;
                     foreach ($pengajuan_list as $p):

@@ -142,7 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
     margin: 0;
 }
 
-<<<<<<< HEAD
 .container {
     background: #FFF1E5 !important;
 }
@@ -153,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
     min-height: 100vh;
     background: #FFF1E5 !important;
 }
-=======
+
         .main-content {
             margin-left: 280px;
             padding: 32px;
@@ -164,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$akses_ditutup) {
             box-sizing: border-box;
             overflow-x: hidden;
         }
->>>>>>> 6407f587c9a68984bdd34846d77971c7977f86a5
+
 
         /* HEADER */
         .dashboard-header {

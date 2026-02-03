@@ -460,19 +460,6 @@ body {
     cursor: not-allowed;
 }
 
-/* FOOTER */
-.footer {
-    background: var(--gradient);
-    padding: 20px;
-    text-align: center;
-    color: white;
-    font-size: 14px;
-    position: fixed;
-    bottom: 0;
-    left: 280px;
-    right: 0;
-    z-index: 10;
-}
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
@@ -598,10 +585,7 @@ body {
 
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-    © 2026 Politeknik Nest - Magang UNS 2026
-</div>
+
 
 <?php if (!$blokir_upload): ?>
 <script>

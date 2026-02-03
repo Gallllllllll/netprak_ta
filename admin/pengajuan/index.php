@@ -417,78 +417,20 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 justify-content: flex-start;
             }
 
-            /* Table - Card Layout on Mobile */
+            /* Table - Horizontal Scroll on Mobile */
             .card {
                 border-radius: 16px;
-                overflow: visible;
+                overflow-x: auto;
+                overflow-y: visible;
+                -webkit-overflow-scrolling: touch;
             }
 
-            table, thead, tbody, tr {
-                display: block;
-                width: 100%;
+            /* Keep table structure, just make it scrollable */
+            table {
+                min-width: 800px; /* Minimum width to trigger scroll */
             }
 
-            thead {
-                display: none;
-            }
-
-            tbody tr {
-                display: block;
-                margin-bottom: 16px;
-                border: 2px solid #FFE5D9;
-                border-radius: 12px;
-                padding: 16px;
-                background: white;
-            }
-
-            td {
-                display: block;
-                width: 100%;
-                border: none !important;
-                padding: 8px 0;
-                justify-content: flex-start !important;
-                text-align: left !important;
-            }
-
-            td::before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #ff8c42;
-                display: block;
-                margin-bottom: 4px;
-                font-size: 12px;
-                text-transform: uppercase;
-            }
-
-            td:nth-child(1)::before { content: "No"; }
-            td:nth-child(2)::before { content: "Nama"; }
-            td:nth-child(3)::before { content: "Judul TA"; }
-            td:nth-child(4)::before { content: "Status"; }
-            td:nth-child(5)::before { content: "Aksi"; }
-
-            td:nth-child(5) {
-                display: flex;
-                gap: 8px;
-                margin-top: 12px;
-                padding-top: 12px;
-                border-top: 1px solid #FFE5D9 !important;
-            }
-
-            td:nth-child(5)::before {
-                display: none;
-            }
-
-            .btn-action {
-                flex: 1;
-                padding: 10px;
-            }
-
-            .status-badge {
-                width: auto;
-                padding: 6px 16px;
-                display: inline-block;
-            }
-
+            /* Pagination responsive */
             .pagination-container {
                 align-items: center;
             }
@@ -523,17 +465,18 @@ $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 height: 38px;
             }
 
-            tbody tr {
-                padding: 14px;
-            }
-
             td {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             .btn-action {
-                font-size: 12px;
-                padding: 10px;
+                font-size: 10px;
+                padding: 5px 0;
+            }
+
+            .status-badge {
+                font-size: 10px;
+                padding: 5px 0;
             }
         }
     </style>

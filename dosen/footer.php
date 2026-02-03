@@ -11,7 +11,7 @@
     left: 250px; /* default: desktop (ada sidebar) */
     right: 0;
 
-    height: 40px;
+    height: 50px;
     line-height: 40px;
 
     background: var(--gradient);
