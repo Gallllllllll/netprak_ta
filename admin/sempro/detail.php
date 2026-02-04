@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once '../../config/base_url.php';
 
 // cek role admin
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
@@ -36,6 +37,7 @@ $files = [
 <head>
 <meta charset="UTF-8">
 <title>Detail Pengajuan Sempro</title>
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>

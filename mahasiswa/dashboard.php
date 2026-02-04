@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "../config/connection.php";
+require_once '../config/base_url.php';
 
 // Cek Login
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
@@ -49,6 +50,7 @@ $kelas = $mhs['kelas'] ?? '-';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
     <title>Dashboard Mahasiswa</title>
     
     <!-- Fonts -->

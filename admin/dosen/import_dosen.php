@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once '../../config/base_url.php';
 require __DIR__ . '/../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -93,6 +93,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['excel'])) {
 <title>Import Dosen</title>
 
 <style>
+body{
+    background: #FFF1E5 !important;
+}
 /* TOP */
 .topbar{
     display:flex;

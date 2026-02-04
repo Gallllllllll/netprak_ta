@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once '../../config/base_url.php';
 
 /* CEK LOGIN */
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {

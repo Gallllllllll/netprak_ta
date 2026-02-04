@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once '../../config/base_url.php';
 
 // ===============================
 // CEK ROLE ADMIN
@@ -69,6 +70,7 @@ $files = [
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Detail Pengajuan Seminar Hasil</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

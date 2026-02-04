@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once '../../config/base_url.php';
 
 // ===============================
 // CEK ROLE ADMIN
@@ -84,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Penjadwalan Seminar Hasil</title>
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
 :root {

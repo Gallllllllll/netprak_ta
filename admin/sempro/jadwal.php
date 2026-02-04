@@ -1,6 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
+require_once '../../config/base_url.php';
 
 // ===============================
 // CEK ROLE ADMIN
@@ -76,6 +77,7 @@ $min_date = $tanggal_value && $tanggal_value > $today
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Penjadwalan Seminar Proposal</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
 <style>
