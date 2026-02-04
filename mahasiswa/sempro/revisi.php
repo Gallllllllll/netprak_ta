@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <title>Revisi Seminar Proposal</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
@@ -276,7 +278,6 @@ body{
 
 </div>
 </div>
-
 <script>
 document.querySelectorAll('input[type="file"]').forEach(input => {
     input.addEventListener('change', function () {
@@ -290,16 +291,20 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
         const iconSpan = icon.querySelector('span');
         const button = item.querySelector('.btn-file');
 
+        // update text
         text.textContent = 'File baru: ' + fileName;
         text.classList.add('file-updated');
 
+        // update icon
         icon.classList.add('success');
         iconSpan.textContent = 'check';
 
+        // update button color
         button.classList.add('success');
     });
 });
 </script>
+
 <script>
 const submitBtn = document.querySelector('.btn-gradient');
 const fileInputs = document.querySelectorAll('input[type="file"]');
@@ -324,5 +329,140 @@ fileInputs.forEach(input => {
     input.addEventListener('change', checkFileSelected);
 });
 </script>
+
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+/* SWEETALERT CUSTOM */
+.swal2-popup {
+    border-radius: 20px !important;
+    padding: 30px !important;
+}
+
+.swal2-title {
+    color: #FF983D !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+.swal2-html-container {
+    color: #555 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #FF983D !important;
+    color: #FF983D !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FF74C7, #FF983D) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-cancel {
+    background: #e5e7eb !important;
+    color: #374151 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-styled:focus {
+    box-shadow: none !important;
+}
+</style>
+
+<script>
+// SWEETALERT KONFIRMASI REVISI
+const form = document.querySelector('form.revisi-wrapper');
+
+if (form) {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Cek file yang akan diupload
+        const fileInputs = form.querySelectorAll('input[type="file"]');
+        let fileList = '';
+        let hasFile = false;
+
+        fileInputs.forEach(input => {
+            if (input.files.length > 0) {
+                hasFile = true;
+                const item = input.closest('.doc-revisi-item');
+                const label = item.querySelector('strong').textContent;
+                
+                fileList += `<div style="text-align:left; margin: 8px 0; padding: 8px; background: #f9fafb; border-radius: 8px;">
+                    <strong style="color: #FF983D;">✓ ${label}</strong><br>
+                    <small style="color: #6b7280;">${input.files[0].name}</small>
+                </div>`;
+            }
+        });
+
+        if (!hasFile) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Ada File yang Dipilih',
+                html: 'Silakan pilih file revisi terlebih dahulu sebelum mengunggah.',
+                confirmButtonText: 'Baik, Saya Mengerti',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi Upload Revisi',
+            html: `
+                <div style="text-align: left; margin-top: 15px;">
+                    <p style="color: #374151; margin-bottom: 12px; font-weight: 600;">
+                        Apakah Anda yakin ingin mengunggah ulang dokumen berikut?
+                    </p>
+                    ${fileList}
+                    <div style="margin-top: 16px; padding: 12px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px;">
+                        <small style="color: #9a3412; font-weight: 600;">
+                            ⚠️ Dokumen yang diunggah akan menggantikan file lama dan akan diverifikasi ulang oleh admin.
+                        </small>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Upload Sekarang',
+            cancelButtonText: 'Periksa Kembali',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Mengunggah Revisi...',
+                    html: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                form.submit();
+            }
+        });
+    });
+}
+</script>
+
 </body>
 </html>

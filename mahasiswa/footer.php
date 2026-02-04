@@ -8,37 +8,60 @@
 .app-footer {
     position: fixed;
     bottom: 0;
-    left: 250px; /* default: desktop (ada sidebar) */
+    left: 280px; /* sesuaikan dengan lebar sidebar */
     right: 0;
 
-    height: 40px;
-    line-height: 40px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     background: var(--gradient);
     color: #ffffff;
     font-size: 13px;
     text-align: center;
 
-    border-top: 1px solid #d1d5db;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     z-index: 999;
 }
 
-/* ===== TABLET & MOBILE ===== */
+/* ===== TABLET ===== */
 @media (max-width: 992px) {
     .app-footer {
-        left: 0;              /* sidebar biasanya collapse */
+        left: 0;
         font-size: 12px;
-        padding: 0 10px;
+        padding: 0 15px;
     }
 }
 
-/* ===== MOBILE KECIL ===== */
+/* ===== TABLET KECIL ===== */
+@media (max-width: 768px) {
+    .app-footer {
+        left: 0;
+        height: 45px;
+        font-size: 12px;
+        padding: 0 12px;
+    }
+}
+
+/* ===== MOBILE ===== */
 @media (max-width: 576px) {
     .app-footer {
+        left: 0;
         height: auto;
-        line-height: 1.4;
-        padding: 8px 12px;
+        min-height: 40px;
+        padding: 10px 15px;
         font-size: 11px;
+        line-height: 1.4;
+    }
+}
+
+/* ===== MOBILE SANGAT KECIL ===== */
+@media (max-width: 380px) {
+    .app-footer {
+        font-size: 10px;
+        padding: 8px 10px;
     }
 }
 </style>

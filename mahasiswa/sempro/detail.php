@@ -208,6 +208,7 @@ body{
 
 .st-disetujui { background: rgba(22, 163, 74, 0.1); color: #16A34A; border-color: rgba(22, 163, 74, 0.3); }
 .st-proses { background: rgba(37, 99, 235, 0.1); color: #2563EB; border-color: rgba(37, 99, 235, 0.3); }
+.st-diajukan { background: rgba(37, 99, 235, 0.1); color: #2563EB; border-color: rgba(37, 99, 235, 0.3); }
 .st-revisi { background: rgba(255, 152, 61, 0.1); color: #FF983D; border-color: rgba(255, 152, 61, 0.3); }
 .st-ditolak { background: rgba(220, 38, 38, 0.1); color: #DC2626; border-color: rgba(220, 38, 38, 0.3); }
 

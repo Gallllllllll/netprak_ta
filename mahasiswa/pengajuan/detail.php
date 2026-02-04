@@ -517,7 +517,7 @@ body{
                         break;
 
                     default:
-                        $statusText  = 'Belum Dicek';
+                        $statusText  = 'Diajukan';
                         $statusClass = 'badge-proses';
                         $cardClass   = 'doc-card';
                 }

@@ -883,71 +883,173 @@ setFileStatus("file-transkrip", "status-transkrip");
 setFileStatus("file-magang", "status-magang");
 </script>
 
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+/* SWEETALERT CUSTOM */
+.swal2-popup {
+    border-radius: 20px !important;
+    padding: 30px !important;
+}
+
+.swal2-title {
+    color: #FF983D !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+.swal2-html-container {
+    color: #555 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #FF983D !important;
+    color: #FF983D !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: #FF74C7 !important;
+    color: #FF74C7 !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FF74C7, #FF983D) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-cancel {
+    background: #e5e7eb !important;
+    color: #374151 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-styled:focus {
+    box-shadow: none !important;
+}
+</style>
+
 <script>
-document.getElementById('btn-submit-ta').addEventListener('click', function (e) {
-    e.preventDefault(); // tahan submit dulu
-
-    const requiredFiles = [
-        { id: 'file-formulir', label: 'Formulir Pendaftaran & Persetujuan Tema' },
-        { id: 'file-bayar', label: 'Bukti Pembayaran' },
-        { id: 'file-transkrip', label: 'Transkrip Nilai' },
-        { id: 'file-magang', label: 'Bukti Kelulusan Magang / PI' }
-    ];
-
-    let missing = [];
-
-    requiredFiles.forEach(f => {
-        const input = document.getElementById(f.id);
-        if (!input || input.files.length === 0) {
-            missing.push(f.label);
+// SWEETALERT KONFIRMASI PENGAJUAN TA
+const formTA = document.querySelector('form[action="simpan.php"]');
+if (formTA) {
+    formTA.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const judul = document.getElementById('judul');
+        
+        // Cek apakah judul diisi
+        if (!judul || !judul.value.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Judul Belum Diisi',
+                html: 'Silakan masukkan judul Tugas Akhir terlebih dahulu.',
+                confirmButtonText: 'Baik, Saya Mengerti',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+            return;
         }
-    });
+        
+        // Cek kelengkapan file
+        const requiredFiles = [
+            { id: 'file-formulir', label: 'Formulir Pendaftaran & Persetujuan Tema' },
+            { id: 'file-bayar', label: 'Bukti Pembayaran' },
+            { id: 'file-transkrip', label: 'Transkrip Nilai' },
+            { id: 'file-magang', label: 'Bukti Kelulusan Magang / PI' }
+        ];
 
-    if (missing.length > 0) {
+        let allFilled = true;
+        let fileList = '';
+
+        requiredFiles.forEach(f => {
+            const input = document.getElementById(f.id);
+            if (input && input.files.length > 0) {
+                fileList += `<div style="text-align:left; margin: 8px 0; padding: 8px; background: #f9fafb; border-radius: 8px;">
+                    <strong style="color: #FF983D;">✓ ${f.label}</strong><br>
+                    <small style="color: #6b7280;">${input.files[0].name}</small>
+                </div>`;
+            } else {
+                allFilled = false;
+            }
+        });
+
+        if (!allFilled) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Dokumen Belum Lengkap',
+                html: 'Pastikan semua dokumen telah diunggah sebelum melanjutkan.',
+                confirmButtonText: 'Baik, Saya Mengerti',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+            return;
+        }
+
+        // Konfirmasi final
         Swal.fire({
             icon: 'warning',
-            title: 'Dokumen Belum Lengkap',
+            title: 'Konfirmasi Pengajuan',
             html: `
-                <p style="margin-bottom:8px;">Silakan lengkapi dokumen berikut:</p>
-                <ul style="text-align:left;">
-                    ${missing.map(m => `<li>${m}</li>`).join('')}
-                </ul>
+                <div style="text-align: left; margin-top: 15px;">
+                    <p style="color: #374151; margin-bottom: 8px; font-weight: 600;">
+                        Judul Tugas Akhir:
+                    </p>
+                    <div style="background: #f9fafb; padding: 12px; border-radius: 10px; margin-bottom: 16px; font-weight: 600; color: #374151;">
+                        ${judul.value}
+                    </div>
+                    
+                    <p style="color: #374151; margin-bottom: 12px; font-weight: 600;">
+                        Dokumen yang akan dikirim:
+                    </p>
+                    ${fileList}
+                    
+                    <div style="margin-top: 16px; padding: 12px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px;">
+                        <small style="color: #9a3412; font-weight: 600;">
+                            ⚠️ Pastikan semua data dan dokumen sudah benar. Data yang sudah dikirim tidak dapat diubah!
+                        </small>
+                    </div>
+                </div>
             `,
-            confirmButtonText: 'Baik, Saya Lengkapi',
-            confirmButtonColor: '#FF983D',
-            background: '#FFF1E5'
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Kirim Sekarang',
+            cancelButtonText: 'Cek Ulang Dokumen',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Mengirim Pengajuan...',
+                    html: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                form.submit();
+            }
         });
-        return;
-    }
-
-    // Konfirmasi final
-    Swal.fire({
-        icon: 'question',
-        title: 'Konfirmasi Pengajuan Tugas Akhir',
-        html: `
-            <p style="margin-bottom:10px;">
-                Apakah Anda <b>yakin</b> seluruh data dan dokumen yang diunggah sudah benar?
-            </p>
-            <small style="color:#6b7280;">
-                Kesalahan dokumen dapat menyebabkan pengajuan ditolak dan tidak dapat diubah.
-            </small>
-        `,
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Kirim Pengajuan',
-        cancelButtonText: 'Periksa Kembali',
-        confirmButtonColor: '#FF74C7',
-        cancelButtonColor: '#e5e7eb',
-        background: '#FFF1E5',
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // submit form manual
-            e.target.closest('form').submit();
-        }
     });
-});
+}
 </script>
-
 </body>
 </html>

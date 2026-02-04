@@ -466,6 +466,7 @@ document.querySelectorAll('input[type="file"]').forEach(input => {
     });
 });
 </script>
+
 <script>
 const submitBtn = document.querySelector('.btn-gradient');
 const fileInputs = document.querySelectorAll('input[type="file"]');
@@ -491,33 +492,139 @@ fileInputs.forEach(input => {
 });
 </script>
 
+<!-- SweetAlert2 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+/* SWEETALERT CUSTOM */
+.swal2-popup {
+    border-radius: 20px !important;
+    padding: 30px !important;
+}
+
+.swal2-title {
+    color: #FF983D !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+.swal2-html-container {
+    color: #555 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #FF983D !important;
+    color: #FF983D !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FF74C7, #FF983D) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-cancel {
+    background: #e5e7eb !important;
+    color: #374151 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-styled:focus {
+    box-shadow: none !important;
+}
+</style>
+
 <script>
+// SWEETALERT KONFIRMASI REVISI
 const form = document.querySelector('form.revisi-wrapper');
 
-form.addEventListener('submit', function (e) {
-    e.preventDefault(); // tahan submit dulu
+if (form) {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
 
-    Swal.fire({
-        title: 'Apakah Anda sudah yakin?',
-        text: 'Dokumen yang diunggah akan dikirim untuk diverifikasi ulang.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Upload Sekarang',
-        cancelButtonText: 'Batal',
-        reverseButtons: true,
-        confirmButtonColor: '#FF8C42',
-        cancelButtonColor: '#9CA3AF',
-        background: '#FFF7F1',
-        color: '#7C2D12'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            form.submit(); // submit asli → PHP tetap jalan
+        // Cek file yang akan diupload
+        const fileInputs = form.querySelectorAll('input[type="file"]');
+        let fileList = '';
+        let hasFile = false;
+
+        fileInputs.forEach(input => {
+            if (input.files.length > 0) {
+                hasFile = true;
+                const item = input.closest('.doc-revisi-item');
+                const label = item.querySelector('strong').textContent;
+                
+                fileList += `<div style="text-align:left; margin: 8px 0; padding: 8px; background: #f9fafb; border-radius: 8px;">
+                    <strong style="color: #FF983D;">✓ ${label}</strong><br>
+                    <small style="color: #6b7280;">${input.files[0].name}</small>
+                </div>`;
+            }
+        });
+
+        if (!hasFile) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Belum Ada File yang Dipilih',
+                html: 'Silakan pilih file revisi terlebih dahulu sebelum mengunggah.',
+                confirmButtonText: 'Baik, Saya Mengerti',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+            return;
         }
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi Upload Revisi',
+            html: `
+                <div style="text-align: left; margin-top: 15px;">
+                    <p style="color: #374151; margin-bottom: 12px; font-weight: 600;">
+                        Apakah Anda yakin ingin mengunggah ulang dokumen berikut?
+                    </p>
+                    ${fileList}
+                    <div style="margin-top: 16px; padding: 12px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px;">
+                        <small style="color: #9a3412; font-weight: 600;">
+                            ⚠️ Dokumen yang diunggah akan menggantikan file lama dan akan diverifikasi ulang oleh admin.
+                        </small>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Upload Sekarang',
+            cancelButtonText: 'Periksa Kembali',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Mengunggah Revisi...',
+                    html: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                form.submit();
+            }
+        });
     });
-});
+}
 </script>
 
 </body>
-
 </html>

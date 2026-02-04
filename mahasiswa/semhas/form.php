@@ -2,7 +2,6 @@
 session_start();
 require "../../config/connection.php";
 require_once '../../config/base_url.php';
-
 /* ===============================
    CEK LOGIN MAHASISWA
 ================================ */
@@ -123,6 +122,8 @@ function find_template_by_keywords($templates, $keywords){
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
+<!-- SweetAlert2 CSS & JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 <title>Pengajuan Seminar Hasil</title>
 
 <style>
@@ -691,6 +692,51 @@ small{
     gap: 6px;
     align-items: center;
 }
+
+.swal2-popup {
+    border-radius: 20px !important;
+    padding: 30px !important;
+}
+
+.swal2-title {
+    color: #FF983D !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+}
+
+.swal2-html-container {
+    color: #555 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #FF983D !important;
+    color: #FF983D !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #FF74C7, #FF983D) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-cancel {
+    background: #e5e7eb !important;
+    color: #374151 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+}
+
+.swal2-styled:focus {
+    box-shadow: none !important;
+}
 </style>
 </head>
 
@@ -938,3 +984,228 @@ setFileStatus('file-pendaftaran', 'status-pendaftaran');
 setFileStatus('file-konsultasi', 'status-konsultasi');
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function setFileStatus(inputId, statusId) {
+    const input = document.getElementById(inputId);
+    const status = document.getElementById(statusId);
+
+    if (!input || !status) return;
+
+    input.addEventListener("change", function () {
+        const wrapper = input.closest(".ta-upload-box");
+
+        if (this.files && this.files.length > 0) {
+            const fileName = this.files[0].name;
+
+            status.textContent = "File dipilih: " + fileName;
+            status.classList.add("uploaded");
+
+            if(wrapper) wrapper.classList.add("is-uploaded");
+        } else {
+            status.textContent = "Tidak ada file yang dipilih";
+            status.classList.remove("uploaded");
+
+            if(wrapper) wrapper.classList.remove("is-uploaded");
+        }
+    });
+}
+
+// Init file status for all uploads
+setFileStatus('file-berita-acara', 'status-berita-acara');
+setFileStatus('file-persetujuan', 'status-persetujuan');
+setFileStatus('file-pendaftaran', 'status-pendaftaran');
+setFileStatus('file-konsultasi', 'status-konsultasi');
+
+// SWEETALERT KONFIRMASI SEBELUM SUBMIT
+document.querySelector('form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const fileInputs = form.querySelectorAll('input[type="file"]');
+    let allFilled = true;
+    let fileList = '';
+    
+    fileInputs.forEach((input, index) => {
+        const label = input.closest('.ta-field').querySelector('.ta-label').textContent.trim().split('Contoh')[0].trim();
+        
+        if (input.files.length > 0) {
+            fileList += `<div style="text-align:left; margin: 8px 0; padding: 8px; background: #f9fafb; border-radius: 8px;">
+                <strong style="color: #FF983D;">✓ ${label}</strong><br>
+                <small style="color: #6b7280;">${input.files[0].name}</small>
+            </div>`;
+        } else {
+            allFilled = false;
+        }
+    });
+    
+    if (!allFilled) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Dokumen Belum Lengkap',
+            html: 'Pastikan semua dokumen telah diunggah sebelum melanjutkan.',
+            confirmButtonText: 'Baik, Saya Mengerti',
+            customClass: {
+                confirmButton: 'swal2-confirm'
+            }
+        });
+        return;
+    }
+    
+    Swal.fire({
+        icon: 'warning',
+        title: 'Konfirmasi Pengajuan',
+        html: `
+            <div style="text-align: left; margin-top: 15px;">
+                <p style="color: #374151; margin-bottom: 12px; font-weight: 600;">
+                    Apakah Anda yakin ingin mengajukan Seminar Hasil dengan dokumen berikut?
+                </p>
+                ${fileList}
+                <div style="margin-top: 16px; padding: 12px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px;">
+                    <small style="color: #9a3412; font-weight: 600;">
+                        ⚠️ Pastikan semua dokumen sudah benar. Data yang sudah dikirim tidak dapat diubah!
+                    </small>
+                </div>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Kirim Sekarang',
+        cancelButtonText: 'Cek Ulang Dokumen',
+        customClass: {
+            confirmButton: 'swal2-confirm',
+            cancelButton: 'swal2-cancel'
+        },
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Mengirim Pengajuan...',
+                html: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            form.submit();
+        }
+    });
+});
+</script>
+
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function setFileStatus(inputId, statusId) {
+    const input = document.getElementById(inputId);
+    const status = document.getElementById(statusId);
+
+    if (!input || !status) return;
+
+    input.addEventListener("change", function () {
+        const wrapper = input.closest(".ta-upload-box");
+
+        if (this.files && this.files.length > 0) {
+            const fileName = this.files[0].name;
+
+            status.textContent = "File dipilih: " + fileName;
+            status.classList.add("uploaded");
+
+            if(wrapper) wrapper.classList.add("is-uploaded");
+        } else {
+            status.textContent = "Tidak ada file yang dipilih";
+            status.classList.remove("uploaded");
+
+            if(wrapper) wrapper.classList.remove("is-uploaded");
+        }
+    });
+}
+
+// Init file status for all uploads
+setFileStatus('file-berita-acara', 'status-berita-acara');
+setFileStatus('file-persetujuan', 'status-persetujuan');
+setFileStatus('file-pendaftaran', 'status-pendaftaran');
+setFileStatus('file-konsultasi', 'status-konsultasi');
+
+// SWEETALERT KONFIRMASI SEBELUM SUBMIT
+const formSemhas = document.querySelector('form');
+if (formSemhas) {
+    formSemhas.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = this;
+        const fileInputs = form.querySelectorAll('input[type="file"]');
+        let allFilled = true;
+        let fileList = '';
+        
+        fileInputs.forEach((input) => {
+            const label = input.closest('.ta-field').querySelector('.ta-label').textContent.trim().split('Contoh')[0].trim();
+            
+            if (input.files.length > 0) {
+                fileList += `<div style="text-align:left; margin: 8px 0; padding: 8px; background: #f9fafb; border-radius: 8px;">
+                    <strong style="color: #FF983D;">✓ ${label}</strong><br>
+                    <small style="color: #6b7280;">${input.files[0].name}</small>
+                </div>`;
+            } else {
+                allFilled = false;
+            }
+        });
+        
+        if (!allFilled) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Dokumen Belum Lengkap',
+                html: 'Pastikan semua dokumen telah diunggah sebelum melanjutkan.',
+                confirmButtonText: 'Baik, Saya Mengerti',
+                customClass: {
+                    confirmButton: 'swal2-confirm'
+                }
+            });
+            return;
+        }
+        
+        Swal.fire({
+            icon: 'warning',
+            title: 'Konfirmasi Pengajuan',
+            html: `
+                <div style="text-align: left; margin-top: 15px;">
+                    <p style="color: #374151; margin-bottom: 12px; font-weight: 600;">
+                        Apakah Anda yakin ingin mengajukan Seminar Hasil dengan dokumen berikut?
+                    </p>
+                    ${fileList}
+                    <div style="margin-top: 16px; padding: 12px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 10px;">
+                        <small style="color: #9a3412; font-weight: 600;">
+                            ⚠️ Pastikan semua dokumen sudah benar. Data yang sudah dikirim tidak dapat diubah!
+                        </small>
+                    </div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Kirim Sekarang',
+            cancelButtonText: 'Cek Ulang Dokumen',
+            customClass: {
+                confirmButton: 'swal2-confirm',
+                cancelButton: 'swal2-cancel'
+            },
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Mengirim Pengajuan...',
+                    html: 'Mohon tunggu sebentar',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                form.submit();
+            }
+        });
+    });
+}
+</script>
