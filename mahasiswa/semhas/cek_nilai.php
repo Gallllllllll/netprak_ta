@@ -305,6 +305,75 @@ body{
     gap:10px;
     align-items:center;
 }
+/* =====================
+   MOBILE RESPONSIVE
+===================== */
+@media (max-width: 600px) {
+
+    /* TAB */
+    .tabs{
+        flex-direction:column;
+    }
+
+    .tab{
+        justify-content:center;
+        padding:12px;
+        font-size:14px;
+    }
+
+    /* DOSEN ROW */
+    .dosen-row{
+        grid-template-columns:1fr;
+        text-align:left;
+    }
+
+    .dosen-score{
+        font-size:26px;
+        margin-top:6px;
+    }
+
+    /* SUMMARY TOP */
+    .summary-top{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .avg-value{
+        font-size:34px;
+    }
+
+    .summary-icon span{
+        font-size:44px;
+    }
+
+    .summary-grid{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .summary-box{
+        padding:14px;
+    }
+
+    .summary-box .big{
+        font-size:22px; /* perkecil teks STATUS */
+        word-break:break-word;
+        white-space:normal;
+    }
+
+    .summary-box small{
+        font-size:10px;
+    }
+
+    /* NOTE */
+    .note{
+        font-size:12px;
+        flex-direction:column;
+        align-items:flex-start;
+        gap:6px;
+    }
+}
 </style>
 </head>
 

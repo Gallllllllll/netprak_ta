@@ -543,10 +543,6 @@ form{
         padding: 24px 20px;
     }
 
-    .topbar h1{
-        font-size:22px;
-    }
-
     .ta-form-head{
         flex-direction: column;
         align-items: flex-start;
@@ -571,21 +567,6 @@ form{
         margin-left: 60px;
         padding: 20px 16px;
     }
-
-    .topbar{
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .topbar h1{
-        font-size:24px;
-    }
-
-    /* HIDE welcome text and person icon on small screens */
-    .mhs-text{ display:none; }
-    .mhs-info{ align-items:center; gap:12px }
-    .mhs-info .avatar{ display:none; }
 
     .ta-form-head{
         align-items:flex-start;
@@ -627,9 +608,6 @@ form{
 
 /* EXTRA SMALL */
 @media (max-width: 480px) {
-    .topbar h1{ font-size:18px }
-    .mhs-text span{ font-size:12px }
-    .mhs-text b{ font-size:13px }
     .ta-upload-icon { width:36px; height:36px }
     .ta-upload-icon span{ font-size:18px }
     .ta-input{ padding:10px; font-size:13px }
