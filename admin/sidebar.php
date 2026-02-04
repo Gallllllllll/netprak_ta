@@ -87,7 +87,7 @@ body {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1100;
+    z-index: 1002;
     width: 28px;
     height: 56px;
     background: var(--gradient);
@@ -763,12 +763,20 @@ body {
     }
 }
 
+/* ==============================
+   SWEETALERT2 CUSTOM STYLES
+============================== */
 /* Custom SweetAlert2 Styles - Theme Matched */
 .swal2-popup {
     font-family: 'Inter', sans-serif !important;
     border-radius: 16px !important;
     padding: 32px !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    z-index: 10001 !important;
+}
+
+.swal2-container {
+    z-index: 10000 !important;
 }
 
 .swal2-title {
