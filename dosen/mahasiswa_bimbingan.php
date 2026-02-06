@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/config/base_url.php';
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dosen') {
     header("Location: " . base_url('login.php'));
@@ -19,10 +19,17 @@ $nama_dosen = $dosen['nama'] ?? 'Dosen';
 $where = [];
 $params = [$dosen_id];
 
-// filter status
+// filter status - DIPERBAIKI
 if (!empty($_GET['status'])) {
-    $where[] = "d.status_persetujuan = ?";
-    $params[] = $_GET['status'];
+    if ($_GET['status'] === 'disetujui_sempro') {
+        $where[] = "d.status_persetujuan = 'disetujui'";
+    } elseif ($_GET['status'] === 'menunggu_sempro') {
+        $where[] = "d.status_persetujuan = 'menunggu'";
+    } elseif ($_GET['status'] === 'disetujui_semhas') {
+        $where[] = "d.status_persetujuan_semhas = 'disetujui'";
+    } elseif ($_GET['status'] === 'menunggu_semhas') {
+        $where[] = "(d.status_persetujuan_semhas = 'menunggu' OR d.status_persetujuan_semhas IS NULL)";
+    }
 }
 
 // filter jenis sidang
@@ -520,7 +527,7 @@ tbody tr:last-child td {
 <div class="controls">
     <div class="search-wrapper">
         <span class="material-symbols-rounded">search</span>
-        <input type="text" id="searchInput" placeholder="Search">
+        <input type="text" id="searchInput" placeholder="Cari nama atau judul...">
     </div>
     <div class="entries-select">
         <span>Show</span>
@@ -538,15 +545,17 @@ tbody tr:last-child td {
 <div class="filter-bar">
     <select id="filterStatus">
         <option value="">Semua Status</option>
-        <option value="disetujui">Disetujui</option>
-        <option value="menunggu">Menunggu</option>
+        <option value="disetujui">Disetujui (SEMPRO)</option>
+        <option value="menunggu">Menunggu (SEMPRO)</option>
+        <option value="disetujui_semhas">Disetujui (SEMHAS)</option>
+        <option value="menunggu_semhas">Menunggu (SEMHAS)</option>
     </select>
 
     <select id="filterJenis">
-        <option value="">Semua Jenis</option>
-        <option value="sempro">Sempro</option>
-        <option value="semhas">Semhas</option>
-        <option value="belum">Belum Sidang</option>
+        <option value="">Semua Jenis Sidang</option>
+        <option value="sudah_sempro">Sudah SEMPRO</option>
+        <option value="sudah_semhas">Sudah SEMHAS</option>
+        <option value="belum_sidang">Belum Sidang</option>
     </select>
 </div>
 
@@ -569,7 +578,12 @@ tbody tr:last-child td {
             </thead>
             <tbody>
                 <?php $no = 1; foreach($data as $row): ?>
-                <tr>
+                <tr 
+                    data-status-sempro="<?= htmlspecialchars($row['status_persetujuan']) ?>"
+                    data-status-semhas="<?= htmlspecialchars($row['status_persetujuan_semhas'] ?? 'menunggu') ?>"
+                    data-tanggal-sempro="<?= $row['tanggal_sempro'] ? 'ada' : 'belum' ?>"
+                    data-tanggal-semhas="<?= $row['tanggal_sidang'] ? 'ada' : 'belum' ?>"
+                >
                     <td><?= $no++ ?></td>
                     <td><strong><?= htmlspecialchars($row['nama_mahasiswa']) ?></strong></td>
                     <td><?= htmlspecialchars($row['judul_ta']) ?></td>
@@ -802,29 +816,56 @@ searchInput.addEventListener("keyup", () => {
     applyFilters();
 });
 
-// FILTERS
+// FILTERS - DIPERBAIKI
 function applyFilters() {
-    const searchVal = searchInput.value.toLowerCase();
-    const statusVal = filterStatus.value.toLowerCase();
+    const searchVal = searchInput.value.toLowerCase().trim();
+    const statusVal = filterStatus.value;
     const jenisVal = filterJenis.value;
 
     filteredRows = allRows.filter(row => {
+        // Ambil data dari row
         const nama = row.children[1].innerText.toLowerCase();
         const judul = row.children[2].innerText.toLowerCase();
-        const status = row.children[4].innerText.toLowerCase();
-        const sempro = row.children[5].innerText.toLowerCase();
-        const semhas = row.children[7].innerText.toLowerCase();
+        
+        // Ambil dari data attributes
+        const statusSempro = row.dataset.statusSempro;
+        const statusSemhas = row.dataset.statusSemhas;
+        const tanggalSempro = row.dataset.tanggalSempro;
+        const tanggalSemhas = row.dataset.tanggalSemhas;
 
-        // Search filter
-        if (searchVal && !nama.includes(searchVal) && !judul.includes(searchVal)) return false;
+        // 1. Search filter (nama atau judul)
+        if (searchVal && !nama.includes(searchVal) && !judul.includes(searchVal)) {
+            return false;
+        }
 
-        // Status filter
-        if (statusVal && !status.includes(statusVal)) return false;
+        // 2. Status filter
+        if (statusVal) {
+            if (statusVal === 'disetujui' && statusSempro !== 'disetujui') {
+                return false;
+            }
+            if (statusVal === 'menunggu' && statusSempro !== 'menunggu') {
+                return false;
+            }
+            if (statusVal === 'disetujui_semhas' && statusSemhas !== 'disetujui') {
+                return false;
+            }
+            if (statusVal === 'menunggu_semhas' && statusSemhas === 'disetujui') {
+                return false;
+            }
+        }
 
-        // Jenis filter
-        if (jenisVal === "sempro" && sempro.includes("belum")) return false;
-        if (jenisVal === "semhas" && semhas.includes("belum")) return false;
-        if (jenisVal === "belum" && (!sempro.includes("belum") || !semhas.includes("belum"))) return false;
+        // 3. Jenis sidang filter
+        if (jenisVal) {
+            if (jenisVal === 'sudah_sempro' && tanggalSempro === 'belum') {
+                return false;
+            }
+            if (jenisVal === 'sudah_semhas' && tanggalSemhas === 'belum') {
+                return false;
+            }
+            if (jenisVal === 'belum_sidang' && (tanggalSempro === 'ada' || tanggalSemhas === 'ada')) {
+                return false;
+            }
+        }
 
         return true;
     });
