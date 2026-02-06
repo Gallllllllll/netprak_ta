@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/config/base_url.php';
 
 // cek role mahasiswa
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'mahasiswa') {
@@ -261,7 +261,7 @@ body {
 <body>
 
 <!-- SIDEBAR -->
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/mahasiswa/sidebar.php'; ?>
 
 <!-- CONTENT -->
 <div class="main-content">

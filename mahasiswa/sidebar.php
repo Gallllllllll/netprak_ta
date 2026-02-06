@@ -1,10 +1,8 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
-require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/connection.php';
-
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/config/connection.php';
 $currentUri = $_SERVER['REQUEST_URI'];
 $currentPage = basename($_SERVER['PHP_SELF']);
-require_once $_SERVER['DOCUMENT_ROOT'] . '/coba/config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/config/base_url.php';
 
 // Fungsi menu aktif
 function isActive(...$paths)
@@ -1140,5 +1138,5 @@ function confirmLogout(event) {
 </script>
 
 <div>
-    <?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/footer.php'; ?>
+    <?php include $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/mahasiswa/footer.php'; ?>
 </div>

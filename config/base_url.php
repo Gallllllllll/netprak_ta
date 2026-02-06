@@ -4,7 +4,7 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
     : 'http';
 
 $host = $_SERVER['HTTP_HOST'];
-$project_folder = 'coba';
+$project_folder = 'ta_netprak';
 
 define('BASE_URL', $protocol . '://' . $host . '/' . $project_folder);
 

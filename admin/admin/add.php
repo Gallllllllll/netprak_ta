@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Tambah Admin</title>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 body {
     font-family: 'Inter', sans-serif;
@@ -213,8 +213,16 @@ input:focus {
     <div class="form-card">
 
         <?php if ($error): ?>
-            <div class="error"><?= htmlspecialchars($error); ?></div>
+            <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '<?= $error ?>',
+                confirmButtonColor: '#FF983D'
+            });
+            </script>
         <?php endif; ?>
+
 
         <form method="POST">
 

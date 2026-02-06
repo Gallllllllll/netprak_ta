@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/ta_netprak/config/base_url.php';
 
 /* CEK LOGIN */
 if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
@@ -21,14 +21,22 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     if($nama && $nip && $username && $password_raw) {
         $password = password_hash($password_raw, PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("
-            INSERT INTO dosen (nama, nip, email, username, password)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$nama, $nip, $email, $username, $password]);
+        try{
+            $stmt = $pdo->prepare("
+                INSERT INTO dosen (nama, nip, email, username, password)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([$nama, $nip, $email, $username, $password]);
 
-        header("Location: index.php");
-        exit;
+            header("Location: index.php");
+            exit;
+        } catch (PDOException $e){
+            if ($e->errorInfo[1] == 1062){
+                $error = "NIP atau Username sudah terdaftar!";
+            } else {
+                $error = "Terjadi kesalahan database!";
+            }
+        }
     } else {
         $error = "Nama, NIP, Username, dan Password wajib diisi!";
     }
@@ -41,7 +49,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="<?= base_url('assets/img/Logo.webp') ?>">
 <title>Tambah Dosen</title>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 body {
     font-family: 'Inter', sans-serif;
@@ -205,8 +213,16 @@ input:focus {
     <div class="form-card">
 
         <?php if($error): ?>
-            <div class="error"><?= htmlspecialchars($error); ?></div>
+            <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '<?= $error ?>',
+                confirmButtonColor: '#FF983D'
+            });
+            </script>
         <?php endif; ?>
+
 
         <form method="POST">
 

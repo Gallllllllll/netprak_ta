@@ -427,7 +427,7 @@ body{
 <body>
 
 <!-- SIDEBAR -->
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/coba/mahasiswa/sidebar.php'; ?>
+<?php include $_SERVER['DOCUMENT_ROOT'] . '/ta_netprak/mahasiswa/sidebar.php'; ?>
 
 <!-- CONTENT -->
 <div class="main-content">

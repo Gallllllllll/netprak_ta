@@ -1,7 +1,7 @@
 <?php
 session_start();
 require "../../config/connection.php";
-require_once $_SERVER['DOCUMENT_ROOT'].'/coba/config/base_url.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/ta_netprak/config/base_url.php';
 
 if(!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: ../../login.php");
@@ -25,19 +25,31 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     if($nama && $nim && $username && $password_raw) {
         $password = password_hash($password_raw, PASSWORD_DEFAULT);
 
-        $stmt = $pdo->prepare("
-            INSERT INTO mahasiswa 
-            (nama, nim, email, prodi, kelas, nomor_telepon, username, password)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            $nama, $nim, $email, $prodi,
-            $kelas, $nomor_telepon,
-            $username, $password
-        ]);
+    try {
+            $stmt = $pdo->prepare("
+                INSERT INTO mahasiswa 
+                (nama, nim, email, prodi, kelas, nomor_telepon, username, password)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ");
 
-        header("Location: index.php");
-        exit;
+            $stmt->execute([
+                $nama, $nim, $email, $prodi,
+                $kelas, $nomor_telepon,
+                $username, $password
+            ]);
+
+            header("Location: index.php");
+            exit;
+
+        } catch (PDOException $e) {
+
+            // kode 1062 = duplicate entry
+            if ($e->errorInfo[1] == 1062) {
+                $error = "NIM atau Username sudah terdaftar!";
+            } else {
+                $error = "Terjadi kesalahan database!";
+            }
+        }
     } else {
         $error = "Nama, NIM, Username, dan Password wajib diisi!";
     }
@@ -50,7 +62,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" sizes="32x32" href="<?= base_url('assets/img/Logo.webp')?>">
 <title>Tambah Mahasiswa</title>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
 body {
     font-family: 'Inter', sans-serif;
@@ -196,8 +208,16 @@ input:focus, select:focus {
     <div class="form-card">
 
         <?php if($error): ?>
-            <div class="error"><?= htmlspecialchars($error); ?></div>
+            <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: '<?= $error ?>',
+                confirmButtonColor: '#FF983D'
+            });
+            </script>
         <?php endif; ?>
+
 
         <form method="POST">
 
